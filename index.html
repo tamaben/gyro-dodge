@@ -2467,6 +2467,13 @@ const EMBEDDED_VOICES = {
       }
     };
 
+    // 動的に生成するボタンの onclick からも各機能へアクセスできるようにする。
+    // const は自動では window に公開されないため、明示的に別名を設定する。
+    Object.assign(window, {
+      app, voiceStudio, accountMgr, onlineNet, hostNet, ctrlNet, gyro, game3d,
+      audio, netStatus, adManager
+    });
+
     function bindAllButtons() {
       const on = (id, fn) => {
         const el = document.getElementById(id);
@@ -2480,12 +2487,9 @@ const EMBEDDED_VOICES = {
           lastFire = now;
           fn(e);
         };
+        // iOS Safariではtouchendとclickを併用すると二重発火や
+        // preventDefaultによるクリック抑止が起きるため、clickに統一する。
         el.addEventListener('click', invoke);
-        el.addEventListener('touchend', (e) => {
-          if (el.disabled) return;
-          e.preventDefault();
-          invoke(e);
-        }, { passive: false });
       };
       on('btnBackHome', () => app.goHome());
       on('btnOpenVoice', () => app.openVoiceStudio());
@@ -2578,7 +2582,7 @@ const EMBEDDED_VOICES = {
     function bootApp() {
       if (window.__tenkyuuBooted) return;
       window.__tenkyuuBooted = true;
-      const run = fn => { try { fn(); } catch (e) {} };
+      const run = fn => { try { fn(); } catch (e) { console.error('アプリ初期化エラー:', e); } };
       run(() => bindAllButtons());
       run(() => netStatus.init());
       run(() => adManager.init());
