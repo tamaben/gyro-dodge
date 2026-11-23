@@ -1,4 +1,4 @@
-const CACHE_NAME = "gyro-dodge-3d-pwa-v11";
+const CACHE_NAME = "gyro-dodge-3d-pwa-v13";
 const CORE_ASSETS = [
   "./",
   "./index.html",

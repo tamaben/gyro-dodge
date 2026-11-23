@@ -203,7 +203,7 @@
         GYRO DODGE 3D
       </h1>
       <p class="text-ink-600 font-medium text-xs sm:text-sm mb-4">
-        全4種の3Dステージ＆オンライン対戦・最大10人マルチ対応<br class="hidden sm:inline">あなたの声7ボイス内蔵・ジャイロ＆バーチャルスティック両対応
+        全8種の3Dマップ × 4段階の難易度！今までと同じ快適操作で攻略しよう<br class="hidden sm:inline">オンライン対戦・最大10人マルチ・全7ボイス内蔵
       </p>
 
       <!-- 最高記録ダッシュボード（BEST SCORE / DISTANCE / COMBO / NEAR MISS） -->
@@ -232,13 +232,31 @@
         </div>
       </div>
 
-      <!-- 3Dマップ（ステージ）選択カード -->
+      <!-- ゲームモード選択カード（5モード・オフライン完全対応） -->
+      <div class="w-full bg-cream-200 rounded-3xl p-4 mb-3.5 text-left">
+        <div class="flex items-center justify-between mb-2 px-1">
+          <span class="text-xs font-extrabold text-ink-800">ゲームモード選択（1人・オフラインOK）</span>
+          <span id="homeSelectedSoloModeBadge" class="text-[11px] font-extrabold text-brand-600">サバイバル</span>
+        </div>
+        <div id="homeSoloModeGrid" class="grid grid-cols-2 sm:grid-cols-5 gap-1.5"></div>
+      </div>
+
+      <!-- 難易度選択カード（4段階） -->
+      <div class="w-full bg-cream-200 rounded-3xl p-4 mb-3.5 text-left">
+        <div class="flex items-center justify-between mb-2 px-1">
+          <span class="text-xs font-extrabold text-ink-800">難易度（DIFFICULTY）選択</span>
+          <span id="homeSelectedDiffBadge" class="text-[11px] font-extrabold text-brand-600">NORMAL · 目標500m · x1.0</span>
+        </div>
+        <div id="homeDiffGrid" class="grid grid-cols-4 gap-1.5"></div>
+      </div>
+
+      <!-- 3Dマップ（ステージ）選択カード（全8ステージ） -->
       <div class="w-full bg-cream-200 rounded-3xl p-4 mb-4 text-left">
         <div class="flex items-center justify-between mb-2.5 px-1">
-          <span class="text-xs font-extrabold text-ink-800">3Dステージ（マップ）選択</span>
+          <span class="text-xs font-extrabold text-ink-800">3Dステージ（全8マップ）</span>
           <span id="homeSelectedMapBadge" class="text-[11px] font-extrabold text-brand-600">サンセット・キャニオン</span>
         </div>
-        <div id="homeMapGrid" class="grid grid-cols-2 gap-2"></div>
+        <div id="homeMapGrid" class="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-0.5"></div>
       </div>
 
       <!-- モード選択ボタン群 -->
@@ -253,8 +271,8 @@
           </div>
           <div class="flex-1">
             <div class="text-lg sm:text-xl font-extrabold">1人でプレイ（3Dソロ）</div>
-            <div class="text-xs text-cream-200 font-medium mt-0.5">
-              選択したマップでニアミスコンボ＆500mクリアに挑戦
+            <div id="homeSoloBtnDesc" class="text-xs text-cream-200 font-medium mt-0.5">
+              サンセット・キャニオン / NORMAL（目標500m）に挑戦
             </div>
           </div>
           <svg class="w-6 h-6 text-cream-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -546,14 +564,24 @@
           </button>
         </div>
 
-        <!-- ステージ表示＆変更（ホストのみ変更可） -->
-        <div class="bg-cream-100 rounded-2xl p-3.5 flex items-center justify-between">
-          <div class="text-xs font-extrabold text-ink-800">
-            ステージ: <span id="onlineMapName" class="text-brand-600">サンセット・キャニオン</span>
+        <!-- ステージ＆難易度表示（ホストのみ変更可） -->
+        <div class="bg-cream-100 rounded-2xl p-3.5 flex flex-col gap-2">
+          <div class="flex items-center justify-between gap-2">
+            <div class="text-xs font-extrabold text-ink-800 truncate">
+              マップ: <span id="onlineMapName" class="text-brand-600">サンセット・キャニオン</span>
+            </div>
+            <button id="btnOnlineCycleMap" onclick="onlineNet.cycleHostMap()" class="shrink-0 px-3 py-1.5 rounded-xl bg-cream-200 hover:bg-cream-300 text-ink-800 font-extrabold text-xs">
+              マップ変更
+            </button>
           </div>
-          <button id="btnOnlineCycleMap" onclick="onlineNet.cycleHostMap()" class="px-3 py-1.5 rounded-xl bg-cream-200 hover:bg-cream-300 text-ink-800 font-extrabold text-xs">
-            マップ変更
-          </button>
+          <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-cream-200">
+            <div class="text-xs font-extrabold text-ink-800">
+              難易度: <span id="onlineDiffName" class="text-brand-600">NORMAL</span>
+            </div>
+            <button id="btnOnlineCycleDiff" onclick="onlineNet.cycleHostDiff()" class="shrink-0 px-3 py-1.5 rounded-xl bg-cream-200 hover:bg-cream-300 text-ink-800 font-extrabold text-xs">
+              難易度変更
+            </button>
+          </div>
         </div>
 
         <!-- 参加者リスト -->
@@ -586,21 +614,29 @@
           <h2 class="text-2xl sm:text-3xl font-extrabold text-ink-800">マルチプレイ・ロビー</h2>
         </div>
 
-        <div class="bg-cream-100 p-1.5 rounded-2xl grid grid-cols-2 gap-1.5 w-full md:w-auto">
-          <button id="btnRuleCoop" onclick="hostNet.setRuleMode('COOP')" class="px-4 py-2.5 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs sm:text-sm transition">
+        <div class="bg-cream-100 p-1.5 rounded-2xl grid grid-cols-3 gap-1.5 w-full md:w-auto">
+          <button id="btnRuleCoop" onclick="hostNet.setRuleMode('COOP')" class="px-3 py-2.5 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs sm:text-sm transition">
             協力モード
           </button>
-          <button id="btnRuleBattle" onclick="hostNet.setRuleMode('BATTLE')" class="px-4 py-2.5 rounded-xl bg-transparent text-ink-600 hover:bg-cream-200 font-extrabold text-xs sm:text-sm transition">
+          <button id="btnRuleBattle" onclick="hostNet.setRuleMode('BATTLE')" class="px-3 py-2.5 rounded-xl bg-transparent text-ink-600 hover:bg-cream-200 font-extrabold text-xs sm:text-sm transition">
             お邪魔バトル
+          </button>
+          <button id="btnRuleRing" onclick="hostNet.setRuleMode('RING_BATTLE')" class="px-3 py-2.5 rounded-xl bg-transparent text-ink-600 hover:bg-cream-200 font-extrabold text-xs sm:text-sm transition">
+            リング争奪(60s)
           </button>
         </div>
       </div>
 
       <div id="lobbyRuleDesc" class="mt-3.5 bg-cream-100 rounded-2xl px-4 py-3 text-xs sm:text-sm font-bold text-ink-600 flex items-center justify-between gap-3">
         <span id="lobbyRuleText">【協力サバイバル】全員でチームエネルギーを共有！青い「RESCUE」ゲートを通過すると脱落した仲間を復活させられます。</span>
-        <button onclick="app.cycleMap()" class="shrink-0 px-3 py-1.5 rounded-xl bg-cream-200 text-ink-800 font-extrabold text-xs">
-          マップ: <span id="lobbyMapLabel" class="text-brand-600">サンセット</span>
-        </button>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button onclick="app.cycleDifficulty()" class="px-2.5 py-1.5 rounded-xl bg-cream-200 text-ink-800 font-extrabold text-xs">
+            難易度: <span id="lobbyDiffLabel" class="text-brand-600">NORMAL</span>
+          </button>
+          <button onclick="app.cycleMap()" class="px-2.5 py-1.5 rounded-xl bg-cream-200 text-ink-800 font-extrabold text-xs">
+            マップ: <span id="lobbyMapLabel" class="text-brand-600">サンセット</span>
+          </button>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-4">
@@ -781,11 +817,20 @@
           <div class="bg-cream-200/95 rounded-2xl px-4 py-2 flex items-center justify-between gap-2">
             <div>
               <span class="text-[10px] sm:text-xs font-extrabold text-ink-600 tracking-wider">DISTANCE</span>
-              <span class="block sm:inline sm:ml-2 text-[10px] font-extrabold text-ink-400">BEST: <span id="hudBestDist">0</span>m</span>
+              <span class="block sm:inline sm:ml-1.5 text-[10px] font-extrabold text-ink-400">
+                <span id="hudDiffTag" class="text-brand-600">NORMAL</span> / 目標 <span id="hudGoalDist">500</span>m · BEST <span id="hudBestDist">0</span>m
+              </span>
             </div>
             <span class="text-lg sm:text-2xl font-extrabold text-brand-600 leading-none">
               <span id="hudDistance">0</span><span class="text-xs ml-0.5">m</span>
             </span>
+          </div>
+          <div id="hudModeTimerBar" class="hidden bg-ink-800/95 text-cream-100 rounded-xl px-3.5 py-1.5 flex items-center justify-between text-xs font-extrabold">
+            <span id="hudModeTimerLabel">TIME ATTACK</span>
+            <span id="hudModeTimerValue" class="text-brand-400 text-sm">60.0s</span>
+          </div>
+          <div id="hudWindBanner" class="hidden bg-sky-100/95 text-sky-900 rounded-xl px-3 py-1 text-center text-[11px] font-extrabold">
+            横風発生中！
           </div>
 
           <div id="hudMultiStatus" class="hidden bg-cream-200/95 rounded-2xl px-3.5 py-2">
@@ -840,7 +885,7 @@
 
       <!-- 右下：水平リセット・お邪魔発動（オンライン時）・BOOST -->
       <div class="pointer-events-auto flex flex-col items-end gap-2">
-        <button id="btnDirectJammer" onclick="onlineNet.sendJammer()" class="hidden px-5 py-3 rounded-2xl bg-cream-300 text-ink-400 font-extrabold text-xs sm:text-sm transition active:scale-95">
+        <button id="btnDirectJammer" onclick="game3d.triggerDirectJammer()" class="hidden px-5 py-3 rounded-2xl bg-cream-300 text-ink-400 font-extrabold text-xs sm:text-sm transition active:scale-95">
           お邪魔 (0%)
         </button>
 
@@ -933,13 +978,138 @@
     
 
     /**
-     * 全4種類の3Dステージ（マップ）テーマ定義
+     * 1人プレイ用 5種類のゲームモード（オフライン完全対応）
+     */
+    const SOLO_MODES = [
+      {
+        id: 'SURVIVAL',
+        label: 'サバイバル',
+        short: '目標距離クリア',
+        desc: '障害物を避けて目標距離＆ハイスコアを目指す定番モード'
+      },
+      {
+        id: 'VS_BOT',
+        label: 'VS BOTバトル',
+        short: '6機お邪魔対戦',
+        desc: 'ランダムLvの人間らしいBOT5体とオフラインお邪魔バトル！'
+      },
+      {
+        id: 'TIME_ATTACK',
+        label: '60秒アタック',
+        short: '制限時間スコア',
+        desc: '60秒間でスコア勝負！当たっても即終了せず減速で続行'
+      },
+      {
+        id: 'RING_RUSH',
+        label: 'リングラッシュ',
+        short: 'リング連続回収',
+        desc: '大量リングをくぐって時間延長＆コンボを繋ぐ爽快モード'
+      },
+      {
+        id: 'SUDDEN_DEATH',
+        label: 'サドンデス',
+        short: '超高速・倍率x2',
+        desc: '最初から超高速＆コンボx2.0スタートの一撃勝負モード'
+      }
+    ];
+
+    /**
+     * 人間らしいBOTのランダムレベル＆性格プロファイル生成（Lv.1〜Lv.10）
+     */
+    function createBotProfile(forcedLevel = null) {
+      const level = forcedLevel !== null ? forcedLevel : (1 + Math.floor(Math.random() * 10));
+      let rankTitle = 'ビギナー';
+      if (level >= 9) rankTitle = 'マスター';
+      else if (level >= 7) rankTitle = 'エース';
+      else if (level >= 5) rankTitle = 'ベテラン';
+      else if (level >= 3) rankTitle = 'ルーキー';
+
+      const t = (level - 1) / 9; // 0.0 (Lv.1) 〜 1.0 (Lv.10)
+      return {
+        level,
+        rankTitle,
+        // 反応間隔（秒）：低レベルほど判断が遅れ、高レベルほど素早く反応
+        reactionInterval: 0.34 - t * 0.27,
+        // 先読み距離（m）：高レベルほど遠くの障害物を見て早めに避ける
+        lookahead: 22 + t * 44,
+        // 手ブレ・揺らぎの大きさ（人間らしい微細なブレ）
+        wobbleAmp: 0.95 - t * 0.72,
+        // たまに判断ミスをする確率（低レベルほどミスしやすい）
+        mistakeChance: 0.24 - t * 0.21,
+        // リングや救助ゲートを積極的に狙う確率
+        ringGreed: 0.22 + t * 0.68,
+        // ブーストを使う積極性
+        boostAggro: 0.06 + t * 0.28,
+        // 操縦のキレ（ステアリング応答速度）
+        steerAgility: 6.2 + t * 6.5,
+        // お邪魔スキルを使うまでの迷い時間
+        jamDelay: 2.2 - t * 1.7
+      };
+    }
+
+    /**
+     * 4段階の難易度設定（操作方法はそのまま、速度・障害物密度・スコア倍率・目標距離が変化）
+     */
+    const DIFFICULTIES = [
+      {
+        id: 'EASY',
+        label: 'EASY',
+        jp: 'かんたん',
+        speedMult: 0.78,
+        spawnIntervalMult: 1.28,
+        scoreMult: 0.8,
+        goalDist: 350,
+        hitRadius: 0.44,
+        moveSpeedMult: 0.7,
+        badgeCss: '#16A34A'
+      },
+      {
+        id: 'NORMAL',
+        label: 'NORMAL',
+        jp: 'ふつう',
+        speedMult: 1.0,
+        spawnIntervalMult: 1.0,
+        scoreMult: 1.0,
+        goalDist: 500,
+        hitRadius: 0.52,
+        moveSpeedMult: 1.0,
+        badgeCss: '#F97316'
+      },
+      {
+        id: 'HARD',
+        label: 'HARD',
+        jp: 'むずかしい',
+        speedMult: 1.24,
+        spawnIntervalMult: 0.82,
+        scoreMult: 1.5,
+        goalDist: 650,
+        hitRadius: 0.56,
+        moveSpeedMult: 1.35,
+        badgeCss: '#EA580C'
+      },
+      {
+        id: 'EXTREME',
+        label: 'EXTREME',
+        jp: 'げきむず',
+        speedMult: 1.48,
+        spawnIntervalMult: 0.68,
+        scoreMult: 2.5,
+        goalDist: 800,
+        hitRadius: 0.60,
+        moveSpeedMult: 1.75,
+        badgeCss: '#DC2626'
+      }
+    ];
+
+    /**
+     * 全8種類の3Dステージ（マップ）＆固有ギミック定義
      */
     const MAPS = [
       {
         id: 'CANYON',
         name: 'サンセット・キャニオン',
-        tag: 'バランス標準',
+        tag: '標準バランス',
+        gimmick: '基本コース',
         bgHex: 0xFFF7ED,
         fogHex: 0xFFF7ED,
         floorHex: 0xFFEDD5,
@@ -948,12 +1118,18 @@
         blockHex: 0x431407,
         stripeHex: 0xF97316,
         accentCss: '#F97316',
-        spawnPattern: 'STANDARD'
+        spawnPattern: 'STANDARD',
+        speedBonus: 1.0,
+        slippery: false,
+        hasWind: false,
+        hasMoving: false,
+        hasSpinner: false
       },
       {
         id: 'FOREST',
         name: 'エメラルド・フォレスト',
         tag: 'リング多数',
+        gimmick: 'コンボ稼ぎ',
         bgHex: 0xF0FDF4,
         fogHex: 0xF0FDF4,
         floorHex: 0xDCFCE7,
@@ -962,12 +1138,18 @@
         blockHex: 0x14532D,
         stripeHex: 0x4ADE80,
         accentCss: '#16A34A',
-        spawnPattern: 'RINGS_HEAVY'
+        spawnPattern: 'RINGS_HEAVY',
+        speedBonus: 1.0,
+        slippery: false,
+        hasWind: false,
+        hasMoving: false,
+        hasSpinner: false
       },
       {
         id: 'GLACIER',
         name: 'クリスタル・グレイシャー',
         tag: '超高速スリップ',
+        gimmick: '氷の慣性',
         bgHex: 0xF0F9FF,
         fogHex: 0xF0F9FF,
         floorHex: 0xE0F2FE,
@@ -976,12 +1158,18 @@
         blockHex: 0x0C4A6E,
         stripeHex: 0x38BDF8,
         accentCss: '#0284C7',
-        spawnPattern: 'HIGH_SPEED'
+        spawnPattern: 'HIGH_SPEED',
+        speedBonus: 1.18,
+        slippery: true,
+        hasWind: false,
+        hasMoving: false,
+        hasSpinner: false
       },
       {
         id: 'VOLCANO',
         name: 'マグマ・ボルケーノ',
-        tag: '高難度迷路',
+        tag: '連続迷路',
+        gimmick: '高密度ウォール',
         bgHex: 0xFEF2F2,
         fogHex: 0xFEF2F2,
         floorHex: 0xFEE2E2,
@@ -990,7 +1178,92 @@
         blockHex: 0x450A0A,
         stripeHex: 0xF97316,
         accentCss: '#DC2626',
-        spawnPattern: 'DENSE_WALLS'
+        spawnPattern: 'DENSE_WALLS',
+        speedBonus: 1.08,
+        slippery: false,
+        hasWind: false,
+        hasMoving: false,
+        hasSpinner: false
+      },
+      {
+        id: 'CYBER',
+        name: 'ネオン・サイバーシティ',
+        tag: '動くゲート',
+        gimmick: '左右スライド壁',
+        bgHex: 0x0F172A,
+        fogHex: 0x0F172A,
+        floorHex: 0x1E293B,
+        ringHex: 0x38BDF8,
+        railHex: 0x22D3EE,
+        blockHex: 0x1E1B4B,
+        stripeHex: 0xEC4899,
+        accentCss: '#06B6D4',
+        spawnPattern: 'MOVING_GATES',
+        speedBonus: 1.1,
+        slippery: false,
+        hasWind: false,
+        hasMoving: true,
+        hasSpinner: false
+      },
+      {
+        id: 'SKY',
+        name: 'スカイ・サンクチュアリ',
+        tag: '横風ギミック',
+        gimmick: '気流ドリフト',
+        bgHex: 0xEFF6FF,
+        fogHex: 0xEFF6FF,
+        floorHex: 0xDBEAFE,
+        ringHex: 0x93C5FD,
+        railHex: 0xF59E0B,
+        blockHex: 0x1E3A8A,
+        stripeHex: 0xFBBF24,
+        accentCss: '#3B82F6',
+        spawnPattern: 'STANDARD',
+        speedBonus: 1.05,
+        slippery: false,
+        hasWind: true,
+        hasMoving: false,
+        hasSpinner: false
+      },
+      {
+        id: 'OCEAN',
+        name: 'ディープ・オーシャン',
+        tag: '回転ブレード',
+        gimmick: 'プロペラ障壁',
+        bgHex: 0xECFEFF,
+        fogHex: 0xECFEFF,
+        floorHex: 0xCFFAFE,
+        ringHex: 0x67E8F9,
+        railHex: 0x0891B2,
+        blockHex: 0x164E63,
+        stripeHex: 0x14B8A6,
+        accentCss: '#0D9488',
+        spawnPattern: 'SPINNER_RUN',
+        speedBonus: 1.06,
+        slippery: false,
+        hasWind: false,
+        hasMoving: false,
+        hasSpinner: true
+      },
+      {
+        id: 'COSMO',
+        name: 'コスモ・ヴォイド',
+        tag: '全ギミック複合',
+        gimmick: '究極ステージ',
+        bgHex: 0x1E1B4B,
+        fogHex: 0x1E1B4B,
+        floorHex: 0x312E81,
+        ringHex: 0xA78BFA,
+        railHex: 0xF59E0B,
+        blockHex: 0x0F172A,
+        stripeHex: 0xFBBF24,
+        accentCss: '#8B5CF6',
+        spawnPattern: 'ALL_MIX',
+        speedBonus: 1.2,
+        slippery: false,
+        hasWind: true,
+        hasMoving: true,
+        hasSpinner: true
       }
     ];
 
@@ -1343,7 +1616,7 @@
           if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') this.keys.down = true;
           if (e.key === ' ' && game3d.state === 'PLAYING') game3d.setDirectBoost(true);
           if ((e.key === 'j' || e.key === 'J') && game3d.state === 'PLAYING') {
-            if (app.mode === 'ONLINE') onlineNet.sendJammer();
+            if (app.mode === 'ONLINE' || (app.mode === 'SOLO' && app.currentSoloMode === 'VS_BOT')) game3d.triggerDirectJammer();
             else if (app.mode === 'HOST') {
               const readyCraft = game3d.crafts.find(c => c.alive && c.jammerCharge >= 100);
               if (readyCraft) game3d.activateJammer(readyCraft.slotIndex);
@@ -1688,6 +1961,7 @@
           document.getElementById('onlineDisplayCode').textContent = this.roomCode;
           document.getElementById('btnOnlineStart').classList.remove('hidden');
           document.getElementById('btnOnlineCycleMap').classList.remove('hidden');
+          document.getElementById('btnOnlineCycleDiff').classList.remove('hidden');
           document.getElementById('onlineGuestWaitMsg').classList.add('hidden');
           this.renderRoster();
           audio.playHello();
@@ -1790,6 +2064,7 @@
             document.getElementById('onlineDisplayCode').textContent = code;
             document.getElementById('btnOnlineStart').classList.add('hidden');
             document.getElementById('btnOnlineCycleMap').classList.add('hidden');
+            document.getElementById('btnOnlineCycleDiff').classList.add('hidden');
             document.getElementById('onlineGuestWaitMsg').classList.remove('hidden');
             audio.playHello();
           });
@@ -1797,13 +2072,13 @@
           this.hostConn.on('data', (data) => {
             if (data.type === 'ROSTER') {
               this.roster = data.roster || [];
-              if (typeof data.mapIndex === 'number') {
-                app.setMapIndex(data.mapIndex);
-              }
+              if (typeof data.mapIndex === 'number') app.setMapIndex(data.mapIndex);
+              if (typeof data.diffIndex === 'number') app.setDifficultyIndex(data.diffIndex);
               this.renderRoster();
               game3d.syncOnlineRivals(this.roster, this.myId);
             } else if (data.type === 'START_MATCH') {
               if (typeof data.mapIndex === 'number') app.setMapIndex(data.mapIndex);
+              if (typeof data.diffIndex === 'number') app.setDifficultyIndex(data.diffIndex);
               app.launchOnlineGame();
             } else if (data.type === 'JAM_HIT') {
               if (game3d.state === 'PLAYING' && game3d.crafts[0] && game3d.crafts[0].alive) {
@@ -1825,6 +2100,11 @@
         app.cycleMap();
         this.broadcastRoster();
       },
+      cycleHostDiff() {
+        if (!this.isHost) return;
+        app.cycleDifficulty();
+        this.broadcastRoster();
+      },
 
       recalcRanks() {
         const sorted = [...this.roster].sort((a, b) => {
@@ -1837,7 +2117,7 @@
       broadcastRoster() {
         if (!this.isHost) return;
         this.recalcRanks();
-        const payload = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex };
+        const payload = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex };
         Object.values(this.guestConns).forEach(c => {
           if (c.open) c.send(payload);
         });
@@ -1849,6 +2129,8 @@
         const countEl = document.getElementById('onlinePlayerCount');
         const mapEl = document.getElementById('onlineMapName');
         if (mapEl) mapEl.textContent = MAPS[app.currentMapIndex].name;
+        const diffEl = document.getElementById('onlineDiffName');
+        if (diffEl) diffEl.textContent = `${DIFFICULTIES[app.currentDiffIndex].label} (${DIFFICULTIES[app.currentDiffIndex].jp})`;
         if (countEl) countEl.textContent = this.roster.length;
         if (!list) return;
 
@@ -1873,7 +2155,7 @@
           r.distance = 0;
           r.alive = true;
         });
-        const msg = { type: 'START_MATCH', mapIndex: app.currentMapIndex };
+        const msg = { type: 'START_MATCH', mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex };
         Object.values(this.guestConns).forEach(c => {
           if (c.open) c.send(msg);
         });
@@ -2076,15 +2358,21 @@
         this.ruleMode = mode;
         const btnCoop = document.getElementById('btnRuleCoop');
         const btnBattle = document.getElementById('btnRuleBattle');
+        const btnRing = document.getElementById('btnRuleRing');
         const descEl = document.getElementById('lobbyRuleText');
 
+        const activeCls = 'px-3 py-2.5 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs sm:text-sm transition';
+        const idleCls = 'px-3 py-2.5 rounded-xl bg-transparent text-ink-600 hover:bg-cream-200 font-extrabold text-xs sm:text-sm transition';
+
+        if (btnCoop) btnCoop.className = mode === 'COOP' ? activeCls : idleCls;
+        if (btnBattle) btnBattle.className = mode === 'BATTLE' ? activeCls : idleCls;
+        if (btnRing) btnRing.className = mode === 'RING_BATTLE' ? activeCls : idleCls;
+
         if (mode === 'COOP') {
-          btnCoop.className = 'px-4 py-2.5 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs sm:text-sm transition';
-          btnBattle.className = 'px-4 py-2.5 rounded-xl bg-transparent text-ink-600 hover:bg-cream-200 font-extrabold text-xs sm:text-sm transition';
           descEl.textContent = '【協力モード】全員でチームエネルギーを共有！青い「RESCUE」ゲートを通過すると脱落した仲間を復活させられます。';
+        } else if (mode === 'RING_BATTLE') {
+          descEl.textContent = '【リング争奪戦(60秒)】大量のリングを奪い合って60秒間の最高スコアを競うパーティーモード！衝突しても減速のみで続行！';
         } else {
-          btnBattle.className = 'px-4 py-2.5 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs sm:text-sm transition';
-          btnCoop.className = 'px-4 py-2.5 rounded-xl bg-transparent text-ink-600 hover:bg-cream-200 font-extrabold text-xs sm:text-sm transition';
           descEl.textContent = '【お邪魔バトル】ニアミスでゲージを溜めて「お邪魔スキル」を発動！最後まで生き残った1人が優勝！';
         }
       },
@@ -2093,12 +2381,14 @@
         const freeIndex = this.slots.findIndex(s => s === null);
         if (freeIndex === -1) return;
         const pal = PLAYER_PALETTE[freeIndex];
+        const botProfile = createBotProfile();
         this.slots[freeIndex] = {
           slotIndex: freeIndex,
           peerId: `bot-${freeIndex}`,
           conn: null,
-          name: `BOT-${pal.id}`,
+          name: `BOT-${pal.id} Lv.${botProfile.level}`,
           isBot: true,
+          botProfile: botProfile,
           colorHex: pal.hex,
           colorNum: pal.num,
           x: 0,
@@ -2608,6 +2898,7 @@
         audio.init();
         this.clearEntities();
         const curMap = MAPS[app.currentMapIndex];
+        const curDiff = DIFFICULTIES[app.currentDiffIndex];
         this.applyMapTheme(curMap);
 
         this.state = 'COUNTDOWN';
@@ -2619,12 +2910,38 @@
         this.comboCount = 0;
         this.maxComboMult = 1.0;
         this.comboDecayTimer = 0;
-        this.baseSpeed = curMap.spawnPattern === 'HIGH_SPEED' ? 48 : 40;
+        this.windForce = 0;
+        this.windTimer = 3.0;
+        this.baseSpeed = 40 * curMap.speedBonus * curDiff.speedMult;
         this.currentSpeed = this.baseSpeed;
         this.speedLevel = 1;
         this.directBoost = false;
         this.shakeTime = 0;
         this.spawnTimer = 0.22;
+
+        const diffTag = document.getElementById('hudDiffTag');
+        const goalEl = document.getElementById('hudGoalDist');
+        const windBanner = document.getElementById('hudWindBanner');
+        if (diffTag) diffTag.textContent = curDiff.label;
+        if (goalEl) goalEl.textContent = curDiff.goalDist;
+        if (windBanner) windBanner.classList.add('hidden');
+
+        this.ringsCollected = 0;
+        this.modeTimer = 0;
+        const soloMode = app.currentSoloMode;
+        if (app.mode === 'SOLO') {
+          if (soloMode === 'TIME_ATTACK') this.modeTimer = 60.0;
+          else if (soloMode === 'RING_RUSH') this.modeTimer = 45.0;
+          else if (soloMode === 'SUDDEN_DEATH') {
+            this.comboCount = 2; // x2.0スタート
+            this.maxComboMult = 2.0;
+            this.comboDecayTimer = 999;
+            this.baseSpeed *= 1.25;
+            this.currentSpeed = this.baseSpeed;
+          }
+        } else if (app.mode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE') {
+          this.modeTimer = 60.0;
+        }
 
         if (app.mode === 'SOLO' || app.mode === 'ONLINE') {
           const myEntry = app.mode === 'ONLINE' ? onlineNet.roster.find(r => r.id === onlineNet.myId) : null;
@@ -2638,6 +2955,7 @@
             name: myEntry ? myEntry.name : 'YOU',
             colorHex: pal.hex,
             isBot: false,
+            botProfile: null,
             mesh: group,
             shadow: shadow,
             debuffRing: debuffRing,
@@ -2651,8 +2969,57 @@
             jammerCharge: 35,
             debuffType: null,
             debuffTimer: 0,
-            botPhase: 0
+            botTargetX: 0,
+            botTargetY: 0,
+            botThinkTimer: 0,
+            botWobbleSeed: Math.random() * 100,
+            botBoostTimer: 0,
+            botJamWait: 0,
+            botBoostActive: false
           });
+
+          // VS BOT バトルモード時はランダムレベルの人間らしいBOTを5体参戦させる（計6機）
+          if (app.mode === 'SOLO' && soloMode === 'VS_BOT') {
+            const botNames = ['タロウ', 'ハナコ', 'レン', 'ミユ', 'ソウタ', 'アオイ', 'カイト', 'ユイ'];
+            const shuffled = [...botNames].sort(() => Math.random() - 0.5);
+            for (let b = 1; b <= 5; b++) {
+              const bPal = PLAYER_PALETTE[b];
+              const prof = createBotProfile();
+              const { group: bg, shadow: bs, debuffRing: bd } = this.createCraftMesh(bPal.num, false);
+              const sx = ((b / 5) - 0.5) * 6.5;
+              const sy = (Math.random() - 0.5) * 2.2;
+              bg.position.set(sx, sy, this.PLAYER_Z);
+              this.scene.add(bg);
+              this.crafts.push({
+                slotIndex: b,
+                slotId: bPal.id,
+                name: `${shuffled[b - 1]} Lv.${prof.level}`,
+                colorHex: bPal.hex,
+                isBot: true,
+                botProfile: prof,
+                mesh: bg,
+                shadow: bs,
+                debuffRing: bd,
+                x: sx,
+                y: sy,
+                alive: true,
+                invuln: 0,
+                score: 0,
+                distance: 0,
+                rank: b + 1,
+                jammerCharge: 25 + Math.floor(Math.random() * 25),
+                debuffType: null,
+                debuffTimer: 0,
+                botTargetX: sx,
+                botTargetY: sy,
+                botThinkTimer: Math.random() * 0.2,
+                botWobbleSeed: Math.random() * 100,
+                botBoostTimer: 0,
+                botJamWait: prof.jamDelay,
+                botBoostActive: false
+              });
+            }
+          }
         } else if (app.mode === 'HOST') {
           const activeSlots = hostNet.slots.filter(s => s !== null);
           const count = activeSlots.length;
@@ -2661,12 +3028,14 @@
             const spreadX = count > 1 ? ((idx / (count - 1)) - 0.5) * 6.0 : 0;
             group.position.set(spreadX, 0, this.PLAYER_Z);
             this.scene.add(group);
+            const prof = slot.isBot ? (slot.botProfile || createBotProfile()) : null;
             this.crafts.push({
               slotIndex: slot.slotIndex,
               slotId: PLAYER_PALETTE[slot.slotIndex].id,
               name: slot.name,
               colorHex: slot.colorHex,
               isBot: slot.isBot,
+              botProfile: prof,
               mesh: group,
               shadow: shadow,
               debuffRing: debuffRing,
@@ -2680,7 +3049,13 @@
               jammerCharge: 35,
               debuffType: null,
               debuffTimer: 0,
-              botPhase: idx * 1.3
+              botTargetX: spreadX,
+              botTargetY: 0,
+              botThinkTimer: Math.random() * 0.2,
+              botWobbleSeed: Math.random() * 100,
+              botBoostTimer: 0,
+              botJamWait: prof ? prof.jamDelay : 1.0,
+              botBoostActive: false
             });
           });
         }
@@ -2691,10 +3066,19 @@
         document.getElementById('blindOverlay').classList.remove('flex');
 
         const isDirect = (app.mode === 'SOLO' || app.mode === 'ONLINE');
-        document.getElementById('directPlayControls').classList.toggle('hidden', !isDirect);
-        document.getElementById('btnDirectJammer').classList.toggle('hidden', app.mode !== 'ONLINE');
+        const isVsBot = (app.mode === 'SOLO' && app.currentSoloMode === 'VS_BOT');
+        const isTimed = (app.mode === 'SOLO' && (app.currentSoloMode === 'TIME_ATTACK' || app.currentSoloMode === 'RING_RUSH')) || (app.mode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE');
 
-        const isMulti = (app.mode === 'HOST' || app.mode === 'ONLINE');
+        document.getElementById('directPlayControls').classList.toggle('hidden', !isDirect);
+        document.getElementById('btnDirectJammer').classList.toggle('hidden', !(app.mode === 'ONLINE' || isVsBot));
+
+        const timerBar = document.getElementById('hudModeTimerBar');
+        if (timerBar) {
+          timerBar.classList.toggle('hidden', !isTimed);
+          timerBar.classList.toggle('flex', isTimed);
+        }
+
+        const isMulti = (app.mode === 'HOST' || app.mode === 'ONLINE' || isVsBot);
         document.getElementById('hudMultiStatus').classList.toggle('hidden', !isMulti);
         document.getElementById('hudPlayerChips').classList.toggle('hidden', !isMulti);
         document.getElementById('hudPlayerChips').classList.toggle('flex', isMulti);
@@ -2712,6 +3096,11 @@
           document.getElementById('hudBattleBar').classList.remove('hidden');
           document.getElementById('hudBattleBar').classList.add('flex');
           onlineNet.startSyncLoop();
+        } else if (isVsBot) {
+          document.getElementById('hudScoreLabel').textContent = 'YOUR SCORE';
+          document.getElementById('hudCoopBar').classList.add('hidden');
+          document.getElementById('hudBattleBar').classList.remove('hidden');
+          document.getElementById('hudBattleBar').classList.add('flex');
         } else {
           document.getElementById('hudScoreLabel').textContent = 'SCORE';
         }
@@ -2771,6 +3160,151 @@
         this._popupTimer = setTimeout(() => el.classList.add('opacity-0'), 1050);
       },
 
+      triggerDirectJammer() {
+        if (app.mode === 'ONLINE') {
+          onlineNet.sendJammer();
+        } else if (app.mode === 'SOLO' && app.currentSoloMode === 'VS_BOT') {
+          this.activateJammer(0);
+        }
+      },
+
+      /**
+       * 人間らしいBOT操縦AI（先読み・反応遅延・候補経路評価・手ブレ・レベル別判断）
+       */
+      computeHumanBotSteering(c, dt, nowSec) {
+        const prof = c.botProfile || createBotProfile(5);
+        c.botThinkTimer -= dt;
+
+        // ブースト状態の更新（危険が少なく、高レベルほど直線で加速する）
+        if (c.botBoostTimer > 0) {
+          c.botBoostTimer -= dt;
+          c.botBoostActive = c.botBoostTimer > 0;
+        } else {
+          c.botBoostActive = false;
+        }
+
+        // お邪魔スキル発動判断（100%溜まってもすぐ撃たず人間らしく少し間を置く）
+        const canJam = (app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') || (app.mode === 'SOLO' && app.currentSoloMode === 'VS_BOT');
+        if (canJam && c.jammerCharge >= 100) {
+          c.botJamWait -= dt;
+          if (c.botJamWait <= 0) {
+            c.botJamWait = prof.jamDelay * (0.7 + Math.random() * 0.7);
+            this.activateJammer(c.slotIndex);
+          }
+        }
+
+        // 反応間隔ごとに前方の状況を判断して目標座標（botTargetX, botTargetY）を更新
+        if (c.botThinkTimer <= 0) {
+          c.botThinkTimer = prof.reactionInterval * (0.8 + Math.random() * 0.4);
+
+          const upcoming = this.obstacles.filter(o => o.z < 1.2 && o.z > -prof.lookahead);
+          // 候補点（現在の周辺＋コース内の安全エリア候補15点）を評価
+          const candidates = [
+            { x: c.x, y: c.y },
+            { x: 0, y: 0 },
+            { x: -4.2, y: 0 }, { x: 4.2, y: 0 },
+            { x: 0, y: 2.6 }, { x: 0, y: -2.6 },
+            { x: -4.2, y: 2.5 }, { x: 4.2, y: 2.5 },
+            { x: -4.2, y: -2.5 }, { x: 4.2, y: -2.5 },
+            { x: -2.2, y: 1.4 }, { x: 2.2, y: 1.4 },
+            { x: -2.2, y: -1.4 }, { x: 2.2, y: -1.4 }
+          ];
+
+          // 近くにリングや救助ゲートがあれば候補点に追加
+          for (const o of upcoming) {
+            if (o.kind === 'RING' || o.kind === 'RESCUE') {
+              candidates.push({ x: o.x, y: o.y });
+            }
+          }
+
+          let bestScore = -99999;
+          let bestPt = { x: c.x, y: c.y };
+          let dangerNear = false;
+
+          for (const pt of candidates) {
+            let sc = 0;
+            // 現在位置からの移動コスト（人間は無駄に大きく動かない）
+            sc -= Math.hypot(pt.x - c.x, pt.y - c.y) * 1.15;
+            // 中央付近をやや好む傾向
+            sc -= Math.hypot(pt.x, pt.y) * 0.25;
+
+            for (const o of upcoming) {
+              const distZ = Math.max(2, -o.z);
+              const urgency = 1.0 / (distZ * 0.08 + 0.4);
+
+              if (o.kind === 'BLOCK') {
+                // 動くブロックは少し先の位置を予測（高レベルほど正確）
+                const predX = o.moveAmpX > 0 ? o.x + Math.cos(o.movePhase) * o.moveAmpX * 0.35 * (prof.level / 10) : o.x;
+                const cx = Math.max(predX - o.halfW, Math.min(pt.x, predX + o.halfW));
+                const cy = Math.max(o.y - o.halfH, Math.min(pt.y, o.y + o.halfH));
+                const d = Math.hypot(pt.x - cx, pt.y - cy);
+                if (d < 1.15) {
+                  sc -= (1.35 - d) * 140 * urgency;
+                  if (distZ < 24) dangerNear = true;
+                } else if (d < 1.75 && prof.level >= 7) {
+                  // 上級BOTはあえてギリギリ（ニアミス）を少し狙う
+                  sc += 8 * urgency;
+                }
+              } else if (o.kind === 'SPINNER') {
+                const predAngle = o.angle + o.rotSpeed * (distZ / Math.max(30, this.currentSpeed)) * (prof.level / 10);
+                const cosA = Math.cos(-predAngle);
+                const sinA = Math.sin(-predAngle);
+                const lx = pt.x * cosA - pt.y * sinA;
+                const ly = pt.x * sinA + pt.y * cosA;
+                const cx = Math.max(-o.halfLen, Math.min(lx, o.halfLen));
+                const cy = Math.max(-o.halfThick, Math.min(ly, o.halfThick));
+                const d = Math.hypot(lx - cx, ly - cy);
+                if (d < 1.25) {
+                  sc -= (1.45 - d) * 150 * urgency;
+                  if (distZ < 24) dangerNear = true;
+                }
+              } else if (o.kind === 'RING' && !o.collectedBy.has(c.slotIndex)) {
+                const d = Math.hypot(pt.x - o.x, pt.y - o.y);
+                if (d < o.radius) sc += 32 * prof.ringGreed * urgency;
+              } else if (o.kind === 'RESCUE' && !o.collectedBy.has(c.slotIndex)) {
+                const d = Math.hypot(pt.x - o.x, pt.y - o.y);
+                if (d < o.radius) sc += 55 * prof.ringGreed * urgency;
+              }
+            }
+
+            // 人間らしい微妙なランダム揺らぎ（低レベルほどブレる）
+            sc += (Math.random() - 0.5) * (12 - prof.level);
+
+            if (sc > bestScore) {
+              bestScore = sc;
+              bestPt = pt;
+            }
+          }
+
+          // 低レベルBOTはときどき判断ミスをして少しズレた方向へ行く
+          if (Math.random() < prof.mistakeChance) {
+            bestPt = {
+              x: Math.max(-this.BOUNDS_X, Math.min(this.BOUNDS_X, bestPt.x + (Math.random() - 0.5) * 3.0)),
+              y: Math.max(-this.BOUNDS_Y, Math.min(this.BOUNDS_Y, bestPt.y + (Math.random() - 0.5) * 2.2))
+            };
+          }
+
+          c.botTargetX = bestPt.x;
+          c.botTargetY = bestPt.y;
+
+          // 安全な直線ではたまにブースト加速
+          if (!dangerNear && Math.random() < prof.boostAggro * 0.25) {
+            c.botBoostTimer = 0.7 + Math.random() * 0.9;
+          }
+        }
+
+        // 手ブレ（複数のサイン波を合成した自然な揺らぎ）を目標値に加算
+        const wobbleX = Math.sin(nowSec * 2.3 + c.botWobbleSeed) * prof.wobbleAmp * 0.55;
+        const wobbleY = Math.cos(nowSec * 1.9 + c.botWobbleSeed * 1.3) * prof.wobbleAmp * 0.45;
+
+        const desiredX = Math.max(-this.BOUNDS_X, Math.min(this.BOUNDS_X, c.botTargetX + wobbleX));
+        const desiredY = Math.max(-this.BOUNDS_Y, Math.min(this.BOUNDS_Y, c.botTargetY + wobbleY));
+
+        const inX = Math.max(-1, Math.min(1, desiredX / this.BOUNDS_X));
+        const inY = Math.max(-1, Math.min(1, desiredY / this.BOUNDS_Y));
+        return { inX, inY, steerAgility: prof.steerAgility };
+      },
+
       activateJammer(attackerSlotIndex) {
         const attacker = this.crafts.find(c => c.slotIndex === attackerSlotIndex && c.alive);
         if (!attacker || attacker.jammerCharge < 100) return;
@@ -2786,6 +3320,17 @@
         for (const t of targets) {
           t.debuffType = chosen;
           t.debuffTimer = 3.8;
+          if (app.mode === 'SOLO' && app.currentSoloMode === 'VS_BOT' && t.slotIndex === 0 && chosen === 'BLIND') {
+            const blind = document.getElementById('blindOverlay');
+            if (blind) {
+              blind.classList.remove('hidden');
+              blind.classList.add('flex');
+              setTimeout(() => {
+                blind.classList.add('hidden');
+                blind.classList.remove('flex');
+              }, 3600);
+            }
+          }
         }
         audio.playJammerLaunch();
         this.showPopup(`${attacker.name} が【${chosen}】発動！`, '#431407');
@@ -2793,6 +3338,7 @@
 
       spawnWave() {
         const curMap = MAPS[app.currentMapIndex];
+        const curDiff = DIFFICULTIES[app.currentDiffIndex];
         const isCoopMulti = app.mode === 'HOST' && hostNet.ruleMode === 'COOP';
         const hasDownedAlly = isCoopMulti && this.crafts.some(c => !c.alive);
         const roll = Math.random();
@@ -2809,7 +3355,38 @@
           return;
         }
 
-        const ringChance = curMap.spawnPattern === 'RINGS_HEAVY' ? 0.36 : 0.22;
+        // 回転ブレード（プロペラ障壁）: OCEAN / COSMO または EXTREME 難易度で出現
+        if ((curMap.hasSpinner || curDiff.id === 'EXTREME') && roll > 0.72) {
+          const group = new THREE.Group();
+          const barLen = 11.4;
+          const barThick = 1.25;
+          const mat = new THREE.MeshLambertMaterial({ color: curMap.blockHex, flatShading: true });
+          const accent = new THREE.MeshLambertMaterial({ color: curMap.stripeHex, flatShading: true });
+          const bar = new THREE.Mesh(new THREE.BoxGeometry(barLen, barThick, 1.5), mat);
+          const core = new THREE.Mesh(new THREE.OctahedronGeometry(1.05, 0), accent);
+          group.add(bar, core);
+          group.position.set(0, 0, this.SPAWN_Z);
+          const initAngle = Math.random() * Math.PI;
+          group.rotation.z = initAngle;
+          this.scene.add(group);
+          this.obstacles.push({
+            kind: 'SPINNER',
+            mesh: group,
+            x: 0,
+            y: 0,
+            z: this.SPAWN_Z,
+            angle: initAngle,
+            rotSpeed: (Math.random() < 0.5 ? 1 : -1) * (1.2 + Math.random() * 0.9) * curDiff.moveSpeedMult,
+            halfLen: barLen / 2,
+            halfThick: barThick / 2,
+            hitBy: new Set(),
+            nearMissedBy: new Set()
+          });
+          return;
+        }
+
+        const isRingMode = (app.mode === 'SOLO' && app.currentSoloMode === 'RING_RUSH') || (app.mode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE');
+        const ringChance = isRingMode ? 0.62 : (curMap.spawnPattern === 'RINGS_HEAVY' ? 0.36 : 0.20);
         if (roll < ringChance) {
           const gx = (Math.random() - 0.5) * 8.0;
           const gy = (Math.random() - 0.5) * 4.5;
@@ -2820,13 +3397,14 @@
           this.scene.add(mesh);
           this.obstacles.push({ kind: 'RING', mesh, x: gx, y: gy, z: this.SPAWN_Z, radius: 1.55, collectedBy: new Set() });
         } else if (roll < 0.72) {
-          const count = (curMap.spawnPattern === 'DENSE_WALLS' || Math.random() < 0.52) ? 2 : 1;
+          const isDense = curMap.spawnPattern === 'DENSE_WALLS' || curDiff.id === 'HARD' || curDiff.id === 'EXTREME';
+          const count = (isDense || Math.random() < 0.50) ? 2 : 1;
           for (let i = 0; i < count; i++) {
-            const w = 2.3 + Math.random() * 1.9;
-            const h = 2.5 + Math.random() * 2.5;
+            const w = 2.2 + Math.random() * 1.8;
+            const h = 2.4 + Math.random() * 2.4;
             const d = 2.0;
-            const ox = (Math.random() - 0.5) * 9.6;
-            const oy = (Math.random() - 0.5) * 4.8;
+            const ox = (Math.random() - 0.5) * 9.4;
+            const oy = (Math.random() - 0.5) * 4.6;
 
             const group = new THREE.Group();
             group.add(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: curMap.blockHex, flatShading: true })));
@@ -2835,12 +3413,30 @@
             const spawnZ = this.SPAWN_Z - i * 5.5;
             group.position.set(ox, oy, spawnZ);
             this.scene.add(group);
-            this.obstacles.push({ kind: 'BLOCK', mesh: group, x: ox, y: oy, z: spawnZ, halfW: w / 2, halfH: h / 2, halfD: d / 2, hitBy: new Set(), nearMissedBy: new Set() });
+
+            const isMoving = curMap.hasMoving || (curDiff.id === 'HARD' && Math.random() < 0.35) || (curDiff.id === 'EXTREME' && Math.random() < 0.65);
+            this.obstacles.push({
+              kind: 'BLOCK',
+              mesh: group,
+              baseX: ox,
+              baseY: oy,
+              x: ox,
+              y: oy,
+              z: spawnZ,
+              halfW: w / 2,
+              halfH: h / 2,
+              halfD: d / 2,
+              moveAmpX: isMoving ? (2.2 + Math.random() * 1.6) : 0,
+              moveSpeed: (1.8 + Math.random() * 1.2) * curDiff.moveSpeedMult,
+              movePhase: Math.random() * Math.PI * 2,
+              hitBy: new Set(),
+              nearMissedBy: new Set()
+            });
           }
         } else {
           const isHorizontal = Math.random() < 0.5;
           const w = isHorizontal ? 13.8 : 3.4;
-          const h = isHorizontal ? 2.7 : 8.4;
+          const h = isHorizontal ? 2.6 : 8.4;
           const d = 1.8;
           const ox = isHorizontal ? 0 : (Math.random() < 0.5 ? -3.4 : 3.4);
           const oy = isHorizontal ? (Math.random() < 0.5 ? -2.2 : 2.2) : 0;
@@ -2850,7 +3446,23 @@
           group.add(new THREE.Mesh(new THREE.BoxGeometry(w + 0.06, 0.3, d + 0.06), new THREE.MeshLambertMaterial({ color: curMap.stripeHex, flatShading: true })));
           group.position.set(ox, oy, this.SPAWN_Z);
           this.scene.add(group);
-          this.obstacles.push({ kind: 'BLOCK', mesh: group, x: ox, y: oy, z: this.SPAWN_Z, halfW: w / 2, halfH: h / 2, halfD: d / 2, hitBy: new Set(), nearMissedBy: new Set() });
+          this.obstacles.push({
+            kind: 'BLOCK',
+            mesh: group,
+            baseX: ox,
+            baseY: oy,
+            x: ox,
+            y: oy,
+            z: this.SPAWN_Z,
+            halfW: w / 2,
+            halfH: h / 2,
+            halfD: d / 2,
+            moveAmpX: 0,
+            moveSpeed: 0,
+            movePhase: 0,
+            hitBy: new Set(),
+            nearMissedBy: new Set()
+          });
         }
       },
 
@@ -2880,6 +3492,7 @@
         if (this.state !== 'PLAYING' && this.state !== 'COUNTDOWN') return;
 
         const curMap = MAPS[app.currentMapIndex];
+        const curDiff = DIFFICULTIES[app.currentDiffIndex];
         let anyBoost = (app.mode === 'SOLO' || app.mode === 'ONLINE')
           ? this.directBoost
           : this.crafts.some(c => c.alive && hostNet.slots[c.slotIndex]?.boost);
@@ -2892,9 +3505,43 @@
             audio.playSpeedUp();
             this.showPopup(`SPEED UP! LV.${this.speedLevel}`, '#EA580C');
           }
-          const startSpd = curMap.spawnPattern === 'HIGH_SPEED' ? 48 : 40;
-          this.baseSpeed = Math.min(92, startSpd + (this.speedLevel - 1) * 6.5);
+          const suddenMult = (app.mode === 'SOLO' && app.currentSoloMode === 'SUDDEN_DEATH') ? 1.25 : 1.0;
+          const startSpd = 40 * curMap.speedBonus * curDiff.speedMult * suddenMult;
+          this.baseSpeed = Math.min(115, startSpd + (this.speedLevel - 1) * 6.5 * curDiff.speedMult);
           this.currentSpeed = anyBoost ? this.baseSpeed * 1.42 : this.baseSpeed;
+
+          // 制限時間モードのタイマー進行
+          const isTimedMode = (app.mode === 'SOLO' && (app.currentSoloMode === 'TIME_ATTACK' || app.currentSoloMode === 'RING_RUSH')) || (app.mode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE');
+          if (isTimedMode) {
+            this.modeTimer -= dt;
+            if (this.modeTimer <= 0) {
+              this.modeTimer = 0;
+              this.triggerGameOver(true);
+              return;
+            }
+          }
+
+          // 横風ギミック（SKY / COSMO）
+          const windBanner = document.getElementById('hudWindBanner');
+          if (curMap.hasWind) {
+            this.windTimer -= dt;
+            if (this.windTimer <= 0) {
+              this.windTimer = 4.2 + Math.random() * 2.5;
+              const dirs = [-1, 0, 1];
+              this.windForce = dirs[Math.floor(Math.random() * dirs.length)] * (2.2 * curDiff.moveSpeedMult);
+            }
+            if (windBanner) {
+              if (Math.abs(this.windForce) > 0.1) {
+                windBanner.classList.remove('hidden');
+                windBanner.textContent = this.windForce > 0 ? '横風発生中！ →→ 右へ流されます' : '横風発生中！ ←← 左へ流されます';
+              } else {
+                windBanner.classList.add('hidden');
+              }
+            }
+          } else {
+            this.windForce = 0;
+            if (windBanner) windBanner.classList.add('hidden');
+          }
 
           if (this.comboCount > 0) {
             this.comboDecayTimer -= dt;
@@ -2924,36 +3571,36 @@
           if (!c.alive) continue;
 
           let inX = 0, inY = 0;
-          if (app.mode === 'SOLO' || app.mode === 'ONLINE') {
+          let customAgility = null;
+          if (c.isBot) {
+            const botCmd = this.computeHumanBotSteering(c, dt, this.lastTime / 1000);
+            inX = botCmd.inX;
+            inY = botCmd.inY;
+            customAgility = botCmd.steerAgility;
+          } else if (app.mode === 'SOLO' || app.mode === 'ONLINE') {
             gyro.updateKeyInput();
             inX = gyro.normX;
             inY = -gyro.normY;
           } else if (app.mode === 'HOST') {
             const slot = hostNet.slots[c.slotIndex];
-            if (slot && slot.isBot) {
-              c.botPhase += dt * 2.1;
-              inX = Math.sin(c.botPhase + c.slotIndex) * 0.72;
-              inY = Math.cos(c.botPhase * 0.8 + c.slotIndex) * 0.65;
-              if (hostNet.ruleMode === 'BATTLE' && c.jammerCharge >= 100 && Math.random() < dt * 0.6) {
-                this.activateJammer(c.slotIndex);
-              }
-            } else if (slot) {
+            if (slot) {
               inX = slot.x;
               inY = -slot.y;
             }
           }
 
-          let steerLerp = 12;
+          let steerLerp = curMap.slippery ? 5.8 : (customAgility || 12);
           if (c.debuffTimer > 0) {
             if (c.debuffType === 'REVERSE') inX = -inX;
-            else if (c.debuffType === 'HEAVY') steerLerp = 4.2;
+            else if (c.debuffType === 'HEAVY') steerLerp = 4.0;
           }
 
           const targetX = Math.max(-this.BOUNDS_X, Math.min(this.BOUNDS_X, inX * this.BOUNDS_X));
           const targetY = Math.max(-this.BOUNDS_Y, Math.min(this.BOUNDS_Y, inY * this.BOUNDS_Y));
 
           const prevX = c.x;
-          c.x += (targetX - c.x) * Math.min(1, dt * steerLerp);
+          c.x += (targetX - c.x) * Math.min(1, dt * steerLerp) + (this.windForce || 0) * dt;
+          c.x = Math.max(-this.BOUNDS_X, Math.min(this.BOUNDS_X, c.x));
           c.y += (targetY - c.y) * Math.min(1, dt * steerLerp);
 
           c.mesh.position.set(c.x, c.y, this.PLAYER_Z);
@@ -2963,11 +3610,11 @@
           c.shadow.position.y = -4.55 - c.y;
 
           if (this.state === 'PLAYING') {
-            const pBoost = (app.mode === 'SOLO' || app.mode === 'ONLINE') ? this.directBoost : hostNet.slots[c.slotIndex]?.boost;
+            const pBoost = c.isBot ? c.botBoostActive : ((app.mode === 'SOLO' || app.mode === 'ONLINE') ? this.directBoost : hostNet.slots[c.slotIndex]?.boost);
             c.distance += this.currentSpeed * dt * 0.45;
-            c.score += Math.floor(dt * 25 * (pBoost ? 1.5 : 1.0));
+            c.score += Math.floor(dt * 25 * (pBoost ? 1.5 : 1.0) * curDiff.scoreMult);
 
-            if ((app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') || app.mode === 'ONLINE') {
+            if ((app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') || app.mode === 'ONLINE' || (app.mode === 'SOLO' && app.currentSoloMode === 'VS_BOT')) {
               c.jammerCharge = Math.min(100, c.jammerCharge + dt * (pBoost ? 14 : 9));
             }
           }
@@ -2988,14 +3635,23 @@
         this.spawnTimer -= dt * (this.currentSpeed / 40);
         if (this.spawnTimer <= 0) {
           this.spawnWave();
-          this.spawnTimer = Math.max(0.36, 0.88 - (this.speedLevel * 0.055));
+          this.spawnTimer = Math.max(0.28, (0.88 - (this.speedLevel * 0.055)) * curDiff.spawnIntervalMult);
         }
 
         for (let i = this.obstacles.length - 1; i >= 0; i--) {
           const obs = this.obstacles[i];
           obs.z += this.currentSpeed * dt;
           obs.mesh.position.z = obs.z;
-          if (obs.kind === 'RING' || obs.kind === 'RESCUE') obs.mesh.rotation.z += dt * 2.5;
+          if (obs.kind === 'RING' || obs.kind === 'RESCUE') {
+            obs.mesh.rotation.z += dt * 2.5;
+          } else if (obs.kind === 'BLOCK' && obs.moveAmpX > 0) {
+            obs.movePhase += dt * obs.moveSpeed;
+            obs.x = Math.max(-5.2, Math.min(5.2, obs.baseX + Math.sin(obs.movePhase) * obs.moveAmpX));
+            obs.mesh.position.x = obs.x;
+          } else if (obs.kind === 'SPINNER') {
+            obs.angle += obs.rotSpeed * dt;
+            obs.mesh.rotation.z = obs.angle;
+          }
 
           if (obs.z > -1.4 && obs.z < 1.4) {
             for (const c of this.crafts) {
@@ -3006,11 +3662,19 @@
                   const mult = this.getComboMultiplier();
                   const pts = Math.round(250 * mult);
                   c.score += pts;
-                  this.teamScore += pts;
+                  if (!c.isBot || app.mode === 'HOST') this.teamScore += pts;
+                  this.ringsCollected++;
+                  if (app.mode === 'SOLO' && app.currentSoloMode === 'RING_RUSH') {
+                    this.modeTimer = Math.min(60, this.modeTimer + 1.5);
+                    this.showPopup(`RING #${this.ringsCollected} +1.5s! (+${pts})`);
+                  } else {
+                    this.showPopup(`RING +${pts} (x${mult.toFixed(1)})`);
+                  }
                   if (app.mode === 'HOST' && hostNet.ruleMode === 'COOP') this.teamEnergy = Math.min(100, this.teamEnergy + 12);
-                  if ((app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') || app.mode === 'ONLINE') c.jammerCharge = Math.min(100, c.jammerCharge + 35);
+                  if ((app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') || app.mode === 'ONLINE' || (app.mode === 'SOLO' && app.currentSoloMode === 'VS_BOT')) {
+                    c.jammerCharge = Math.min(100, c.jammerCharge + 35);
+                  }
                   audio.playRingCollect();
-                  this.showPopup(`RING +${pts} (x${mult.toFixed(1)})`);
                 }
               } else if (obs.kind === 'RESCUE' && !obs.collectedBy.has(c.slotIndex)) {
                 if (Math.hypot(c.x - obs.x, c.y - obs.y) <= obs.radius + 0.5) {
@@ -3028,11 +3692,23 @@
                     audio.playRescue();
                   }
                 }
-              } else if (obs.kind === 'BLOCK' && !obs.hitBy.has(c.slotIndex)) {
-                const closestX = Math.max(obs.x - obs.halfW, Math.min(c.x, obs.x + obs.halfW));
-                const closestY = Math.max(obs.y - obs.halfH, Math.min(c.y, obs.y + obs.halfH));
-                const dist = Math.hypot(c.x - closestX, c.y - closestY);
-                const hitRadius = 0.52;
+              } else if ((obs.kind === 'BLOCK' || obs.kind === 'SPINNER') && !obs.hitBy.has(c.slotIndex)) {
+                let dist = 999;
+                if (obs.kind === 'BLOCK') {
+                  const closestX = Math.max(obs.x - obs.halfW, Math.min(c.x, obs.x + obs.halfW));
+                  const closestY = Math.max(obs.y - obs.halfH, Math.min(c.y, obs.y + obs.halfH));
+                  dist = Math.hypot(c.x - closestX, c.y - closestY);
+                } else {
+                  // 回転ブレード（SPINNER）のローカル回転座標への逆変換による正確な当たり判定
+                  const cosA = Math.cos(-obs.angle);
+                  const sinA = Math.sin(-obs.angle);
+                  const lx = c.x * cosA - c.y * sinA;
+                  const ly = c.x * sinA + c.y * cosA;
+                  const cx = Math.max(-obs.halfLen, Math.min(lx, obs.halfLen));
+                  const cy = Math.max(-obs.halfThick, Math.min(ly, obs.halfThick));
+                  dist = Math.hypot(lx - cx, ly - cy);
+                }
+                const hitRadius = curDiff.hitRadius;
 
                 if (dist < hitRadius && c.invuln <= 0) {
                   obs.hitBy.add(c.slotIndex);
@@ -3044,15 +3720,17 @@
                   this.comboDecayTimer = 4.2;
                   const mult = this.getComboMultiplier();
                   if (mult > this.maxComboMult) this.maxComboMult = mult;
-                  const bonusPts = Math.round(200 * mult);
+                  const bonusPts = Math.round(200 * mult * curDiff.scoreMult);
                   c.score += bonusPts;
-                  this.teamScore += bonusPts;
-                  this.nearMissCount++;
-                  if ((app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') || app.mode === 'ONLINE') {
+                  if (!c.isBot || app.mode === 'HOST') {
+                    this.teamScore += bonusPts;
+                    this.nearMissCount++;
+                    audio.playNearMiss(this.comboCount);
+                    this.showPopup(`あぶなっ！ +${bonusPts} (x${mult.toFixed(1)})`);
+                  }
+                  if ((app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') || app.mode === 'ONLINE' || (app.mode === 'SOLO' && app.currentSoloMode === 'VS_BOT')) {
                     c.jammerCharge = Math.min(100, c.jammerCharge + 30);
                   }
-                  audio.playNearMiss(this.comboCount);
-                  this.showPopup(`あぶなっ！ +${bonusPts} (x${mult.toFixed(1)})`);
                 }
               }
             }
@@ -3081,9 +3759,42 @@
         this.comboCount = 0;
         this.spawnExplosion(craft.x, craft.y, this.PLAYER_Z, PLAYER_PALETTE[craft.slotIndex].num);
 
+        const goalDist = DIFFICULTIES[app.currentDiffIndex].goalDist;
+        // 制限時間モード（60秒アタック / リングラッシュ / リング争奪戦）では即死せず1.8秒無敵＆減速で続行
+        const isTimedNonLethal = (app.mode === 'SOLO' && (app.currentSoloMode === 'TIME_ATTACK' || app.currentSoloMode === 'RING_RUSH')) || (app.mode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE');
+        if (isTimedNonLethal) {
+          craft.invuln = 1.8;
+          craft.score = Math.max(0, craft.score - 150);
+          if (!craft.isBot) this.teamScore = Math.max(0, this.teamScore - 150);
+          audio.playHit();
+          this.showPopup(`${craft.name} ヒット！ -150pts`, '#7C2D12');
+          return;
+        }
+
+        // VS BOT バトル（オフライン6機バトルロイヤル）
+        if (app.mode === 'SOLO' && app.currentSoloMode === 'VS_BOT') {
+          craft.alive = false;
+          audio.playHit();
+          this.showPopup(`${craft.name} 脱落！`, '#431407');
+          const aliveList = this.crafts.filter(c => c.alive);
+          // 自分が脱落したら即終了、または最後の一人（優勝）になったら勝利終了
+          if (craft.slotIndex === 0) {
+            this.triggerGameOver(false);
+          } else if (aliveList.length <= 1) {
+            if (aliveList[0]) {
+              aliveList[0].score += 1000;
+              this.teamScore += 1000;
+            }
+            app.markStageCleared(MAPS[app.currentMapIndex].id, DIFFICULTIES[app.currentDiffIndex].id);
+            this.triggerGameOver(true);
+          }
+          return;
+        }
+
         if (app.mode === 'SOLO' || app.mode === 'ONLINE') {
           craft.alive = false;
-          const isClear = this.teamDistance >= 500;
+          const isClear = this.teamDistance >= goalDist;
+          if (isClear) app.markStageCleared(MAPS[app.currentMapIndex].id, DIFFICULTIES[app.currentDiffIndex].id);
           this.triggerGameOver(isClear);
           return;
         }
@@ -3095,7 +3806,7 @@
             audio.playHit();
             this.showPopup(`${craft.name} DOWN! RESCUEゲートで復活`);
             if (this.teamEnergy <= 0 || !this.crafts.some(c => c.alive)) {
-              this.triggerGameOver(this.teamDistance >= 500);
+              this.triggerGameOver(this.teamDistance >= goalDist);
             }
           } else {
             craft.alive = false;
@@ -3137,7 +3848,8 @@
 
         if (!isHostMulti) {
           scoreCard.classList.remove('hidden');
-          document.getElementById('resultBadge').textContent = isVictoryOrClear ? '500m CLEAR!' : (isOnline ? 'ONLINE MATCH' : 'SOLO RUN');
+          const curDiffObj = DIFFICULTIES[app.currentDiffIndex];
+          document.getElementById('resultBadge').textContent = isVictoryOrClear ? `${curDiffObj.label} ${curDiffObj.goalDist}m CLEAR!` : `${MAPS[app.currentMapIndex].name} · ${curDiffObj.label}`;
           document.getElementById('resultTitle').textContent = isVictoryOrClear ? 'CLEAR! おめでとう!' : 'GAME OVER';
           document.getElementById('resultScoreSubLabel').textContent = 'FINAL SCORE';
 
@@ -3172,7 +3884,18 @@
           document.getElementById('resultNearMiss').textContent = this.nearMissCount;
           document.getElementById('resultNewRecord').classList.toggle('hidden', !isNewBest);
 
-          if (isOnline && onlineNet.roster.length > 0) {
+          if (app.mode === 'SOLO' && app.currentSoloMode === 'VS_BOT') {
+            rankList.classList.remove('hidden');
+            rankList.classList.add('flex');
+            const sortedBots = [...this.crafts].sort((a, b) => a.rank - b.rank);
+            if (isVictoryOrClear) document.getElementById('resultTitle').textContent = '優勝！おめでとう！';
+            rankList.innerHTML = sortedBots.map(c => `
+              <div class="flex items-center justify-between bg-cream-200 rounded-xl px-3.5 py-2">
+                <span class="font-extrabold text-sm text-ink-800">#${c.rank} ${c.name}</span>
+                <span class="font-extrabold text-sm text-brand-600">${c.score.toLocaleString()} pts (${Math.floor(c.distance)}m)</span>
+              </div>
+            `).join('');
+          } else if (isOnline && onlineNet.roster.length > 0) {
             rankList.classList.remove('hidden');
             rankList.classList.add('flex');
             onlineNet.recalcRanks();
@@ -3234,7 +3957,38 @@
         document.getElementById('hudSpeedLv').textContent = this.speedLevel;
         document.getElementById('hudSpeed').textContent = Math.round(this.currentSpeed * 3.4);
 
-        if (app.mode === 'ONLINE' && this.crafts[0]) {
+        const isTimedHud = (app.mode === 'SOLO' && (app.currentSoloMode === 'TIME_ATTACK' || app.currentSoloMode === 'RING_RUSH')) || (app.mode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE');
+        if (isTimedHud) {
+          const tLbl = document.getElementById('hudModeTimerLabel');
+          const tVal = document.getElementById('hudModeTimerValue');
+          if (tLbl) {
+            if (app.currentSoloMode === 'RING_RUSH' && app.mode === 'SOLO') tLbl.textContent = `RING RUSH · 獲得 ${this.ringsCollected}個`;
+            else if (app.mode === 'HOST') tLbl.textContent = 'RING BATTLE (60s)';
+            else tLbl.textContent = '60s TIME ATTACK';
+          }
+          if (tVal) tVal.textContent = `${Math.max(0, this.modeTimer).toFixed(1)}s`;
+        }
+
+        if (app.mode === 'SOLO' && app.currentSoloMode === 'VS_BOT' && this.crafts[0]) {
+          const pct = Math.floor(this.crafts[0].jammerCharge);
+          const jamBtn = document.getElementById('btnDirectJammer');
+          if (pct >= 100 && this.crafts[0].alive) {
+            jamBtn.className = 'px-5 py-3 rounded-2xl bg-ink-800 text-cream-50 font-extrabold text-xs sm:text-sm animate-pulse';
+            jamBtn.textContent = 'お邪魔発動！';
+          } else {
+            jamBtn.className = 'px-5 py-3 rounded-2xl bg-cream-300 text-ink-400 font-extrabold text-xs sm:text-sm';
+            jamBtn.textContent = `お邪魔 (${pct}%)`;
+          }
+          document.getElementById('hudAliveCount').textContent = this.crafts.filter(c => c.alive).length;
+          document.getElementById('hudTotalCount').textContent = this.crafts.length;
+          const chipsEl = document.getElementById('hudPlayerChips');
+          chipsEl.innerHTML = this.crafts.map(c => `
+            <div class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-cream-200/95 text-ink-800 flex items-center gap-1 ${c.alive ? '' : 'opacity-45 line-through'}">
+              <span class="w-2 h-2 rounded-full" style="background-color:${c.colorHex}"></span>
+              <span>${c.name}</span>
+            </div>
+          `).join('');
+        } else if (app.mode === 'ONLINE' && this.crafts[0]) {
           const pct = Math.floor(this.crafts[0].jammerCharge);
           const jamBtn = document.getElementById('btnDirectJammer');
           if (pct >= 100 && this.crafts[0].alive) {
@@ -3296,13 +4050,108 @@
       currentScreen: 'screenHome',
       mode: 'NONE',
       currentMapIndex: 0,
+      currentDiffIndex: 1, // Default: NORMAL
+      currentSoloMode: 'SURVIVAL',
+      clearedStages: {},
+
+      renderSoloModeGrid() {
+        const grid = document.getElementById('homeSoloModeGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        SOLO_MODES.forEach(m => {
+          const selected = (m.id === this.currentSoloMode);
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.onclick = () => this.setSoloMode(m.id);
+          btn.className = selected
+            ? 'py-2 px-2 rounded-2xl bg-brand-500 text-cream-50 text-center transition'
+            : 'py-2 px-2 rounded-2xl bg-cream-100 hover:bg-cream-300 text-ink-800 text-center transition';
+          btn.innerHTML = `
+            <div class="text-[11px] font-extrabold leading-tight truncate">${m.label}</div>
+            <div class="text-[9px] font-bold truncate ${selected ? 'text-cream-100' : 'text-ink-400'}">${m.short}</div>
+          `;
+          grid.appendChild(btn);
+        });
+        const cur = SOLO_MODES.find(m => m.id === this.currentSoloMode) || SOLO_MODES[0];
+        const badge = document.getElementById('homeSelectedSoloModeBadge');
+        if (badge) badge.textContent = cur.label;
+        this.updateSoloBtnDesc();
+      },
+
+      setSoloMode(modeId) {
+        this.currentSoloMode = modeId;
+        this.renderSoloModeGrid();
+      },
+
+      loadClearedStages() {
+        try {
+          this.clearedStages = JSON.parse(localStorage.getItem('gyrododge3d_cleared_v12') || '{}');
+        } catch (e) {
+          this.clearedStages = {};
+        }
+      },
+
+      markStageCleared(mapId, diffId) {
+        const key = `${mapId}_${diffId}`;
+        this.clearedStages[key] = true;
+        localStorage.setItem('gyrododge3d_cleared_v12', JSON.stringify(this.clearedStages));
+        this.renderMapGrid();
+      },
+
+      renderDiffGrid() {
+        const grid = document.getElementById('homeDiffGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        DIFFICULTIES.forEach((d, idx) => {
+          const selected = (idx === this.currentDiffIndex);
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.onclick = () => this.setDifficultyIndex(idx);
+          btn.className = selected
+            ? 'py-2 px-1 rounded-2xl bg-ink-800 text-cream-100 text-center transition'
+            : 'py-2 px-1 rounded-2xl bg-cream-100 hover:bg-cream-300 text-ink-800 text-center transition';
+          btn.innerHTML = `
+            <div class="text-[11px] font-extrabold leading-tight">${d.label}</div>
+            <div class="text-[9px] font-bold ${selected ? 'text-brand-400' : 'text-ink-400'}">${d.jp}</div>
+          `;
+          grid.appendChild(btn);
+        });
+        const curDiff = DIFFICULTIES[this.currentDiffIndex];
+        const badge = document.getElementById('homeSelectedDiffBadge');
+        const lobbyDiff = document.getElementById('lobbyDiffLabel');
+        if (badge) badge.textContent = `${curDiff.label} · 目標${curDiff.goalDist}m · x${curDiff.scoreMult}`;
+        if (lobbyDiff) lobbyDiff.textContent = curDiff.label;
+        this.updateSoloBtnDesc();
+      },
+
+      setDifficultyIndex(idx) {
+        this.currentDiffIndex = idx % DIFFICULTIES.length;
+        this.renderDiffGrid();
+        this.renderMapGrid();
+        if (typeof onlineNet !== 'undefined') onlineNet.renderRoster();
+      },
+
+      cycleDifficulty() {
+        this.setDifficultyIndex((this.currentDiffIndex + 1) % DIFFICULTIES.length);
+      },
+
+      updateSoloBtnDesc() {
+        const desc = document.getElementById('homeSoloBtnDesc');
+        if (!desc) return;
+        const sm = SOLO_MODES.find(x => x.id === this.currentSoloMode) || SOLO_MODES[0];
+        const m = MAPS[this.currentMapIndex];
+        const d = DIFFICULTIES[this.currentDiffIndex];
+        desc.textContent = `【${sm.label}】${m.name} / ${d.label}（${sm.short}）`;
+      },
 
       renderMapGrid() {
         const grid = document.getElementById('homeMapGrid');
         if (!grid) return;
         grid.innerHTML = '';
+        const curDiffId = DIFFICULTIES[this.currentDiffIndex].id;
         MAPS.forEach((m, idx) => {
           const selected = (idx === this.currentMapIndex);
+          const isCleared = Boolean(this.clearedStages[`${m.id}_${curDiffId}`]);
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.onclick = () => this.setMapIndex(idx);
@@ -3310,9 +4159,9 @@
             ? 'p-2.5 rounded-2xl bg-brand-500 text-cream-50 text-left transition'
             : 'p-2.5 rounded-2xl bg-cream-100 hover:bg-cream-300 text-ink-800 text-left transition';
           btn.innerHTML = `
-            <div class="flex items-center justify-between mb-0.5">
-              <span class="w-2.5 h-2.5 rounded-full" style="background-color:${selected ? '#FFF7ED' : m.accentCss}"></span>
-              <span class="text-[9px] font-extrabold ${selected ? 'text-cream-100' : 'text-ink-400'}">${m.tag}</span>
+            <div class="flex items-center justify-between mb-0.5 gap-1">
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color:${selected ? '#FFF7ED' : m.accentCss}"></span>
+              <span class="text-[9px] font-extrabold truncate ${selected ? 'text-cream-100' : 'text-ink-400'}">${isCleared ? '★CLEAR · ' : ''}${m.tag}</span>
             </div>
             <div class="text-xs font-extrabold truncate">${m.name}</div>
           `;
@@ -3320,8 +4169,9 @@
         });
         const badge = document.getElementById('homeSelectedMapBadge');
         const lobbyLbl = document.getElementById('lobbyMapLabel');
-        if (badge) badge.textContent = MAPS[this.currentMapIndex].name;
+        if (badge) badge.textContent = `${MAPS[this.currentMapIndex].name} (${MAPS[this.currentMapIndex].gimmick})`;
         if (lobbyLbl) lobbyLbl.textContent = MAPS[this.currentMapIndex].name;
+        this.updateSoloBtnDesc();
       },
 
       setMapIndex(idx) {
@@ -3591,6 +4441,9 @@
     window.addEventListener('DOMContentLoaded', () => {
       netStatus.init();
       adManager.init();
+      app.loadClearedStages();
+      app.renderSoloModeGrid();
+      app.renderDiffGrid();
       app.renderMapGrid();
       gyro.init();
       voiceStudio.init();
