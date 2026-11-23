@@ -141,6 +141,13 @@
 </head>
 <body class="bg-cream-100 text-ink-800 antialiased">
 
+  <!-- モバイル画面下部オーバーレイ広告の直上に浮かぶ非表示ボタン -->
+  <button id="floatingAdCloseBtn" type="button" onclick="adManager.hideAd()"
+    style="z-index: 2147483647;"
+    class="fixed bottom-[62px] right-2.5 px-3 py-1.5 rounded-full bg-ink-800/90 text-cream-100 font-extrabold text-[11px] flex items-center gap-1 active:scale-95 transition">
+    <span>✕ 広告を消す</span>
+  </button>
+
   <!-- =====================================================================
        共通ヘッダーバー（タイトル戻り・ボイス設定・サウンド切替）
        ===================================================================== -->
@@ -181,8 +188,8 @@
   <!-- =====================================================================
        1. ホーム画面（モード選択）
        ===================================================================== -->
-  <main id="screenHome" class="screen active items-center justify-center p-5 pt-16">
-    <div class="w-full max-w-lg flex flex-col items-center text-center my-auto py-4">
+  <main id="screenHome" class="screen active items-center justify-start p-5 pt-16 pb-28">
+    <div class="w-full max-w-lg flex flex-col items-center text-center my-auto py-2">
       <!-- アプリロゴ -->
       <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnR3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkY3RUQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkZFREQ1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ3aW5nUmlnaHQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRUE1ODBDIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0MyNDEwQyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0id2luZ0xlZnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkI5MjNDIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0Y5NzMxNiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBSb3VuZGVkIFNxdWFyZSBCYXNlIC0tPgogIDxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTEyIiBmaWxsPSJ1cmwoI2JnR3JhZCkiLz4KICA8cmVjdCB4PSIxNCIgeT0iMTQiIHdpZHRoPSI0ODQiIGhlaWdodD0iNDg0IiByeD0iMTAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNGRUQ3QUEiIHN0cm9rZS13aWR0aD0iOCIvPgoKICA8IS0tIDNEIFR1bm5lbCBSaW5ncyAtLT4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjE5NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkRCQTc0IiBzdHJva2Utd2lkdGg9IjE0IiBzdHJva2UtZGFzaGFycmF5PSI2NCAyOCIgb3BhY2l0eT0iMC41NSIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTQ2IiBmaWxsPSJub25lIiBzdHJva2U9IiMxRTI5M0IiIHN0cm9rZS13aWR0aD0iMTQiIG9wYWNpdHk9IjAuMTQiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9Ijk2IiBmaWxsPSJub25lIiBzdHJva2U9IiNGOTczMTYiIHN0cm9rZS13aWR0aD0iMTAiIG9wYWNpdHk9IjAuMjgiLz4KCiAgPCEtLSBTcGVlZCBNb3Rpb24gTGluZXMgLS0+CiAgPGxpbmUgeDE9Ijk0IiB5MT0iMzYyIiB4Mj0iMTYyIiB5Mj0iMjk0IiBzdHJva2U9IiNGOTczMTYiIHN0cm9rZS13aWR0aD0iMTAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC42Ii8+CiAgPGxpbmUgeDE9IjQxOCIgeTE9IjM2MiIgeDI9IjM1MCIgeTI9IjI5NCIgc3Ryb2tlPSIjRjk3MzE2IiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9IjAuNiIvPgogIDxsaW5lIHgxPSIyNTYiIHkxPSI0MjgiIHgyPSIyNTYiIHkyPSIzNjgiIHN0cm9rZT0iIzFFMjkzQiIgc3Ryb2tlLXdpZHRoPSIxMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIwLjI1Ii8+CgogIDwhLS0gTG93LVBvbHkgM0QgR2xpZGVyIFNoaXAgLS0+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2LCAyNDgpIHJvdGF0ZSgtMTQpIj4KICAgIDwhLS0gU2hhZG93IC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSIwLC0xMTggMTE4LDkyIDAsNTQgLTExOCw5MiIgZmlsbD0iIzFFMjkzQiIgb3BhY2l0eT0iMC4xNCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwgMTgpIi8+CiAgICA8IS0tIExlZnQgV2luZyAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iMCwtMTE4IC0xMTgsOTIgMCw0OCIgZmlsbD0idXJsKCN3aW5nTGVmdCkiLz4KICAgIDwhLS0gUmlnaHQgV2luZyAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iMCwtMTE4IDExOCw5MiAwLDQ4IiBmaWxsPSJ1cmwoI3dpbmdSaWdodCkiLz4KICAgIDwhLS0gQ2VudGVyIEZ1c2VsYWdlIFJpZGdlIC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSIwLC0xMTggMzIsNTYgMCw0MiAtMzIsNTYiIGZpbGw9IiNGRkY3RUQiIG9wYWNpdHk9IjAuOTIiLz4KICAgIDwhLS0gVGhydXN0ZXIgQ29yZSAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iLTI2LDU2IDI2LDU2IDAsODgiIGZpbGw9IiMxRTI5M0IiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLTE0LDU4IDE0LDU4IDAsNzgiIGZpbGw9IiNGREJBNzQiLz4KICA8L2c+Cjwvc3ZnPg==" alt="GYRO DODGE 3D Logo" class="w-20 h-20 rounded-3xl mb-3 animate-soft-pulse">
 
@@ -315,7 +322,7 @@
       <div id="admaxContainer" class="w-full mt-4 flex flex-col items-center justify-center overflow-hidden rounded-2xl bg-cream-200/60 py-2 px-3">
         <div class="w-full flex items-center justify-between mb-1">
           <span class="text-[9px] font-bold text-ink-400 tracking-widest">SPONSORED</span>
-          <button type="button" onclick="adManager.hideAd()" class="px-2 py-0.5 rounded-full bg-cream-300/80 hover:bg-cream-300 active:scale-95 transition text-[10px] font-extrabold text-ink-600 flex items-center gap-1">
+          <button type="button" onclick="adManager.hideAd()" class="px-2.5 py-1 rounded-full bg-ink-800 text-cream-100 active:scale-95 transition text-[10px] font-extrabold flex items-center gap-1">
             <span>✕ 広告を非表示</span>
           </button>
         </div>
@@ -2955,6 +2962,10 @@
           backBtn.classList.remove('hidden');
           backBtn.classList.add('flex');
         }
+        const floatAdBtn = document.getElementById('floatingAdCloseBtn');
+        if (floatAdBtn) {
+          floatAdBtn.classList.toggle('hidden', adManager.hidden || screenId !== 'screenHome');
+        }
       },
 
       goHome() {
@@ -3028,14 +3039,39 @@
     };
 
     /**
-     * 広告表示・非表示マネージャー（状態保存対応）
+     * 広告表示・非表示マネージャー（オーバーレイ広告・状態保存対応）
      */
     const adManager = {
       hidden: false,
+      observer: null,
 
       init() {
         this.hidden = localStorage.getItem('gyrododge3d_ad_hidden') === '1';
         this.applyState();
+
+        // Shinobi AdMaxが後からbody直下に挿入するオーバーレイ広告も監視して制御
+        this.observer = new MutationObserver(() => {
+          if (this.hidden) this.hideInjectedOverlays(true);
+        });
+        this.observer.observe(document.body, { childList: true, subtree: true });
+      },
+
+      hideInjectedOverlays(hide) {
+        // Shinobi AdMaxがbody直下に生成するオーバーレイコンテナやiframeを検出して表示切替
+        const candidates = document.querySelectorAll(
+          'iframe[src*="shinobi.jp"], [id*="admax"], [class*="admax"], [id*="shinobi"], [class*="shinobi"]'
+        );
+        candidates.forEach(el => {
+          if (el.id === 'admaxContainer' || el.id === 'admaxScriptWrap' || el.id === 'admaxHiddenBar') return;
+          el.style.setProperty('display', hide ? 'none' : '', 'important');
+        });
+
+        // body直下の固定配置広告ラッパー（アプリ自身の要素以外）も制御
+        Array.from(document.body.children).forEach(child => {
+          if (['SCRIPT', 'STYLE', 'HEADER', 'MAIN', 'SECTION', 'BUTTON'].includes(child.tagName)) return;
+          if (child.id === 'floatingAdCloseBtn') return;
+          child.style.setProperty('display', hide ? 'none' : '', 'important');
+        });
       },
 
       hideAd() {
@@ -3058,9 +3094,13 @@
       applyState() {
         const box = document.getElementById('admaxContainer');
         const hiddenBar = document.getElementById('admaxHiddenBar');
+        const floatBtn = document.getElementById('floatingAdCloseBtn');
 
         if (box) box.classList.toggle('hidden', this.hidden);
         if (hiddenBar) hiddenBar.classList.toggle('hidden', !this.hidden);
+        if (floatBtn) floatBtn.classList.toggle('hidden', this.hidden);
+
+        this.hideInjectedOverlays(this.hidden);
       }
     };
 
