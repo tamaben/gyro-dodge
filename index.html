@@ -985,14 +985,6 @@
     ];
 
 
-
-    const DIFFICULTIES = [
-      { id: 'EASY', label: 'EASY', jp: 'かんたん', speedMult: 0.78, spawnIntervalMult: 1.28, scoreMult: 0.8, goalDist: 350, hitRadius: 0.44, moveSpeedMult: 0.7 },
-      { id: 'NORMAL', label: 'NORMAL', jp: 'ふつう', speedMult: 1.0, spawnIntervalMult: 1.0, scoreMult: 1.0, goalDist: 500, hitRadius: 0.52, moveSpeedMult: 1.0 },
-      { id: 'HARD', label: 'HARD', jp: 'むずかしい', speedMult: 1.24, spawnIntervalMult: 0.82, scoreMult: 1.5, goalDist: 650, hitRadius: 0.56, moveSpeedMult: 1.35 },
-      { id: 'EXTREME', label: 'EXTREME', jp: 'げきむず', speedMult: 1.48, spawnIntervalMult: 0.68, scoreMult: 2.5, goalDist: 800, hitRadius: 0.60, moveSpeedMult: 1.75 }
-    ];
-
     const MAPS = [
       { id: 'CANYON', chapter: 1, storyTitle: '第1章 旅立ちの渓谷', name: 'サンセット・キャニオン', tag: '八角回廊', gimmick: '八角トンネル', tunnelShape: 'OCTAGON', obstacleShape: 'BOULDER', bgHex: 0xFFF7ED, fogHex: 0xFFF7ED, floorHex: 0xFFEDD5, ringHex: 0xFED7AA, railHex: 0xFB923C, blockHex: 0x431407, stripeHex: 0xF97316, accentCss: '#F97316', spawnPattern: 'STANDARD', speedBonus: 1.0, slippery: false, hasWind: false, hasMoving: false, hasSpinner: false, storyGoalDist: 250, storySpeedMult: 0.78, storySpawnMult: 1.25, difficultyStars: 1, introText: '「最初の光のコアを探しに夕焼けの渓谷へ出撃しよう！」', clearText: '「第1章クリア！最初の光のコアを手に入れたよ！」' },
       { id: 'FOREST', chapter: 2, storyTitle: '第2章 緑の樹海', name: 'エメラルド・フォレスト', tag: '六角樹海', gimmick: 'リング多数', tunnelShape: 'HEXAGON', obstacleShape: 'TRUNK', bgHex: 0xF0FDF4, fogHex: 0xF0FDF4, floorHex: 0xDCFCE7, ringHex: 0xBBF7D0, railHex: 0x22C55E, blockHex: 0x14532D, stripeHex: 0x4ADE80, accentCss: '#16A34A', spawnPattern: 'RINGS_HEAVY', speedBonus: 1.0, slippery: false, hasWind: false, hasMoving: false, hasSpinner: false, storyGoalDist: 300, storySpeedMult: 0.84, storySpawnMult: 1.18, difficultyStars: 1, introText: '「森のリングをくぐりながら2つ目のコアを目指そう！」', clearText: '「第2章クリア！森のコアを回収完了！」' },
@@ -1047,15 +1039,6 @@
       { id: 'TURBO', name: 'ターボブースター', effect: '加速力UP＆倍率+0.3' },
       { id: 'STABILIZER', name: 'スタビライザー', effect: '横風・氷スリップ65%軽減' },
       { id: 'RADAR', name: 'ニアミスレーダー', effect: 'ニアミス判定拡大＆ゲージ1.4倍' }
-    ];
-
-    const SOLO_MODES = [
-      { id: 'SURVIVAL', label: 'サバイバル', short: '標準', desc: '目標距離クリア＆ハイスコア' },
-      { id: 'VS_BOT', label: 'VS BOT', short: '6機対戦', desc: 'BOT5体とお邪魔バトル' },
-      { id: 'TIME_ATTACK', label: '60秒', short: '時間制', desc: '60秒間でスコア勝負' },
-      { id: 'RING_RUSH', label: 'リング', short: '時間延長', desc: 'リングで+1.5秒延長' },
-      { id: 'SUDDEN_DEATH', label: '高速x2', short: '一撃勝負', desc: '超高速＆x2.0スタート' },
-      { id: 'RANDOM', label: 'ランダム', short: 'ワープ', desc: '150m毎にマップ変化' }
     ];
 
     const VOICE_SLOTS = [
