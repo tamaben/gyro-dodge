@@ -672,8 +672,8 @@
        ===================================================================== -->
   <section id="screenStoryMap" class="screen items-center justify-start p-4 pt-16 pb-24 bg-cream-50">
     <div class="w-full max-w-md flex flex-col items-center">
-      <!-- トップステータスバー（アバター / コア / 連続クリア / エネルギー） -->
-      <div class="w-full flex items-center justify-between px-2 py-2 mb-3">
+      <!-- ポップRPG風ステータスバー（パイロット / コア / スター） -->
+      <div class="w-full bg-cream-200 rounded-full px-3 py-2 mb-3 flex items-center justify-between gap-2">
         <div class="flex items-center gap-2">
           <div id="storyAvatarCircle" class="w-10 h-10 rounded-full bg-brand-500 border-2 border-cream-200 flex items-center justify-center text-cream-50 font-extrabold text-xs">
             P1
@@ -3213,6 +3213,7 @@
       camera: null,
       renderer: null,
       state: 'IDLE',
+      runMode: 'SOLO',
       lastTime: 0,
 
       tunnelGroup: null,
@@ -3628,11 +3629,15 @@
         }
       },
 
-      start() {
+      start(forcedMode = null) {
+        if (forcedMode) this.runMode = forcedMode;
+        else this.runMode = app.mode || 'SOLO';
+        const mMode = this.runMode;
+
         audio.init();
         this.clearEntities();
         const curMap = MAPS[app.currentMapIndex];
-        const isStory = (app.mode === 'STORY');
+        const isStory = (mMode === 'STORY');
         const curDiff = DIFFICULTIES[app.currentDiffIndex];
         this.applyMapTheme(curMap);
 
@@ -4233,9 +4238,10 @@
 
         if (this.state !== 'PLAYING' && this.state !== 'COUNTDOWN') return;
 
+        const mMode = this.runMode || app.mode;
         const curMap = MAPS[app.currentMapIndex];
         const curDiff = DIFFICULTIES[app.currentDiffIndex];
-        let anyBoost = (app.mode === 'SOLO' || app.mode === 'ONLINE' || app.mode === 'STORY')
+        let anyBoost = (mMode === 'SOLO' || mMode === 'ONLINE' || mMode === 'STORY')
           ? this.directBoost
           : this.crafts.some(c => c.alive && hostNet.slots[c.slotIndex]?.boost);
 
@@ -4243,7 +4249,7 @@
           this.teamDistance += this.currentSpeed * dt * 0.45;
 
           // 探検（ストーリー）モード：目標距離到達で即ステージクリア＆次章解放！
-          if (app.mode === 'STORY' && this.teamDistance >= curMap.storyGoalDist) {
+          if (mMode === 'STORY' && this.teamDistance >= curMap.storyGoalDist) {
             app.markStoryChapterCleared(curMap.chapter);
             this.triggerGameOver(true);
             return;
@@ -5644,9 +5650,12 @@
 
             if (isCurrent || cleared) {
               btn.innerHTML = `
-                <svg class="w-9 h-9" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                </svg>
+                <div class="flex flex-col items-center justify-center leading-none">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                  <span class="text-[9px] font-black tracking-wider mt-0.5 bg-white/95 text-pink-600 px-1.5 py-0.5 rounded-full">${isCurrent ? 'NEW' : 'CLEAR'}</span>
+                </div>
               `;
             } else {
               btn.innerHTML = `
@@ -5725,13 +5734,14 @@
       },
 
       confirmStoryDialogue() {
+        const idx = this.pendingStoryChapterIndex || 0;
         this.closeStoryDialogue();
         this.mode = 'STORY';
-        this.setMapIndex(this.pendingStoryChapterIndex);
+        this.setMapIndex(idx);
         gyro.calibrate();
         this.showScreen('screenGame');
         game3d.onResize();
-        game3d.start();
+        game3d.start('STORY');
       },
 
       advanceNextStoryChapter() {
