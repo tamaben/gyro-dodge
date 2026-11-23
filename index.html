@@ -1674,7 +1674,7 @@ const EMBEDDED_VOICES = {
           });
         }
 
-        document.getElementById('gameOverModal').classList.add('hidden'); document.getElementById('gameOverModal').classList.remove('flex');
+        const gm = document.getElementById('gameOverModal'); gm.classList.add('hidden'); gm.classList.remove('flex'); gm.style.display = 'none';
         document.getElementById('blindOverlay').classList.add('hidden'); document.getElementById('blindOverlay').classList.remove('flex');
         document.getElementById('hudWindBanner').classList.add('hidden');
 
@@ -2078,7 +2078,7 @@ const EMBEDDED_VOICES = {
         app.addCoins(coinReward); app.recordFlightStats(finalDist, this.nearMissCount);
         accountMgr.saveActiveProfile();
 
-        setTimeout(() => { if (this.state === 'GAMEOVER') { const m = document.getElementById('gameOverModal'); m.classList.remove('hidden'); m.classList.add('flex'); } }, 450);
+        setTimeout(() => { if (this.state === 'GAMEOVER') { const m = document.getElementById('gameOverModal'); m.classList.remove('hidden'); m.classList.add('flex'); m.style.display = 'flex'; } }, 450);
       },
       updateHud() {
         const isVsBot = (this.runMode === 'SOLO' && app.currentSoloMode === 'VS_BOT');
@@ -2296,9 +2296,9 @@ const EMBEDDED_VOICES = {
         document.getElementById('storyDlgStars').textContent = '★'.repeat(m.difficultyStars);
         document.getElementById('storyDlgGimmick').textContent = m.gimmick;
         const modal = document.getElementById('modalStoryDialogue');
-        modal.classList.remove('hidden'); modal.classList.add('flex');
+        modal.classList.remove('hidden'); modal.classList.add('flex'); modal.style.display = 'flex';
       },
-      closeStoryDialogue() { const modal = document.getElementById('modalStoryDialogue'); modal.classList.add('hidden'); modal.classList.remove('flex'); },
+      closeStoryDialogue() { const modal = document.getElementById('modalStoryDialogue'); modal.classList.add('hidden'); modal.classList.remove('flex'); modal.style.display = 'none'; },
       confirmStoryDialogue() {
         const idx = this.pendingStoryChapterIndex || 0;
         this.closeStoryDialogue();
@@ -2308,17 +2308,32 @@ const EMBEDDED_VOICES = {
       advanceNextStoryChapter() {
         const ni = this.currentMapIndex + 1;
         if (ni >= MAPS.length) { this.openStoryMap(); return; }
-        document.getElementById('gameOverModal').classList.add('hidden'); document.getElementById('gameOverModal').classList.remove('flex');
+        const gm = document.getElementById('gameOverModal'); gm.classList.add('hidden'); gm.classList.remove('flex'); gm.style.display = 'none';
         this.openStoryMap(); this.openStoryDialogue(ni);
       },
       showScreen(id) {
-        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.screen').forEach(el => {
+          el.classList.remove('active');
+          el.style.display = 'none';
+        });
+        const target = document.getElementById(id);
+        if (target) {
+          target.classList.add('active');
+          target.style.display = 'flex';
+        }
         this.currentScreen = id;
         const back = document.getElementById('btnBackHome');
-        if (back) back.classList.toggle('hidden', id === 'screenHome');
+        if (back) {
+          const showBack = (id !== 'screenHome');
+          back.classList.toggle('hidden', !showBack);
+          back.style.display = showBack ? 'flex' : 'none';
+        }
         const fl = document.getElementById('floatingAdCloseBtn');
-        if (fl) fl.classList.toggle('hidden', adManager.hidden || id !== 'screenHome');
+        if (fl) {
+          const hideFl = adManager.hidden || id !== 'screenHome';
+          fl.classList.toggle('hidden', hideFl);
+          fl.style.display = hideFl ? 'none' : 'block';
+        }
       },
       goHome() {
         audio.stopBgm(); game3d.state = 'IDLE'; game3d.clearEntities();
@@ -2475,7 +2490,7 @@ const EMBEDDED_VOICES = {
       btnHomeCoins: () => app.openShop('ALL'),
       btnStartStory: () => app.openStoryMap(),
       btnStartRandom: () => { gyro.requestPermission('solo'); app.launchQuickRandom(); },
-      btnStartFree: () => app.startSoloSetup(),
+      btnStartFree: () => { gyro.requestPermission('solo'); app.launchSoloGame(); },
       btnOpenCustom: () => app.openCustomGarage(),
       btnOpenShop: () => app.openShop('ALL'),
       btnOpenVault: () => app.openCollectionVault(),
@@ -2547,11 +2562,27 @@ const EMBEDDED_VOICES = {
     };
 
     function bindAllButtons() {
+      const showToast = (label) => {
+        let tb = document.getElementById('btnFeedbackToast');
+        if (!tb) {
+          tb = document.createElement('div');
+          tb.id = 'btnFeedbackToast';
+          tb.style.cssText = 'position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:2147483646;pointer-events:none;background:#292524;color:#FFFDF9;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:800;opacity:0;transition:opacity 0.15s ease;';
+          document.body.appendChild(tb);
+        }
+        tb.textContent = label;
+        tb.style.opacity = '1';
+        clearTimeout(tb._t);
+        tb._t = setTimeout(() => { tb.style.opacity = '0'; }, 850);
+      };
+
       Object.entries(BUTTON_ACTIONS).forEach(([id, fn]) => {
         const el = document.getElementById(id);
         if (el) {
           el.onclick = (e) => {
             if (el.disabled) return;
+            const txt = (el.innerText || '').trim().split('\n')[0].slice(0, 18);
+            if (txt) showToast(txt);
             fn(e);
           };
         }
