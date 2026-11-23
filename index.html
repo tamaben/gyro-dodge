@@ -153,9 +153,6 @@
     </button>
     <div class="flex-1"></div>
     <div class="pointer-events-auto flex items-center gap-2">
-      <button id="btnHeaderAdToggle" onclick="adManager.toggleAd()" class="flex items-center gap-1 px-3 py-2 rounded-full bg-cream-200 hover:bg-cream-300 active:scale-95 transition text-ink-800 font-bold text-xs sm:text-sm" aria-label="広告表示切り替え">
-        <span id="labelHeaderAd">広告: ON</span>
-      </button>
       <button id="btnHeaderVoice" onclick="app.openVoiceStudio()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-cream-200 hover:bg-cream-300 active:scale-95 transition text-ink-800 font-bold text-xs sm:text-sm">
         <svg class="w-4 h-4 text-brand-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
@@ -3061,11 +3058,9 @@
       applyState() {
         const box = document.getElementById('admaxContainer');
         const hiddenBar = document.getElementById('admaxHiddenBar');
-        const headerLabel = document.getElementById('labelHeaderAd');
 
         if (box) box.classList.toggle('hidden', this.hidden);
         if (hiddenBar) hiddenBar.classList.toggle('hidden', !this.hidden);
-        if (headerLabel) headerLabel.textContent = this.hidden ? '広告: OFF' : '広告: ON';
       }
     };
 
