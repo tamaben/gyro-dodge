@@ -153,6 +153,9 @@
     </button>
     <div class="flex-1"></div>
     <div class="pointer-events-auto flex items-center gap-2">
+      <button id="btnHeaderAdToggle" onclick="adManager.toggleAd()" class="flex items-center gap-1 px-3 py-2 rounded-full bg-cream-200 hover:bg-cream-300 active:scale-95 transition text-ink-800 font-bold text-xs sm:text-sm" aria-label="広告表示切り替え">
+        <span id="labelHeaderAd">広告: ON</span>
+      </button>
       <button id="btnHeaderVoice" onclick="app.openVoiceStudio()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-cream-200 hover:bg-cream-300 active:scale-95 transition text-ink-800 font-bold text-xs sm:text-sm">
         <svg class="w-4 h-4 text-brand-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
@@ -311,12 +314,24 @@
             追加する
           </button>
         </div>
-      <!-- admax -->
-      <div class="w-full mt-4 flex flex-col items-center justify-center overflow-hidden rounded-2xl bg-cream-200/60 py-2 px-2">
-        <span class="text-[9px] font-bold text-ink-400 tracking-widest mb-1">SPONSORED</span>
-        <!-- admax -->
-        <script src="https://adm.shinobi.jp/s/6deabf2adba66b7bba510d1b374de414"></script>
-        <!-- admax -->
+      <!-- admax（非表示・再表示切替対応） -->
+      <div id="admaxContainer" class="w-full mt-4 flex flex-col items-center justify-center overflow-hidden rounded-2xl bg-cream-200/60 py-2 px-3">
+        <div class="w-full flex items-center justify-between mb-1">
+          <span class="text-[9px] font-bold text-ink-400 tracking-widest">SPONSORED</span>
+          <button type="button" onclick="adManager.hideAd()" class="px-2 py-0.5 rounded-full bg-cream-300/80 hover:bg-cream-300 active:scale-95 transition text-[10px] font-extrabold text-ink-600 flex items-center gap-1">
+            <span>✕ 広告を非表示</span>
+          </button>
+        </div>
+        <div id="admaxScriptWrap" class="w-full flex justify-center overflow-hidden">
+          <!-- admax -->
+          <script src="https://adm.shinobi.jp/s/6deabf2adba66b7bba510d1b374de414"></script>
+          <!-- admax -->
+        </div>
+      </div>
+      <div id="admaxHiddenBar" class="hidden w-full mt-3 flex justify-center">
+        <button type="button" onclick="adManager.showAd()" class="px-3.5 py-1.5 rounded-full bg-cream-200/70 hover:bg-cream-200 active:scale-95 transition text-[11px] font-bold text-ink-400">
+          広告を再表示する
+        </button>
       </div>
       </div>
     </div>
@@ -3015,7 +3030,47 @@
       }
     };
 
+    /**
+     * 広告表示・非表示マネージャー（状態保存対応）
+     */
+    const adManager = {
+      hidden: false,
+
+      init() {
+        this.hidden = localStorage.getItem('gyrododge3d_ad_hidden') === '1';
+        this.applyState();
+      },
+
+      hideAd() {
+        this.hidden = true;
+        localStorage.setItem('gyrododge3d_ad_hidden', '1');
+        this.applyState();
+      },
+
+      showAd() {
+        this.hidden = false;
+        localStorage.setItem('gyrododge3d_ad_hidden', '0');
+        this.applyState();
+      },
+
+      toggleAd() {
+        if (this.hidden) this.showAd();
+        else this.hideAd();
+      },
+
+      applyState() {
+        const box = document.getElementById('admaxContainer');
+        const hiddenBar = document.getElementById('admaxHiddenBar');
+        const headerLabel = document.getElementById('labelHeaderAd');
+
+        if (box) box.classList.toggle('hidden', this.hidden);
+        if (hiddenBar) hiddenBar.classList.toggle('hidden', !this.hidden);
+        if (headerLabel) headerLabel.textContent = this.hidden ? '広告: OFF' : '広告: ON';
+      }
+    };
+
     window.addEventListener('DOMContentLoaded', () => {
+      adManager.init();
       gyro.init();
       voiceStudio.init();
       game3d.init();
