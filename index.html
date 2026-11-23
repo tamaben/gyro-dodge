@@ -219,6 +219,20 @@
     .animate-bob {
       animation: floatBob 1.8s infinite ease-in-out;
     }
+    /* 手作り感・ゲーム筐体風のスタンプ＆枠アクセント */
+    .game-stamp {
+      display: inline-block;
+      border: 2px solid currentColor;
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      transform: rotate(-2deg);
+    }
+    .game-panel {
+      background: #FFFDF9;
+      border: 2px solid #FDBA74;
+    }
   </style>
 </head>
 <body class="bg-cream-100 text-ink-800 antialiased">
@@ -318,9 +332,12 @@
         <div class="flex items-center gap-3 min-w-0">
           <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnR3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkY3RUQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkZFREQ1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ3aW5nUmlnaHQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRUE1ODBDIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0MyNDEwQyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0id2luZ0xlZnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkI5MjNDIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0Y5NzMxNiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBSb3VuZGVkIFNxdWFyZSBCYXNlIC0tPgogIDxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTEyIiBmaWxsPSJ1cmwoI2JnR3JhZCkiLz4KICA8cmVjdCB4PSIxNCIgeT0iMTQiIHdpZHRoPSI0ODQiIGhlaWdodD0iNDg0IiByeD0iMTAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNGRUQ3QUEiIHN0cm9rZS13aWR0aD0iOCIvPgoKICA8IS0tIDNEIFR1bm5lbCBSaW5ncyAtLT4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjE5NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkRCQTc0IiBzdHJva2Utd2lkdGg9IjE0IiBzdHJva2UtZGFzaGFycmF5PSI2NCAyOCIgb3BhY2l0eT0iMC41NSIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTQ2IiBmaWxsPSJub25lIiBzdHJva2U9IiMxRTI5M0IiIHN0cm9rZS13aWR0aD0iMTQiIG9wYWNpdHk9IjAuMTQiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9Ijk2IiBmaWxsPSJub25lIiBzdHJva2U9IiNGOTczMTYiIHN0cm9rZS13aWR0aD0iMTAiIG9wYWNpdHk9IjAuMjgiLz4KCiAgPCEtLSBTcGVlZCBNb3Rpb24gTGluZXMgLS0+CiAgPGxpbmUgeDE9Ijk0IiB5MT0iMzYyIiB4Mj0iMTYyIiB5Mj0iMjk0IiBzdHJva2U9IiNGOTczMTYiIHN0cm9rZS13aWR0aD0iMTAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC42Ii8+CiAgPGxpbmUgeDE9IjQxOCIgeTE9IjM2MiIgeDI9IjM1MCIgeTI9IjI5NCIgc3Ryb2tlPSIjRjk3MzE2IiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9IjAuNiIvPgogIDxsaW5lIHgxPSIyNTYiIHkxPSI0MjgiIHgyPSIyNTYiIHkyPSIzNjgiIHN0cm9rZT0iIzFFMjkzQiIgc3Ryb2tlLXdpZHRoPSIxMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIwLjI1Ii8+CgogIDwhLS0gTG93LVBvbHkgM0QgR2xpZGVyIFNoaXAgLS0+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2LCAyNDgpIHJvdGF0ZSgtMTQpIj4KICAgIDwhLS0gU2hhZG93IC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSIwLC0xMTggMTE4LDkyIDAsNTQgLTExOCw5MiIgZmlsbD0iIzFFMjkzQiIgb3BhY2l0eT0iMC4xNCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwgMTgpIi8+CiAgICA8IS0tIExlZnQgV2luZyAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iMCwtMTE4IC0xMTgsOTIgMCw0OCIgZmlsbD0idXJsKCN3aW5nTGVmdCkiLz4KICAgIDwhLS0gUmlnaHQgV2luZyAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iMCwtMTE4IDExOCw5MiAwLDQ4IiBmaWxsPSJ1cmwoI3dpbmdSaWdodCkiLz4KICAgIDwhLS0gQ2VudGVyIEZ1c2VsYWdlIFJpZGdlIC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSIwLC0xMTggMzIsNTYgMCw0MiAtMzIsNTYiIGZpbGw9IiNGRkY3RUQiIG9wYWNpdHk9IjAuOTIiLz4KICAgIDwhLS0gVGhydXN0ZXIgQ29yZSAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iLTI2LDU2IDI2LDU2IDAsODgiIGZpbGw9IiMxRTI5M0IiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLTE0LDU4IDE0LDU4IDAsNzgiIGZpbGw9IiNGREJBNzQiLz4KICA8L2c+Cjwvc3ZnPg==" alt="GYRO DODGE 3D Logo" class="w-14 h-14 rounded-2xl shrink-0">
           <div class="min-w-0">
-            <div class="flex items-center gap-1.5">
-              <span class="px-2 py-0.5 rounded-full bg-brand-500 text-cream-50 font-extrabold text-[9px]">3D次元アクション</span>
-              <span id="homeNetBadge" class="px-2 py-0.5 rounded-full bg-cream-100 text-ink-600 font-extrabold text-[9px]">OFFLINE READY</span>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="px-2 py-0.5 rounded-md bg-brand-500 text-cream-50 font-extrabold text-[10px]">本格3D</span>
+              <span id="homeNetBadge" class="px-2 py-0.5 rounded-md bg-cream-100 text-ink-600 font-extrabold text-[10px]">オフライン可</span>
+              <button type="button" onclick="accountMgr.openModal()" id="homeAccountPill" class="px-2 py-0.5 rounded-md bg-ink-800 text-cream-100 font-extrabold text-[10px] active:scale-95 transition">
+                ゲストモード
+              </button>
             </div>
             <h1 class="text-xl sm:text-2xl font-extrabold text-ink-800 tracking-tight leading-tight truncate">
               天穹のグラビティ・ランナー
@@ -334,6 +351,25 @@
           <div class="text-base sm:text-lg font-extrabold leading-none">
             <span id="homeCoinBalance">500</span><span class="text-[10px] ml-0.5">C</span>
           </div>
+        </button>
+      </div>
+
+      <!-- アカウント＆ゲストモードバー -->
+      <div class="w-full bg-cream-200 rounded-3xl px-4 py-3 mb-3.5 flex items-center justify-between gap-2 text-left">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div id="acctAvatarBadge" class="w-9 h-9 rounded-2xl bg-brand-500 text-cream-50 font-extrabold text-xs flex items-center justify-center shrink-0">
+            G
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span id="acctModeTag" class="text-[10px] font-extrabold text-brand-600">ゲストモード</span>
+              <span id="acctCodeTag" class="text-[10px] font-bold text-ink-400">#GUEST</span>
+            </div>
+            <div id="acctDisplayName" class="text-sm font-extrabold text-ink-800 truncate">ゲストプレイヤー</div>
+          </div>
+        </div>
+        <button type="button" onclick="accountMgr.openModal()" class="mg-btn mg-btn-cream shrink-0 px-3 py-2 rounded-2xl text-ink-800 font-extrabold text-xs">
+          アカウント管理
         </button>
       </div>
 
@@ -352,7 +388,7 @@
       <!-- 最高記録＆コレクション達成度カード -->
       <div class="w-full bg-cream-200 rounded-3xl p-4 mb-3.5 text-left">
         <div class="flex items-center justify-between mb-2 px-0.5">
-          <span class="text-[11px] font-extrabold text-ink-800 tracking-wider">PERSONAL BEST &amp; COLLECTION</span>
+          <span class="text-xs font-extrabold text-ink-800">マイレコード＆お宝図鑑</span>
           <span id="homeCollectionCountBadge" class="px-2.5 py-0.5 rounded-full bg-cream-100 text-brand-600 text-[10px] font-extrabold">図鑑 0 / 126</span>
         </div>
         <div class="grid grid-cols-4 gap-2">
@@ -420,7 +456,7 @@
         <div class="grid grid-cols-2 gap-2.5">
           <button type="button" onclick="app.openShop('OUTFIT')" class="mg-btn mg-btn-cream rounded-2xl p-3 text-left text-ink-800 flex items-center justify-between">
             <div>
-              <div class="text-sm font-extrabold">服装＆アイテムSHOP</div>
+              <div class="text-sm font-extrabold">服装＆ギア交換所</div>
               <div class="text-[10px] font-bold text-ink-600">コインで購入・装備</div>
             </div>
             <span class="px-2 py-0.5 rounded-full bg-brand-500 text-cream-50 text-[10px] font-extrabold">SHOP</span>
@@ -428,7 +464,7 @@
 
           <button type="button" onclick="app.openCollectionVault()" class="mg-btn mg-btn-cream rounded-2xl p-3 text-left text-ink-800 flex items-center justify-between">
             <div>
-              <div class="text-sm font-extrabold">コレクション図鑑</div>
+              <div class="text-sm font-extrabold">お宝図鑑</div>
               <div id="homeVaultSubLabel" class="text-[10px] font-bold text-ink-600">全126種コンプ目指せ</div>
             </div>
             <span class="px-2 py-0.5 rounded-full bg-ink-800 text-cream-100 text-[10px] font-extrabold">126種</span>
@@ -614,8 +650,8 @@
     <div class="w-full max-w-2xl bg-cream-200 rounded-3xl p-5 sm:p-6 flex flex-col gap-3.5 my-auto">
       <div class="flex items-center justify-between border-b border-cream-300 pb-3">
         <div>
-          <span class="px-3 py-0.5 rounded-full bg-brand-500 text-cream-50 font-extrabold text-[10px]">COIN EXCHANGE SHOP</span>
-          <h2 class="text-2xl font-extrabold text-ink-800 mt-0.5">コインショップ（全126種）</h2>
+          <span class="px-2.5 py-0.5 rounded-md bg-brand-500 text-cream-50 font-extrabold text-[10px]">お買い物</span>
+          <h2 class="text-2xl font-extrabold text-ink-800 mt-0.5">コイン交換所（全126種）</h2>
         </div>
         <div class="px-4 py-2 rounded-2xl bg-brand-500 text-cream-50 font-extrabold text-sm">
           残高: <span id="shopCoinBalance">500</span> C
@@ -643,8 +679,8 @@
     <div class="w-full max-w-2xl bg-cream-200 rounded-3xl p-5 sm:p-6 flex flex-col gap-3.5 my-auto">
       <div class="flex items-center justify-between border-b border-cream-300 pb-3">
         <div>
-          <span class="px-3 py-0.5 rounded-full bg-ink-800 text-cream-100 font-extrabold text-[10px]">ARCHIVE VAULT</span>
-          <h2 class="text-2xl font-extrabold text-ink-800 mt-0.5">コレクション図鑑</h2>
+          <span class="px-2.5 py-0.5 rounded-md bg-ink-800 text-cream-100 font-extrabold text-[10px]">コレクション</span>
+          <h2 class="text-2xl font-extrabold text-ink-800 mt-0.5">お宝図鑑</h2>
         </div>
         <div class="text-right">
           <div class="text-[10px] font-bold text-ink-600">収集率</div>
@@ -707,8 +743,8 @@
     <div class="w-full max-w-lg bg-cream-200 rounded-3xl p-5 flex flex-col gap-4 my-auto">
       <div class="flex items-center justify-between border-b border-cream-300 pb-3">
         <div>
-          <span class="px-3 py-0.5 rounded-full bg-brand-500 text-cream-50 font-extrabold text-[10px]">CUSTOM GARAGE</span>
-          <h2 class="text-2xl font-extrabold text-ink-800 mt-0.5">機体カスタム</h2>
+          <span class="px-2.5 py-0.5 rounded-md bg-brand-500 text-cream-50 font-extrabold text-[10px]">改造・着せ替え</span>
+          <h2 class="text-2xl font-extrabold text-ink-800 mt-0.5">機体改造所</h2>
         </div>
         <button onclick="app.goHome()" class="mg-btn mg-btn-dark px-4 py-2 rounded-2xl text-cream-50 font-extrabold text-xs">
           保存して戻る
@@ -790,6 +826,59 @@
         <button id="btnStoryDlgAction" onclick="app.confirmStoryDialogue()" class="flex-[2] py-3 rounded-2xl bg-brand-500 hover:bg-brand-600 active:scale-95 transition text-cream-50 font-extrabold text-base">
           出撃する！
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- アカウント登録・ログイン・ゲストモード切替モーダル -->
+  <div id="modalAccount" class="hidden fixed inset-0 z-50 bg-ink-800/75 backdrop-blur-sm items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-md bg-cream-200 rounded-3xl p-5 sm:p-6 text-left flex flex-col gap-3.5 my-auto">
+      <div class="flex items-center justify-between border-b border-cream-300 pb-2.5">
+        <div>
+          <span class="px-2.5 py-0.5 rounded-md bg-brand-500 text-cream-50 font-extrabold text-[10px]">アカウント＆ゲスト</span>
+          <h3 class="text-xl font-extrabold text-ink-800 mt-0.5">プレイヤー情報・登録</h3>
+        </div>
+        <button type="button" onclick="accountMgr.closeModal()" class="px-3 py-1.5 rounded-xl bg-cream-300 text-ink-800 font-extrabold text-xs">
+          閉じる
+        </button>
+      </div>
+
+      <!-- 現在の状態カード -->
+      <div class="bg-cream-100 rounded-2xl p-3.5 flex items-center justify-between gap-2">
+        <div class="min-w-0">
+          <div class="text-[10px] font-bold text-ink-400">現在のプレイ状態</div>
+          <div id="acctModalCurrentStatus" class="text-sm font-extrabold text-ink-800 truncate">ゲストモード（ゲストプレイヤー）</div>
+        </div>
+        <button type="button" onclick="accountMgr.switchToGuest()" class="mg-btn mg-btn-cream shrink-0 px-3 py-2 rounded-xl text-ink-800 font-extrabold text-xs">
+          ゲストで遊ぶ
+        </button>
+      </div>
+
+      <!-- 新規アカウント登録フォーム -->
+      <div class="bg-cream-100 rounded-2xl p-4 flex flex-col gap-2.5">
+        <div class="text-xs font-extrabold text-ink-800">新規アカウント登録（セーブデータ引き継ぎ・保存）</div>
+        <div>
+          <label class="block text-[11px] font-bold text-ink-600 mb-1">プレイヤー名（2〜12文字）</label>
+          <input id="acctInputName" type="text" maxlength="12" placeholder="例: 聖優 / ランナー" class="w-full px-3.5 py-2.5 rounded-xl bg-cream-200 text-ink-800 font-extrabold text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-ink-600 mb-1">暗証番号PIN（任意・4桁数字など）</label>
+          <input id="acctInputPin" type="tel" maxlength="8" placeholder="未設定でも登録可能" class="w-full px-3.5 py-2.5 rounded-xl bg-cream-200 text-ink-800 font-extrabold text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+        <label class="flex items-center gap-2 text-xs font-bold text-ink-600 cursor-pointer pt-0.5">
+          <input id="acctCarryGuestData" type="checkbox" checked class="accent-brand-500">
+          <span>現在のゲスト成績・コイン・所持アイテムを引き継ぐ</span>
+        </label>
+        <button type="button" onclick="accountMgr.registerAccount()" class="mg-btn mg-btn-orange w-full py-3 rounded-2xl text-cream-50 font-extrabold text-sm mt-1">
+          この内容でアカウント登録
+        </button>
+        <div id="acctFeedbackMsg" class="text-xs font-extrabold text-brand-600 min-h-[1rem] text-center"></div>
+      </div>
+
+      <!-- 登録済みアカウント一覧（ログイン・切替・削除） -->
+      <div class="bg-cream-100 rounded-2xl p-3.5 flex flex-col gap-2">
+        <div class="text-xs font-extrabold text-ink-800">登録済みアカウント一覧</div>
+        <div id="acctSavedList" class="flex flex-col gap-2 max-h-40 overflow-y-auto pr-0.5"></div>
       </div>
     </div>
   </div>
@@ -4752,6 +4841,7 @@
         const coinReward = Math.max(20, Math.floor(earnedDist * 0.35) + this.nearMissCount * 15 + (isVictoryOrClear ? 120 : 0));
         app.addCoins(coinReward);
         app.recordFlightStats(earnedDist, this.nearMissCount);
+        if (typeof accountMgr !== 'undefined') accountMgr.saveActiveProfile();
 
         setTimeout(() => {
           if (this.state === 'GAMEOVER') {
@@ -5211,6 +5301,7 @@
       },
 
       saveEconomy() {
+        if (typeof accountMgr !== 'undefined') accountMgr.saveActiveProfile();
         localStorage.setItem('gyrododge3d_coins_v16', String(this.coins));
         localStorage.setItem('gyrododge3d_owned_v16', JSON.stringify(this.ownedIds));
         localStorage.setItem('gyrododge3d_eq_outfit_v16', this.equippedOutfitId);
@@ -5527,6 +5618,7 @@
           this.storyClearedMax = chapterNum;
           localStorage.setItem('gyrododge3d_story_max_v14', String(this.storyClearedMax));
         }
+        if (typeof accountMgr !== 'undefined') accountMgr.saveActiveProfile();
         this.updateStoryBadges();
         this.renderStoryChapterList();
       },
@@ -5654,7 +5746,7 @@
                   <svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                   </svg>
-                  <span class="text-[9px] font-black tracking-wider mt-0.5 bg-white/95 text-pink-600 px-1.5 py-0.5 rounded-full">${isCurrent ? 'NEW' : 'CLEAR'}</span>
+                  <span class="text-[9px] font-black tracking-wider mt-0.5 bg-white/95 text-pink-600 px-1.5 py-0.5 rounded-full">${isCurrent ? '挑戦中' : 'クリア'}</span>
                 </div>
               `;
             } else {
@@ -5916,6 +6008,312 @@
     };
 
     /**
+     * アカウント登録・ログイン・ゲストモード管理（オフライン端末保存対応）
+     */
+    const accountMgr = {
+      STORAGE_KEY: 'tenkyuu_accounts_v20',
+      ACTIVE_KEY: 'tenkyuu_active_acct_v20',
+      accounts: [],
+      activeId: 'GUEST', // 'GUEST' or account id
+
+      init() {
+        try {
+          const raw = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
+          if (Array.isArray(raw)) this.accounts = raw;
+        } catch (e) {
+          this.accounts = [];
+        }
+        const savedActive = localStorage.getItem(this.ACTIVE_KEY) || 'GUEST';
+        if (savedActive !== 'GUEST' && !this.accounts.some(a => a.id === savedActive)) {
+          this.activeId = 'GUEST';
+        } else {
+          this.activeId = savedActive;
+        }
+        this.applyCurrentProfileToApp();
+        this.updateUI();
+      },
+
+      getActiveAccount() {
+        if (this.activeId === 'GUEST') return null;
+        return this.accounts.find(a => a.id === this.activeId) || null;
+      },
+
+      snapshotCurrentAppState() {
+        return {
+          coins: app.coins,
+          ownedIds: [...app.ownedIds],
+          equippedOutfitId: app.equippedOutfitId,
+          equippedItemId: app.equippedItemId,
+          custom: { ...app.custom },
+          storyClearedMax: app.storyClearedMax,
+          clearedStages: { ...app.clearedStages },
+          highScore: game3d.highScore,
+          bestDistance: game3d.bestDistance,
+          bestCombo: game3d.bestCombo,
+          bestNearMiss: game3d.bestNearMiss,
+          dailyState: app.dailyState ? JSON.parse(JSON.stringify(app.dailyState)) : null
+        };
+      },
+
+      applyCurrentProfileToApp() {
+        const acct = this.getActiveAccount();
+        const data = acct ? acct.data : null;
+
+        if (data) {
+          app.coins = typeof data.coins === 'number' ? data.coins : 500;
+          app.ownedIds = Array.isArray(data.ownedIds) && data.ownedIds.length ? [...data.ownedIds] : ['OUTFIT_001', 'ITEM_001', 'COLL_001'];
+          app.equippedOutfitId = data.equippedOutfitId || 'OUTFIT_001';
+          app.equippedItemId = data.equippedItemId || 'ITEM_001';
+          if (data.custom) {
+            app.custom = {
+              colorIndex: data.custom.colorIndex || 0,
+              shapeId: data.custom.shapeId || 'DELTA',
+              partId: data.custom.partId || 'NONE'
+            };
+          }
+          app.storyClearedMax = data.storyClearedMax || 0;
+          app.clearedStages = data.clearedStages || {};
+          game3d.highScore = data.highScore || 0;
+          game3d.bestDistance = data.bestDistance || 0;
+          game3d.bestCombo = data.bestCombo || 1.0;
+          game3d.bestNearMiss = data.bestNearMiss || 0;
+          if (data.dailyState && data.dailyState.date === app.getTodayKey()) {
+            app.dailyState = data.dailyState;
+          } else {
+            app.dailyState = {
+              date: app.getTodayKey(),
+              stats: { maxRunDist: 0, sessionNearMiss: 0, shopBuysToday: 0, flightsToday: 0 },
+              claimed: {}
+            };
+          }
+        } else {
+          // ゲストモードのローカル保存領域を読み込み
+          try {
+            const gData = JSON.parse(localStorage.getItem('tenkyuu_guest_profile_v20') || 'null');
+            if (gData) {
+              app.coins = typeof gData.coins === 'number' ? gData.coins : 500;
+              app.ownedIds = Array.isArray(gData.ownedIds) && gData.ownedIds.length ? [...gData.ownedIds] : ['OUTFIT_001', 'ITEM_001', 'COLL_001'];
+              app.equippedOutfitId = gData.equippedOutfitId || 'OUTFIT_001';
+              app.equippedItemId = gData.equippedItemId || 'ITEM_001';
+              if (gData.custom) app.custom = { ...gData.custom };
+              app.storyClearedMax = gData.storyClearedMax || 0;
+              app.clearedStages = gData.clearedStages || {};
+              game3d.highScore = gData.highScore || 0;
+              game3d.bestDistance = gData.bestDistance || 0;
+              game3d.bestCombo = gData.bestCombo || 1.0;
+              game3d.bestNearMiss = gData.bestNearMiss || 0;
+              if (gData.dailyState && gData.dailyState.date === app.getTodayKey()) {
+                app.dailyState = gData.dailyState;
+              }
+            }
+          } catch (e) {}
+        }
+
+        app.updateCustomHomeSummary();
+        app.updateStoryBadges();
+        app.updateCoinAndCollectionUI();
+        app.renderDailyTasks();
+        app.renderMapGrid();
+        game3d.refreshBestRecordUI();
+      },
+
+      saveActiveProfile() {
+        localStorage.setItem(this.ACTIVE_KEY, this.activeId);
+        const snap = this.snapshotCurrentAppState();
+        const acct = this.getActiveAccount();
+        if (acct) {
+          acct.data = snap;
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.accounts));
+        } else {
+          localStorage.setItem('tenkyuu_guest_profile_v20', JSON.stringify(snap));
+        }
+      },
+
+      openModal() {
+        audio.init();
+        const fb = document.getElementById('acctFeedbackMsg');
+        if (fb) fb.textContent = '';
+        this.renderSavedList();
+        this.updateUI();
+        const modal = document.getElementById('modalAccount');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      },
+
+      closeModal() {
+        const modal = document.getElementById('modalAccount');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      },
+
+      registerAccount() {
+        const nameInp = document.getElementById('acctInputName');
+        const pinInp = document.getElementById('acctInputPin');
+        const carryChk = document.getElementById('acctCarryGuestData');
+        const fb = document.getElementById('acctFeedbackMsg');
+
+        const name = (nameInp ? nameInp.value : '').trim();
+        const pin = (pinInp ? pinInp.value : '').trim();
+        const carry = carryChk ? carryChk.checked : true;
+
+        if (name.length < 2) {
+          if (fb) fb.textContent = 'プレイヤー名は2文字以上で入力してください';
+          return;
+        }
+
+        const randTag = 'GR-' + String(Math.floor(1000 + Math.random() * 9000));
+        const id = 'acct_' + Date.now();
+        const newAcct = {
+          id,
+          name,
+          tag: randTag,
+          pin: pin || '',
+          createdAt: new Date().toLocaleDateString('ja-JP'),
+          data: carry ? this.snapshotCurrentAppState() : {
+            coins: 500,
+            ownedIds: ['OUTFIT_001', 'ITEM_001', 'COLL_001'],
+            equippedOutfitId: 'OUTFIT_001',
+            equippedItemId: 'ITEM_001',
+            custom: { colorIndex: 0, shapeId: 'DELTA', partId: 'NONE' },
+            storyClearedMax: 0,
+            clearedStages: {},
+            highScore: 0,
+            bestDistance: 0,
+            bestCombo: 1.0,
+            bestNearMiss: 0,
+            dailyState: {
+              date: app.getTodayKey(),
+              stats: { maxRunDist: 0, sessionNearMiss: 0, shopBuysToday: 0, flightsToday: 0 },
+              claimed: {}
+            }
+          }
+        };
+
+        this.accounts.unshift(newAcct);
+        this.activeId = id;
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.accounts));
+        localStorage.setItem(this.ACTIVE_KEY, this.activeId);
+
+        if (nameInp) nameInp.value = '';
+        if (pinInp) pinInp.value = '';
+
+        this.applyCurrentProfileToApp();
+        this.renderSavedList();
+        this.updateUI();
+        audio.playRingCollect();
+        if (fb) fb.textContent = `アカウント「${name} (#${randTag})」を登録しました！`;
+      },
+
+      loginAccount(acctId) {
+        const acct = this.accounts.find(a => a.id === acctId);
+        if (!acct) return;
+        const fb = document.getElementById('acctFeedbackMsg');
+
+        if (acct.pin) {
+          const entered = window.prompt(`「${acct.name}」の暗証番号PINを入力してください`);
+          if (entered === null) return;
+          if (entered.trim() !== acct.pin) {
+            if (fb) fb.textContent = '暗証番号PINが一致しません';
+            audio.playHit();
+            return;
+          }
+        }
+
+        // 現在のプロフィールを保存してから切り替え
+        this.saveActiveProfile();
+        this.activeId = acct.id;
+        localStorage.setItem(this.ACTIVE_KEY, this.activeId);
+        this.applyCurrentProfileToApp();
+        this.renderSavedList();
+        this.updateUI();
+        audio.playHello();
+        if (fb) fb.textContent = `「${acct.name}」でログインしました！`;
+      },
+
+      switchToGuest() {
+        const fb = document.getElementById('acctFeedbackMsg');
+        this.saveActiveProfile();
+        this.activeId = 'GUEST';
+        localStorage.setItem(this.ACTIVE_KEY, 'GUEST');
+        this.applyCurrentProfileToApp();
+        this.renderSavedList();
+        this.updateUI();
+        audio.playHello();
+        if (fb) fb.textContent = 'ゲストモードに切り替えました（登録なしでもプレイ可能）';
+      },
+
+      deleteAccount(acctId) {
+        if (!window.confirm('この登録アカウントを削除しますか？')) return;
+        this.accounts = this.accounts.filter(a => a.id !== acctId);
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.accounts));
+        if (this.activeId === acctId) {
+          this.activeId = 'GUEST';
+          localStorage.setItem(this.ACTIVE_KEY, 'GUEST');
+          this.applyCurrentProfileToApp();
+        }
+        this.renderSavedList();
+        this.updateUI();
+      },
+
+      renderSavedList() {
+        const box = document.getElementById('acctSavedList');
+        if (!box) return;
+        box.innerHTML = '';
+
+        if (this.accounts.length === 0) {
+          box.innerHTML = '<div class="text-xs font-bold text-ink-400 py-2 text-center">登録済みアカウントはまだありません（ゲストモードで遊べます）</div>';
+          return;
+        }
+
+        this.accounts.forEach(a => {
+          const isCur = a.id === this.activeId;
+          const row = document.createElement('div');
+          row.className = 'bg-cream-200 rounded-xl px-3 py-2 flex items-center justify-between gap-2';
+          row.innerHTML = `
+            <div class="min-w-0">
+              <div class="text-xs font-extrabold text-ink-800 truncate">${a.name} <span class="text-[10px] text-ink-400">#${a.tag}</span> ${a.pin ? '<span class="text-[10px] text-brand-600">[PIN有]</span>' : ''}</div>
+              <div class="text-[10px] font-bold text-ink-600">コイン: ${(a.data?.coins ?? 500).toLocaleString()}C · 探検: ${a.data?.storyClearedMax ?? 0}/12章</div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              ${isCur
+                ? '<span class="px-2.5 py-1 rounded-lg bg-ink-800 text-cream-100 text-[10px] font-extrabold">使用中</span>'
+                : `<button type="button" onclick="accountMgr.loginAccount('${a.id}')" class="px-2.5 py-1 rounded-lg bg-brand-500 text-cream-50 text-[10px] font-extrabold">切替</button>`
+              }
+              <button type="button" onclick="accountMgr.deleteAccount('${a.id}')" class="px-2 py-1 rounded-lg bg-cream-100 text-ink-400 hover:text-brand-600 text-[10px] font-extrabold">削除</button>
+            </div>
+          `;
+          box.appendChild(row);
+        });
+      },
+
+      updateUI() {
+        const acct = this.getActiveAccount();
+        const modeTag = document.getElementById('acctModeTag');
+        const codeTag = document.getElementById('acctCodeTag');
+        const nameEl = document.getElementById('acctDisplayName');
+        const avatarEl = document.getElementById('acctAvatarBadge');
+        const pillEl = document.getElementById('homeAccountPill');
+        const modalStatus = document.getElementById('acctModalCurrentStatus');
+
+        if (acct) {
+          if (modeTag) modeTag.textContent = '登録アカウント';
+          if (codeTag) codeTag.textContent = `#${acct.tag}`;
+          if (nameEl) nameEl.textContent = acct.name;
+          if (avatarEl) avatarEl.textContent = acct.name.slice(0, 1);
+          if (pillEl) pillEl.textContent = acct.name;
+          if (modalStatus) modalStatus.textContent = `登録アカウント：${acct.name} (#${acct.tag})`;
+        } else {
+          if (modeTag) modeTag.textContent = 'ゲストモード';
+          if (codeTag) codeTag.textContent = '#GUEST';
+          if (nameEl) nameEl.textContent = 'ゲストプレイヤー';
+          if (avatarEl) avatarEl.textContent = 'G';
+          if (pillEl) pillEl.textContent = 'ゲストモード';
+          if (modalStatus) modalStatus.textContent = 'ゲストモード（登録なしプレイ中）';
+        }
+      }
+    };
+
+    /**
      * 広告表示・非表示マネージャー（オフライン時は通信ゼロ・非表示維持）
      */
     const adManager = {
@@ -5984,6 +6382,7 @@
       app.loadEconomyAndTasks();
       app.loadCustom();
       app.loadStoryProgress();
+      accountMgr.init();
       app.renderSoloModeGrid();
       app.renderDiffGrid();
       app.renderMapGrid();
