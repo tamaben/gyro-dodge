@@ -1,0 +1,30 @@
+{
+  "name": "GYRO DODGE 3D — フルボイス版",
+  "short_name": "GYRO DODGE",
+  "description": "スマホのジャイロ操作とあなたの声7ボイスで遊ぶ3D回避アクション＆10人協力・バトルゲーム",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FFF7ED",
+  "theme_color": "#FFF7ED",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
