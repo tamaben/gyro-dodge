@@ -224,8 +224,26 @@
       <!-- 下部ネイティブ・コントロールデッキ -->
       <div class="native-glass p-3.5 flex flex-col gap-2.5">
         <div class="grid grid-cols-3 gap-1.5">
-          <select id="quickMapSelect" class="native-select bg-cream-100  rounded-xl px-2.5 py-2 text-[11px] font-extrabold text-ink-800 truncate"></select>
-          <select id="quickDiffSelect" class="native-select bg-cream-100  rounded-xl px-2.5 py-2 text-[11px] font-extrabold text-ink-800"></select>
+          <select id="quickMapSelect" class="native-select min-w-0 w-full bg-cream-100 rounded-xl px-2.5 py-2 text-[11px] font-extrabold text-ink-800 truncate">
+            <option value="0">1. サンセット・キャニオン</option>
+            <option value="1">2. エメラルド・フォレスト</option>
+            <option value="2">3. サクラ・シュライン</option>
+            <option value="3">4. ゴールデン・デザート</option>
+            <option value="4">5. クリスタル・グレイシャー</option>
+            <option value="5">6. スカイ・サンクチュアリ</option>
+            <option value="6">7. エンシェント・ルインズ</option>
+            <option value="7">8. ディープ・オーシャン</option>
+            <option value="8">9. クロックワーク・タワー</option>
+            <option value="9">10. ネオン・サイバーシティ</option>
+            <option value="10">11. マグマ・ボルケーノ</option>
+            <option value="11">12. コスモ・ヴォイド</option>
+          </select>
+          <select id="quickDiffSelect" class="native-select min-w-0 w-full bg-cream-100 rounded-xl px-2.5 py-2 text-[11px] font-extrabold text-ink-800">
+            <option value="0">EASY (かんたん)</option>
+            <option value="1" selected>NORMAL (ふつう)</option>
+            <option value="2">HARD (むずかしい)</option>
+            <option value="3">EXTREME (げきむず)</option>
+          </select>
           <select id="selectBotLevelHome" class="native-select bg-cream-100  rounded-xl px-2.5 py-2 text-[11px] font-extrabold text-ink-800">
             <option value="RANDOM">BOT: ランダム</option>
             <option value="1">BOT: Lv.1</option><option value="2">BOT: Lv.2</option><option value="3">BOT: Lv.3</option>
@@ -264,7 +282,10 @@
           </button>
         </div>
 
-        <div class="grid grid-cols-4 gap-1.5 pt-0.5">
+        <div class="grid grid-cols-5 gap-1 pt-0.5">
+          <button id="btnOpenSoloSetup" type="button" class="native-btn-soft py-2 px-1 text-[10px] font-extrabold truncate">
+            操作設定
+          </button>
           <button id="btnOpenTasks" type="button" class="native-btn-soft py-2 px-1 text-[10px] font-extrabold truncate">
             タスク<span id="dailyTaskShortBadge" class="text-brand-600">(0/4)</span>
           </button>
@@ -2244,9 +2265,15 @@ const EMBEDDED_VOICES = {
       },
       renderQuickSelectors() {
         const ms = document.getElementById('quickMapSelect');
-        if (ms) ms.innerHTML = MAPS.map((m, i) => `<option value="${i}" ${i===this.currentMapIndex?'selected':''}>${m.chapter}. ${m.name}</option>`).join('');
+        if (ms) {
+          ms.innerHTML = MAPS.map((m, i) => `<option value="${i}" ${i===this.currentMapIndex?'selected':''}>${m.chapter}. ${m.name}</option>`).join('');
+          ms.value = String(this.currentMapIndex);
+        }
         const ds = document.getElementById('quickDiffSelect');
-        if (ds) ds.innerHTML = DIFFICULTIES.map((d, i) => `<option value="${i}" ${i===this.currentDiffIndex?'selected':''}>${d.label} (${d.jp})</option>`).join('');
+        if (ds) {
+          ds.innerHTML = DIFFICULTIES.map((d, i) => `<option value="${i}" ${i===this.currentDiffIndex?'selected':''}>${d.label} (${d.jp})</option>`).join('');
+          ds.value = String(this.currentDiffIndex);
+        }
         this.renderSoloModeGrid();
         this.syncHomeLabels();
       },
@@ -2490,6 +2517,7 @@ const EMBEDDED_VOICES = {
       btnHomeCoins: () => app.openShop('ALL'),
       btnStartStory: () => app.openStoryMap(),
       btnStartRandom: () => { gyro.requestPermission('solo'); app.launchQuickRandom(); },
+      btnOpenSoloSetup: () => app.startSoloSetup(),
       btnStartFree: () => { gyro.requestPermission('solo'); app.launchSoloGame(); },
       btnOpenCustom: () => app.openCustomGarage(),
       btnOpenShop: () => app.openShop('ALL'),
