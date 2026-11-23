@@ -43,6 +43,7 @@
     button, a, label, select, input {
       touch-action: manipulation;
       pointer-events: auto;
+      cursor: pointer;
     }
     #threeContainer {
       position: fixed; inset: 0; width: 100%; height: 100%;
@@ -58,71 +59,76 @@
     }
     .screen.active { display: flex; }
 
-    /* ポップ＆シンプルなフラット角丸カード（枠線・重い影なし） */
+    /* 参考レイアウト風のポップ＆シンプルな角丸パネル＆立体ボタン */
     .native-glass {
       background: rgba(255, 253, 249, 0.94);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border-radius: 28px;
+      border-radius: 24px;
+      border-bottom: 3px solid #FED7AA;
     }
     .native-pill {
-      background: rgba(255, 253, 249, 0.95);
+      background: rgba(255, 253, 249, 0.96);
       border-radius: 999px;
+      border-bottom: 2px solid #FED7AA;
     }
     .native-tile {
       background: #FFEDD5;
-      border-radius: 20px;
-      transition: transform 0.1s ease, background-color 0.15s ease;
+      border-radius: 18px;
+      border-bottom: 3px solid #FDBA74;
+      transition: transform 0.08s ease;
     }
-    .native-tile:hover { background: #FED7AA; }
-    .native-tile:active { transform: scale(0.95); }
+    .native-tile:active { transform: translateY(2px); border-bottom-width: 1px; }
 
-    /* ポップな単色ラウンドボタン */
     .native-btn-hero {
-      background: #F97316;
+      background: #F59E0B;
       color: #FFFFFF;
-      border-radius: 22px;
-      transition: transform 0.1s ease, background-color 0.15s ease;
+      border-radius: 20px;
+      border-bottom: 4px solid #B45309;
+      transition: transform 0.08s ease;
     }
-    .native-btn-hero:hover { background: #EA580C; }
-    .native-btn-hero:active { transform: scale(0.96); }
+    .native-btn-hero:hover { background: #F97316; }
+    .native-btn-hero:active { transform: translateY(2px); border-bottom-width: 2px; }
 
     .native-btn-play {
-      background: #16A34A;
+      background: #22C55E;
       color: #FFFFFF;
-      border-radius: 22px;
-      transition: transform 0.1s ease, background-color 0.15s ease;
+      border-radius: 20px;
+      border-bottom: 4px solid #15803D;
+      transition: transform 0.08s ease;
     }
-    .native-btn-play:hover { background: #15803D; }
-    .native-btn-play:active { transform: scale(0.96); }
+    .native-btn-play:hover { background: #16A34A; }
+    .native-btn-play:active { transform: translateY(2px); border-bottom-width: 2px; }
 
     .native-btn-soft {
       background: #FFEDD5;
       color: #292524;
-      border-radius: 18px;
-      transition: transform 0.1s ease, background-color 0.15s ease;
+      border-radius: 16px;
+      border-bottom: 3px solid #FDBA74;
+      transition: transform 0.08s ease;
     }
     .native-btn-soft:hover { background: #FED7AA; }
-    .native-btn-soft:active { transform: scale(0.96); }
+    .native-btn-soft:active { transform: translateY(2px); border-bottom-width: 1px; }
 
     .native-btn-dark {
       background: #292524;
       color: #FFFDF9;
-      border-radius: 20px;
-      transition: transform 0.1s ease;
+      border-radius: 18px;
+      border-bottom: 3px solid #0C0A09;
+      transition: transform 0.08s ease;
     }
-    .native-btn-dark:active { transform: scale(0.96); }
+    .native-btn-dark:active { transform: translateY(2px); border-bottom-width: 1px; }
 
     .path-node {
       width: 68px; height: 64px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-weight: 900; font-size: 13px;
-      transition: transform 0.1s ease;
+      transition: transform 0.08s ease;
     }
-    .path-node:active:not(:disabled) { transform: scale(0.93); }
-    .path-node-active { background: #F97316; color: #fff; }
-    .path-node-clear  { background: #16A34A; color: #fff; }
-    .path-node-locked { background: #E7E5E4; color: #A8A29E; }
+    .path-node:active:not(:disabled) { transform: scale(0.94); }
+    .path-node-active { background: #F97316; color: #fff; border-bottom: 4px solid #C2410C; }
+    .path-node-clear  { background: #16A34A; color: #fff; border-bottom: 4px solid #15803D; }
+    .path-node-locked { background: #E7E5E4; color: #A8A29E; border-bottom: 4px solid #D6D3D1; }
 
     select.native-select {
       appearance: none;
@@ -2530,7 +2536,9 @@ const EMBEDDED_VOICES = {
       on('btnResultHome', () => app.goHome());
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    function bootApp() {
+      if (window.__tenkyuuBooted) return;
+      window.__tenkyuuBooted = true;
       const run = fn => { try { fn(); } catch (e) {} };
       run(() => bindAllButtons());
       run(() => netStatus.init());
@@ -2545,7 +2553,12 @@ const EMBEDDED_VOICES = {
       if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       }
-    });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootApp);
+    } else {
+      bootApp();
+    }
 
   
   </script>
