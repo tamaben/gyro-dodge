@@ -1,4 +1,4 @@
-const CACHE_NAME = "gyro-dodge-3d-pwa-v13";
+const CACHE_NAME = "tenkyuu-gravity-runner-v17";
 const CORE_ASSETS = [
   "./",
   "./index.html",

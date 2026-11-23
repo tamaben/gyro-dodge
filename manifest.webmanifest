@@ -1,7 +1,7 @@
 {
-  "name": "GYRO DODGE 3D - ジャイロ・ドッジ 3D",
-  "short_name": "GYRO DODGE",
-  "description": "スマホのジャイロ操作とあなたの声7ボイスで遊ぶ3D回避アクション＆10人協力・お邪魔バトルゲーム",
+  "name": "天穹のグラビティ・ランナー",
+  "short_name": "グラビティ・ランナー",
+  "description": "画面の向きに自動追従するジャイロ＆方角コンパスと全12マップ・全126コレクションで遊ぶ3D次元回避アクション＆バトルゲーム",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
