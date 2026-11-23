@@ -1,5 +1,5 @@
-const CACHE_NAME = "gyro-dodge-3d-pwa-v8";
-const PRECACHE_ASSETS = [
+const CACHE_NAME = "gyro-dodge-3d-pwa-v11";
+const CORE_ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
@@ -8,9 +8,21 @@ const PRECACHE_ASSETS = [
   "./icons/icon-512.png"
 ];
 
+const EXTERNAL_LIB_ASSETS = [
+  "https://cdn.tailwindcss.com",
+  "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+];
+
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE_ASSETS))
+    caches.open(CACHE_NAME).then(async cache => {
+      await cache.addAll(CORE_ASSETS);
+      for (const url of EXTERNAL_LIB_ASSETS) {
+        try {
+          await cache.add(url);
+        } catch (e) {}
+      }
+    })
   );
   self.skipWaiting();
 });
@@ -28,6 +40,10 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
+  const reqUrl = event.request.url;
+  // Never cache ad scripts or PeerJS signaling calls
+  if (reqUrl.includes("shinobi.jp") || reqUrl.includes("peerjs")) return;
+
   event.respondWith(
     caches.match(event.request).then(cached => {
       const fetchPromise = fetch(event.request)

@@ -23,7 +23,7 @@
   <!-- Three.js (r128) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-  <!-- PeerJS (WebRTC P2P連携用) -->
+  <!-- PeerJS (WebRTC P2P連携・オンライン対戦用) -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
   <!-- QRCode.js (ルーム接続QRコード生成用) -->
@@ -112,7 +112,6 @@
       margin: 0 auto;
       border-radius: 12px;
     }
-    /* フラット・レンジスライダー */
     input[type="range"] {
       -webkit-appearance: none;
       appearance: none;
@@ -186,21 +185,25 @@
   </header>
 
   <!-- =====================================================================
-       1. ホーム画面（モード選択）
+       1. ホーム画面（モード＆マップ選択）
        ===================================================================== -->
   <main id="screenHome" class="screen active items-center justify-start p-5 pt-16 pb-28">
     <div class="w-full max-w-lg flex flex-col items-center text-center my-auto py-2">
-      <!-- アプリロゴ -->
       <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnR3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkY3RUQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkZFREQ1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ3aW5nUmlnaHQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRUE1ODBDIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0MyNDEwQyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0id2luZ0xlZnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkI5MjNDIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0Y5NzMxNiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBSb3VuZGVkIFNxdWFyZSBCYXNlIC0tPgogIDxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTEyIiBmaWxsPSJ1cmwoI2JnR3JhZCkiLz4KICA8cmVjdCB4PSIxNCIgeT0iMTQiIHdpZHRoPSI0ODQiIGhlaWdodD0iNDg0IiByeD0iMTAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNGRUQ3QUEiIHN0cm9rZS13aWR0aD0iOCIvPgoKICA8IS0tIDNEIFR1bm5lbCBSaW5ncyAtLT4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjE5NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkRCQTc0IiBzdHJva2Utd2lkdGg9IjE0IiBzdHJva2UtZGFzaGFycmF5PSI2NCAyOCIgb3BhY2l0eT0iMC41NSIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTQ2IiBmaWxsPSJub25lIiBzdHJva2U9IiMxRTI5M0IiIHN0cm9rZS13aWR0aD0iMTQiIG9wYWNpdHk9IjAuMTQiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9Ijk2IiBmaWxsPSJub25lIiBzdHJva2U9IiNGOTczMTYiIHN0cm9rZS13aWR0aD0iMTAiIG9wYWNpdHk9IjAuMjgiLz4KCiAgPCEtLSBTcGVlZCBNb3Rpb24gTGluZXMgLS0+CiAgPGxpbmUgeDE9Ijk0IiB5MT0iMzYyIiB4Mj0iMTYyIiB5Mj0iMjk0IiBzdHJva2U9IiNGOTczMTYiIHN0cm9rZS13aWR0aD0iMTAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC42Ii8+CiAgPGxpbmUgeDE9IjQxOCIgeTE9IjM2MiIgeDI9IjM1MCIgeTI9IjI5NCIgc3Ryb2tlPSIjRjk3MzE2IiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9IjAuNiIvPgogIDxsaW5lIHgxPSIyNTYiIHkxPSI0MjgiIHgyPSIyNTYiIHkyPSIzNjgiIHN0cm9rZT0iIzFFMjkzQiIgc3Ryb2tlLXdpZHRoPSIxMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIwLjI1Ii8+CgogIDwhLS0gTG93LVBvbHkgM0QgR2xpZGVyIFNoaXAgLS0+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2LCAyNDgpIHJvdGF0ZSgtMTQpIj4KICAgIDwhLS0gU2hhZG93IC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSIwLC0xMTggMTE4LDkyIDAsNTQgLTExOCw5MiIgZmlsbD0iIzFFMjkzQiIgb3BhY2l0eT0iMC4xNCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwgMTgpIi8+CiAgICA8IS0tIExlZnQgV2luZyAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iMCwtMTE4IC0xMTgsOTIgMCw0OCIgZmlsbD0idXJsKCN3aW5nTGVmdCkiLz4KICAgIDwhLS0gUmlnaHQgV2luZyAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iMCwtMTE4IDExOCw5MiAwLDQ4IiBmaWxsPSJ1cmwoI3dpbmdSaWdodCkiLz4KICAgIDwhLS0gQ2VudGVyIEZ1c2VsYWdlIFJpZGdlIC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSIwLC0xMTggMzIsNTYgMCw0MiAtMzIsNTYiIGZpbGw9IiNGRkY3RUQiIG9wYWNpdHk9IjAuOTIiLz4KICAgIDwhLS0gVGhydXN0ZXIgQ29yZSAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iLTI2LDU2IDI2LDU2IDAsODgiIGZpbGw9IiMxRTI5M0IiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLTE0LDU4IDE0LDU4IDAsNzgiIGZpbGw9IiNGREJBNzQiLz4KICA8L2c+Cjwvc3ZnPg==" alt="GYRO DODGE 3D Logo" class="w-20 h-20 rounded-3xl mb-3 animate-soft-pulse">
 
-      <span class="px-4 py-1 rounded-full bg-cream-200 text-brand-600 font-extrabold text-xs tracking-widest uppercase mb-1.5">
-        3D TUNNEL DODGE &amp; PARTY
-      </span>
+      <div class="flex items-center justify-center gap-2 mb-1.5">
+        <span class="px-3.5 py-1 rounded-full bg-cream-200 text-brand-600 font-extrabold text-xs tracking-widest uppercase">
+          3D TUNNEL DODGE
+        </span>
+        <span id="homeNetBadge" class="px-3 py-1 rounded-full bg-cream-200 text-ink-600 font-extrabold text-xs">
+          OFFLINE READY
+        </span>
+      </div>
       <h1 class="text-4xl sm:text-5xl font-extrabold text-ink-800 tracking-tight mb-1.5">
         GYRO DODGE 3D
       </h1>
-      <p class="text-ink-600 font-medium text-xs sm:text-sm mb-5">
-        ギリギリ回避コンボで高得点を狙え！<br class="hidden sm:inline">最大10人マルチ＆お邪魔バトル・全7ボイス内蔵済み
+      <p class="text-ink-600 font-medium text-xs sm:text-sm mb-4">
+        全4種の3Dステージ＆オンライン対戦・最大10人マルチ対応<br class="hidden sm:inline">あなたの声7ボイス内蔵・ジャイロ＆バーチャルスティック両対応
       </p>
 
       <!-- 最高記録ダッシュボード（BEST SCORE / DISTANCE / COMBO / NEAR MISS） -->
@@ -229,12 +232,21 @@
         </div>
       </div>
 
+      <!-- 3Dマップ（ステージ）選択カード -->
+      <div class="w-full bg-cream-200 rounded-3xl p-4 mb-4 text-left">
+        <div class="flex items-center justify-between mb-2.5 px-1">
+          <span class="text-xs font-extrabold text-ink-800">3Dステージ（マップ）選択</span>
+          <span id="homeSelectedMapBadge" class="text-[11px] font-extrabold text-brand-600">サンセット・キャニオン</span>
+        </div>
+        <div id="homeMapGrid" class="grid grid-cols-2 gap-2"></div>
+      </div>
+
       <!-- モード選択ボタン群 -->
-      <div class="w-full flex flex-col gap-3.5">
-        <!-- 1人でプレイ -->
+      <div class="w-full flex flex-col gap-3">
+        <!-- 1. 1人でプレイ -->
         <button onclick="app.startSoloSetup()" class="w-full bg-brand-500 hover:bg-brand-600 active:scale-[0.98] transition rounded-3xl p-4 sm:p-5 text-left flex items-center gap-4 text-cream-50">
-          <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-brand-600 flex items-center justify-center shrink-0">
-            <svg class="w-7 h-7 sm:w-8 sm:h-8 text-cream-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <div class="w-12 h-12 rounded-2xl bg-brand-600 flex items-center justify-center shrink-0">
+            <svg class="w-7 h-7 text-cream-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="6" y="2" width="12" height="20" rx="3"/>
               <line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/>
             </svg>
@@ -242,7 +254,7 @@
           <div class="flex-1">
             <div class="text-lg sm:text-xl font-extrabold">1人でプレイ（3Dソロ）</div>
             <div class="text-xs text-cream-200 font-medium mt-0.5">
-              ニアミス倍率コンボ＆距離記録チャレンジ（目標500mクリア）
+              選択したマップでニアミスコンボ＆500mクリアに挑戦
             </div>
           </div>
           <svg class="w-6 h-6 text-cream-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -250,8 +262,31 @@
           </svg>
         </button>
 
-        <!-- モニター ＋ スマホリモコン（最大10人） -->
-        <div class="w-full bg-cream-200 rounded-3xl p-4 sm:p-5 flex flex-col gap-3">
+        <!-- 2. オンライン対戦（各自のスマホ・PCで直接対戦・ネット接続時のみ有効） -->
+        <button id="btnModeOnline" onclick="app.startOnlineLobby()" class="w-full bg-ink-800 hover:bg-ink-600 disabled:bg-cream-200 disabled:text-ink-400 active:scale-[0.98] transition rounded-3xl p-4 sm:p-5 text-left flex items-center gap-4 text-cream-50">
+          <div id="iconModeOnline" class="w-12 h-12 rounded-2xl bg-brand-500 flex items-center justify-center shrink-0">
+            <svg class="w-7 h-7 text-cream-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-lg sm:text-xl font-extrabold">オンライン対戦</span>
+              <span id="badgeModeOnline" class="px-2.5 py-0.5 rounded-full bg-brand-500 text-cream-50 text-[10px] font-extrabold">各自の端末で対戦</span>
+            </div>
+            <div id="descModeOnline" class="text-xs text-cream-200 font-medium mt-0.5">
+              離れた友達とそれぞれのスマホ・PC画面を見ながらリアルタイムお邪魔バトル！
+            </div>
+          </div>
+          <svg class="w-6 h-6 opacity-70 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+
+        <!-- 3. モニター ＋ スマホリモコン（最大10人パーティー・ネット接続時のみ有効） -->
+        <div id="cardModeMulti" class="w-full bg-cream-200 rounded-3xl p-4 sm:p-5 flex flex-col gap-3 transition">
           <div class="flex items-center gap-3 text-left">
             <div class="w-11 h-11 rounded-2xl bg-cream-300 text-brand-600 flex items-center justify-center shrink-0">
               <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -262,17 +297,17 @@
               </svg>
             </div>
             <div>
-              <div class="flex items-center gap-2">
+              <div class="flex flex-wrap items-center gap-2">
                 <span class="text-base sm:text-lg font-extrabold text-ink-800">モニター ＋ スマホリモコン</span>
-                <span class="px-2.5 py-0.5 rounded-full bg-brand-500 text-cream-50 text-[10px] font-extrabold">最大10人</span>
+                <span id="badgeModeMulti" class="px-2.5 py-0.5 rounded-full bg-brand-500 text-cream-50 text-[10px] font-extrabold">最大10人</span>
               </div>
-              <div class="text-xs text-ink-600 font-medium">大画面で「協力サバイバル」＆「お邪魔バトルロイヤル」</div>
+              <div id="descModeMulti" class="text-xs text-ink-600 font-medium">1つの大画面に全員の機体を映して協力＆バトル</div>
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <button onclick="app.startHostSetup()" class="w-full py-3.5 px-4 rounded-2xl bg-ink-800 hover:bg-ink-600 active:scale-[0.98] transition text-cream-100 font-bold text-sm flex items-center justify-center gap-2">
-              <svg class="w-4 h-4 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <button id="btnModeHost" onclick="app.startHostSetup()" class="w-full py-3.5 px-4 rounded-2xl bg-ink-800 hover:bg-ink-600 disabled:bg-cream-300 disabled:text-ink-400 active:scale-[0.98] transition text-cream-100 font-bold text-sm flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="3" width="20" height="14" rx="2"/>
                 <line x1="8" y1="21" x2="16" y2="21"/>
                 <line x1="12" y1="17" x2="12" y2="21"/>
@@ -280,7 +315,7 @@
               <span>メインモニター側</span>
             </button>
 
-            <button onclick="app.startControllerSetup()" class="w-full py-3.5 px-4 rounded-2xl bg-brand-500 hover:bg-brand-600 active:scale-[0.98] transition text-cream-50 font-bold text-sm flex items-center justify-center gap-2">
+            <button id="btnModeRemote" onclick="app.startControllerSetup()" class="w-full py-3.5 px-4 rounded-2xl bg-brand-500 hover:bg-brand-600 disabled:bg-cream-300 disabled:text-ink-400 active:scale-[0.98] transition text-cream-50 font-bold text-sm flex items-center justify-center gap-2">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="5" y="2" width="14" height="20" rx="2"/>
                 <line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/>
@@ -318,31 +353,28 @@
             追加する
           </button>
         </div>
-      <!-- admax（非表示・再表示切替対応） -->
-      <div id="admaxContainer" class="w-full mt-4 flex flex-col items-center justify-center overflow-hidden rounded-2xl bg-cream-200/60 py-2 px-3">
-        <div class="w-full flex items-center justify-between mb-1">
-          <span class="text-[9px] font-bold text-ink-400 tracking-widest">SPONSORED</span>
-          <button type="button" onclick="adManager.hideAd()" class="px-2.5 py-1 rounded-full bg-ink-800 text-cream-100 active:scale-95 transition text-[10px] font-extrabold flex items-center gap-1">
-            <span>✕ 広告を非表示</span>
+
+        <!-- admax（非表示・再表示切替対応） -->
+        <div id="admaxContainer" class="w-full mt-2 flex flex-col items-center justify-center overflow-hidden rounded-2xl bg-cream-200/60 py-2 px-3">
+          <div class="w-full flex items-center justify-between mb-1">
+            <span class="text-[9px] font-bold text-ink-400 tracking-widest">SPONSORED</span>
+            <button type="button" onclick="adManager.hideAd()" class="px-2.5 py-1 rounded-full bg-ink-800 text-cream-100 active:scale-95 transition text-[10px] font-extrabold flex items-center gap-1">
+              <span>✕ 広告を非表示</span>
+            </button>
+          </div>
+          <div id="admaxScriptWrap" class="w-full flex justify-center overflow-hidden"></div>
+        </div>
+        <div id="admaxHiddenBar" class="hidden w-full mt-2 flex justify-center">
+          <button type="button" onclick="adManager.showAd()" class="px-3.5 py-1.5 rounded-full bg-cream-200/70 hover:bg-cream-200 active:scale-95 transition text-[11px] font-bold text-ink-400">
+            広告を再表示する
           </button>
         </div>
-        <div id="admaxScriptWrap" class="w-full flex justify-center overflow-hidden">
-          <!-- admax -->
-          <script src="https://adm.shinobi.jp/s/6deabf2adba66b7bba510d1b374de414"></script>
-          <!-- admax -->
-        </div>
-      </div>
-      <div id="admaxHiddenBar" class="hidden w-full mt-3 flex justify-center">
-        <button type="button" onclick="adManager.showAd()" class="px-3.5 py-1.5 rounded-full bg-cream-200/70 hover:bg-cream-200 active:scale-95 transition text-[11px] font-bold text-ink-400">
-          広告を再表示する
-        </button>
-      </div>
       </div>
     </div>
   </main>
 
   <!-- =====================================================================
-       1.5 ボイス設定スタジオ画面（全7スロット個別＆一括自動振り分け）
+       1.5 ボイス設定スタジオ画面
        ===================================================================== -->
   <section id="screenVoiceStudio" class="screen items-center justify-center p-4 sm:p-6 pt-16">
     <div class="w-full max-w-2xl bg-cream-200 rounded-3xl p-5 sm:p-7 flex flex-col my-auto">
@@ -361,83 +393,88 @@
         </div>
       </div>
 
-      <!-- 一括ファイル選択（複数まとめて自動振り分け） -->
       <div class="mt-4 bg-cream-100 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div class="text-left">
           <div class="text-sm font-extrabold text-ink-800">一括ファイル選択（別の音声へ一括差し替え）</div>
           <div class="text-xs text-ink-600 font-medium mt-0.5">
-            ファイル名（「ヤッホー」「スタート」「あぶな」「調子」「スピード」「クリア」「失敗」等）から自動で7枠へ振り分けます
+            ファイル名から自動で7枠へ振り分けます
           </div>
         </div>
         <label class="shrink-0 cursor-pointer px-4 py-3 rounded-2xl bg-brand-500 hover:bg-brand-600 active:scale-95 transition text-cream-50 font-extrabold text-xs sm:text-sm flex items-center gap-2">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
           <span>一括ファイル選択</span>
           <input type="file" accept="audio/*" multiple onchange="voiceStudio.handleBulkUpload(this.files)" class="hidden">
         </label>
       </div>
 
       <div id="voiceBulkFeedback" class="text-xs font-extrabold text-brand-600 mt-2 min-h-[1rem] text-center"></div>
-
-      <!-- 7スロット一覧コンテナ -->
       <div id="voiceSlotsContainer" class="mt-2 flex flex-col gap-2.5 max-h-[52dvh] overflow-y-auto pr-1"></div>
     </div>
   </section>
 
   <!-- =====================================================================
-       2. 1人プレイ準備＆センサー・感度設定画面
+       2. 1人プレイ準備＆操作方法・感度設定画面
        ===================================================================== -->
   <section id="screenSoloSetup" class="screen items-center justify-center p-5 pt-16">
     <div class="w-full max-w-md bg-cream-200 rounded-3xl p-6 sm:p-7 flex flex-col items-center text-center my-auto">
-      <div class="w-14 h-14 rounded-full bg-brand-500 text-cream-100 flex items-center justify-center mb-3">
-        <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-        </svg>
-      </div>
-
-      <h2 class="text-2xl font-extrabold text-ink-800 mb-1">ジャイロ＆感度調整</h2>
+      <h2 class="text-2xl font-extrabold text-ink-800 mb-1">操作方法＆感度設定</h2>
       <p class="text-xs text-ink-600 font-medium mb-4">
-        障害物のすぐ横をかすめる「ニアミス」を連続で決めるとスコア倍率が最大x5.0まで上昇！500m到達でクリアボーナス！
+        ジャイロ傾き操作に加えて、画面左下のバーチャルスティックでも直感的に操作できます！
       </p>
 
-      <!-- iOS Safari用 センサー許可ボタン -->
-      <button id="btnRequestGyroSolo" onclick="gyro.requestPermission('solo')" class="w-full py-3 px-4 rounded-2xl bg-brand-500 hover:bg-brand-600 active:scale-95 transition text-cream-50 font-extrabold text-xs sm:text-sm mb-4 flex items-center justify-center gap-2">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
-          <path d="M21 3v5h-5"/>
-        </svg>
-        <span>ジャイロセンサーを有効化（iOS必須）</span>
+      <!-- 操作モード切替（ハイブリッド / タッチスティック専用 / ジャイロ専用） -->
+      <div class="w-full bg-cream-100 p-1.5 rounded-2xl grid grid-cols-3 gap-1 mb-2.5">
+        <button id="btnCtrlModeHybrid" onclick="gyro.setControlMode('HYBRID')" class="py-2 px-2 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs transition">
+          両対応 (推奨)
+        </button>
+        <button id="btnCtrlModeTouch" onclick="gyro.setControlMode('TOUCH')" class="py-2 px-2 rounded-xl text-ink-600 font-extrabold text-xs transition">
+          指スティック
+        </button>
+        <button id="btnCtrlModeGyro" onclick="gyro.setControlMode('GYRO')" class="py-2 px-2 rounded-xl text-ink-600 font-extrabold text-xs transition">
+          ジャイロのみ
+        </button>
+      </div>
+
+      <!-- ジャイロ軸方式（方角ヨー＋傾きミックス / 方角コンパスのみ / 傾きロールのみ） -->
+      <div class="w-full bg-cream-100 p-1.5 rounded-2xl grid grid-cols-3 gap-1 mb-4">
+        <button id="btnGyroAxisMix" onclick="gyro.setGyroAxisMode('MIX')" class="py-1.5 px-1.5 rounded-xl bg-ink-800 text-cream-100 font-extrabold text-[11px] transition">
+          傾き＋方角ミックス
+        </button>
+        <button id="btnGyroAxisCompass" onclick="gyro.setGyroAxisMode('COMPASS')" class="py-1.5 px-1.5 rounded-xl text-ink-600 font-extrabold text-[11px] transition">
+          方角(向き)メイン
+        </button>
+        <button id="btnGyroAxisTilt" onclick="gyro.setGyroAxisMode('TILT')" class="py-1.5 px-1.5 rounded-xl text-ink-600 font-extrabold text-[11px] transition">
+          傾き(ロール)のみ
+        </button>
+      </div>
+
+      <button id="btnRequestGyroSolo" onclick="gyro.requestPermission('solo')" class="w-full py-3 px-4 rounded-2xl bg-brand-500 hover:bg-brand-600 active:scale-95 transition text-cream-50 font-extrabold text-xs sm:text-sm mb-4">
+        ジャイロセンサーを有効化（iOS必須）
       </button>
 
-      <!-- センサー診断＋感度スライダー -->
       <div class="w-full bg-cream-100 rounded-2xl p-4 mb-4">
         <div class="flex items-center justify-between text-xs font-bold text-ink-600 mb-2">
-          <span>状態: <strong id="soloGyroStatus" class="text-brand-600">待機中 / キー・ドラッグ可</strong></span>
+          <span>状態: <strong id="soloGyroStatus" class="text-brand-600">待機中 / スティック可</strong></span>
           <button onclick="gyro.calibrate()" class="px-3 py-1 rounded-full bg-cream-200 hover:bg-cream-300 text-ink-800 text-xs font-bold active:scale-95 transition">
-            水平リセット
+            水平・方角リセット
           </button>
         </div>
 
-        <div class="relative w-28 h-28 mx-auto rounded-full bg-cream-200 flex items-center justify-center mb-2 overflow-hidden">
+        <div class="relative w-24 h-24 mx-auto rounded-full bg-cream-200 flex items-center justify-center mb-2 overflow-hidden">
           <div class="absolute inset-x-0 h-0.5 bg-cream-300"></div>
           <div class="absolute inset-y-0 w-0.5 bg-cream-300"></div>
           <div id="soloRadarDot" class="w-6 h-6 rounded-full bg-brand-500 transition-transform duration-75"></div>
         </div>
 
-        <div id="soloGyroDebug" class="text-[11px] font-bold text-ink-600 mb-2">
-          傾き X: 0.00 / Y: 0.00
+        <div id="soloCompassReadout" class="text-[11px] font-extrabold text-ink-600 mb-1">
+          方角(Yaw): ---° (基準差: 0°)
         </div>
 
         <div class="w-full text-left mt-2">
           <div class="flex justify-between text-xs font-bold text-ink-600 mb-1.5">
-            <span>傾き感度</span>
-            <span id="soloSensLabel" class="text-brand-600 font-extrabold">55</span>
+            <span>操作感度</span>
+            <span id="soloSensLabel" class="text-brand-600 font-extrabold">65</span>
           </div>
-          <input id="soloSensSlider" type="range" min="1" max="100" value="55" oninput="gyro.setSensitivity(this.value)" class="w-full">
+          <input id="soloSensSlider" type="range" min="1" max="100" value="65" oninput="gyro.setSensitivity(this.value)" class="w-full">
         </div>
 
         <div class="flex items-center justify-between gap-3 mt-3 pt-2.5 border-t border-cream-200">
@@ -459,6 +496,83 @@
   </section>
 
   <!-- =====================================================================
+       2.5 オンライン対戦ロビー（各自のスマホ・PCで直接リアルタイム対戦）
+       ===================================================================== -->
+  <section id="screenOnlineLobby" class="screen items-center justify-center p-4 sm:p-6 pt-16">
+    <div class="w-full max-w-xl bg-cream-200 rounded-3xl p-5 sm:p-7 flex flex-col my-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-cream-300">
+        <div>
+          <span class="px-3 py-0.5 rounded-full bg-brand-500 text-cream-50 font-extrabold text-xs">ONLINE P2P BATTLE</span>
+          <h2 class="text-2xl font-extrabold text-ink-800 mt-1">オンライン対戦ロビー</h2>
+        </div>
+        <span class="px-3 py-1 rounded-full bg-cream-100 text-ink-800 font-extrabold text-xs">最大8人</span>
+      </div>
+
+      <p class="text-xs text-ink-600 font-medium mt-3 mb-4">
+        各自のスマホ・PCで自分の機体を操作しながら、相手の順位や生存状況がリアルタイムで同期！お邪魔スキルで直接攻撃できます。
+      </p>
+
+      <!-- ニックネーム入力 -->
+      <div class="bg-cream-100 rounded-2xl p-3.5 mb-4 flex items-center gap-3">
+        <span class="text-xs font-extrabold text-ink-600 shrink-0">あなたの名前:</span>
+        <input id="onlineMyName" type="text" maxlength="10" placeholder="PLAYER" class="flex-1 bg-cream-200 rounded-xl px-3 py-2 text-sm font-extrabold text-ink-800 focus:outline-none">
+      </div>
+
+      <!-- ルーム作成 vs ルーム参加タブ（待機室表示前は切替表示） -->
+      <div id="onlineEntryTabs">
+        <div class="grid grid-cols-2 gap-2.5 mb-4">
+          <button onclick="onlineNet.createRoom()" class="py-3.5 px-4 rounded-2xl bg-brand-500 hover:bg-brand-600 active:scale-95 transition text-cream-50 font-extrabold text-sm">
+            ルームを作成する
+          </button>
+          <div class="flex gap-1.5">
+            <input id="onlineJoinCodeInput" type="tel" maxlength="4" placeholder="4桁コード" class="w-full text-center text-lg font-extrabold tracking-widest rounded-2xl bg-cream-100 text-ink-800 focus:outline-none">
+            <button onclick="onlineNet.joinRoom()" class="shrink-0 px-4 rounded-2xl bg-ink-800 hover:bg-ink-600 active:scale-95 transition text-cream-100 font-extrabold text-sm">
+              参加
+            </button>
+          </div>
+        </div>
+        <div id="onlineStatusMsg" class="text-xs font-bold text-brand-600 text-center min-h-[1rem]"></div>
+      </div>
+
+      <!-- オンライン対戦 待機ルーム（接続後） -->
+      <div id="onlineRoomBox" class="hidden flex-col gap-3">
+        <div class="bg-cream-100 rounded-2xl p-4 flex items-center justify-between">
+          <div>
+            <div class="text-[10px] font-bold text-ink-600">ONLINE ROOM CODE</div>
+            <div id="onlineDisplayCode" class="text-4xl font-extrabold text-brand-500 tracking-widest">----</div>
+          </div>
+          <button onclick="onlineNet.copyShareUrl()" class="px-4 py-2.5 rounded-xl bg-cream-200 hover:bg-cream-300 active:scale-95 transition text-ink-800 font-extrabold text-xs">
+            <span id="onlineCopyBtnText">招待URLをコピー</span>
+          </button>
+        </div>
+
+        <!-- ステージ表示＆変更（ホストのみ変更可） -->
+        <div class="bg-cream-100 rounded-2xl p-3.5 flex items-center justify-between">
+          <div class="text-xs font-extrabold text-ink-800">
+            ステージ: <span id="onlineMapName" class="text-brand-600">サンセット・キャニオン</span>
+          </div>
+          <button id="btnOnlineCycleMap" onclick="onlineNet.cycleHostMap()" class="px-3 py-1.5 rounded-xl bg-cream-200 hover:bg-cream-300 text-ink-800 font-extrabold text-xs">
+            マップ変更
+          </button>
+        </div>
+
+        <!-- 参加者リスト -->
+        <div class="bg-cream-100 rounded-2xl p-3.5">
+          <div class="text-xs font-extrabold text-ink-800 mb-2">対戦メンバー (<span id="onlinePlayerCount">1</span> / 8)</div>
+          <div id="onlineRosterList" class="grid grid-cols-2 gap-2"></div>
+        </div>
+
+        <button id="btnOnlineStart" onclick="onlineNet.hostStartMatch()" class="w-full py-4 rounded-2xl bg-brand-500 hover:bg-brand-600 active:scale-95 transition text-cream-50 font-extrabold text-lg">
+          オンライン対戦スタート！
+        </button>
+        <div id="onlineGuestWaitMsg" class="hidden text-center text-xs font-extrabold text-ink-600 py-2">
+          ホストが対戦を開始するのを待っています...
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
        3. ホスト（メインモニター）ロビー画面（最大10人・協力／お邪魔バトル）
        ===================================================================== -->
   <section id="screenHostLobby" class="screen items-center justify-center p-4 sm:p-6 pt-16">
@@ -472,33 +586,23 @@
           <h2 class="text-2xl sm:text-3xl font-extrabold text-ink-800">マルチプレイ・ロビー</h2>
         </div>
 
-        <!-- 協力モード / バトルモード 切替セグメント -->
         <div class="bg-cream-100 p-1.5 rounded-2xl grid grid-cols-2 gap-1.5 w-full md:w-auto">
-          <button id="btnRuleCoop" onclick="hostNet.setRuleMode('COOP')" class="px-4 py-2.5 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs sm:text-sm transition flex items-center justify-center gap-1.5">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-            <span>協力モード</span>
+          <button id="btnRuleCoop" onclick="hostNet.setRuleMode('COOP')" class="px-4 py-2.5 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs sm:text-sm transition">
+            協力モード
           </button>
-          <button id="btnRuleBattle" onclick="hostNet.setRuleMode('BATTLE')" class="px-4 py-2.5 rounded-xl bg-transparent text-ink-600 hover:bg-cream-200 font-extrabold text-xs sm:text-sm transition flex items-center justify-center gap-1.5">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-            </svg>
-            <span>お邪魔バトル</span>
+          <button id="btnRuleBattle" onclick="hostNet.setRuleMode('BATTLE')" class="px-4 py-2.5 rounded-xl bg-transparent text-ink-600 hover:bg-cream-200 font-extrabold text-xs sm:text-sm transition">
+            お邪魔バトル
           </button>
         </div>
       </div>
 
-      <!-- ルール説明バナー -->
-      <div id="lobbyRuleDesc" class="mt-3.5 bg-cream-100 rounded-2xl px-4 py-3 text-xs sm:text-sm font-bold text-ink-600 flex items-center gap-3">
-        <span class="w-2.5 h-2.5 rounded-full bg-brand-500 shrink-0"></span>
+      <div id="lobbyRuleDesc" class="mt-3.5 bg-cream-100 rounded-2xl px-4 py-3 text-xs sm:text-sm font-bold text-ink-600 flex items-center justify-between gap-3">
         <span id="lobbyRuleText">【協力サバイバル】全員でチームエネルギーを共有！青い「RESCUE」ゲートを通過すると脱落した仲間を復活させられます。</span>
+        <button onclick="app.cycleMap()" class="shrink-0 px-3 py-1.5 rounded-xl bg-cream-200 text-ink-800 font-extrabold text-xs">
+          マップ: <span id="lobbyMapLabel" class="text-brand-600">サンセット</span>
+        </button>
       </div>
 
-      <!-- 中段：左側(QR＆ルームコード) ／ 右側(10人プレイヤースロット) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-4">
         <div class="lg:col-span-5 bg-cream-100 rounded-3xl p-5 flex flex-col items-center justify-between text-center">
           <div class="w-full">
@@ -515,20 +619,12 @@
           </div>
 
           <div class="w-full flex flex-col gap-2">
-            <button onclick="hostNet.copyJoinUrl()" class="w-full py-2.5 px-4 rounded-xl bg-cream-200 hover:bg-cream-300 active:scale-95 transition text-ink-800 font-bold text-xs flex items-center justify-center gap-2">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-              </svg>
+            <button onclick="hostNet.copyJoinUrl()" class="w-full py-2.5 px-4 rounded-xl bg-cream-200 hover:bg-cream-300 active:scale-95 transition text-ink-800 font-bold text-xs">
               <span id="btnCopyLabel">参加URLをコピー（?room=付き）</span>
             </button>
 
-            <button onclick="hostNet.addBotPlayer()" class="w-full py-2.5 px-4 rounded-xl bg-cream-300 hover:bg-brand-400 hover:text-cream-50 active:scale-95 transition text-ink-800 font-bold text-xs flex items-center justify-center gap-1.5">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-              <span>BOT追加 (テスト用 / 最大10人まで)</span>
+            <button onclick="hostNet.addBotPlayer()" class="w-full py-2.5 px-4 rounded-xl bg-cream-300 hover:bg-brand-400 hover:text-cream-50 active:scale-95 transition text-ink-800 font-bold text-xs">
+              + BOT追加 (テスト用 / 最大10人まで)
             </button>
           </div>
         </div>
@@ -538,7 +634,6 @@
             <span class="text-sm font-extrabold text-ink-800">参加プレイヤー (<span id="lobbyPlayerCount">0</span> / 10)</span>
             <button onclick="hostNet.clearBots()" class="text-xs font-bold text-ink-400 hover:text-brand-600">BOT全削除</button>
           </div>
-
           <div id="lobbySlotsGrid" class="grid grid-cols-2 gap-2.5 flex-1"></div>
         </div>
       </div>
@@ -550,17 +645,11 @@
   </section>
 
   <!-- =====================================================================
-       4. スマホリモコン（コントローラー側）接続＆お邪魔スキル搭載操作画面
+       4. スマホリモコン（コントローラー側）操作しやすい大画面パッド＆方向ボタン
        ===================================================================== -->
   <section id="screenController" class="screen items-center justify-between p-4 pt-16">
     <!-- 未接続時 -->
     <div id="ctrlConnectBox" class="w-full max-w-md bg-cream-200 rounded-3xl p-6 flex flex-col items-center text-center my-auto">
-      <div class="w-14 h-14 rounded-2xl bg-brand-500 text-cream-100 flex items-center justify-center mb-3">
-        <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="5" y="2" width="14" height="20" rx="2"/>
-          <line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/>
-        </svg>
-      </div>
       <h2 class="text-2xl font-extrabold text-ink-800 mb-1">リモコン参加</h2>
       <p class="text-xs text-ink-600 font-medium mb-4">
         モニターの4桁コードとニックネームを入力して参加
@@ -576,12 +665,8 @@
         <input id="inputPlayerName" type="text" maxlength="10" placeholder="PLAYER" class="w-full text-center text-base font-extrabold py-3 px-4 rounded-2xl bg-cream-100 text-ink-800 placeholder-cream-300 focus:outline-none focus:ring-4 focus:ring-brand-400">
       </div>
 
-      <button id="btnRequestGyroCtrl" onclick="gyro.requestPermission('ctrl')" class="w-full py-3 px-4 rounded-2xl bg-cream-300 hover:bg-brand-400 hover:text-cream-50 transition text-ink-800 font-bold text-xs mb-3 flex items-center justify-center gap-2">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
-          <path d="M21 3v5h-5"/>
-        </svg>
-        <span>ジャイロセンサーを許可する（iOS必須）</span>
+      <button id="btnRequestGyroCtrl" onclick="gyro.requestPermission('ctrl')" class="w-full py-3 px-4 rounded-2xl bg-cream-300 hover:bg-brand-400 hover:text-cream-50 transition text-ink-800 font-bold text-xs mb-3">
+        ジャイロセンサーを許可する（iOS必須）
       </button>
 
       <button id="btnConnectHost" onclick="ctrlNet.connect()" class="w-full py-4 rounded-2xl bg-brand-500 hover:bg-brand-600 active:scale-95 transition text-cream-50 font-extrabold text-lg">
@@ -591,9 +676,8 @@
       <p id="ctrlErrorMsg" class="text-xs font-bold text-brand-700 mt-3 min-h-[1rem]"></p>
     </div>
 
-    <!-- 接続完了後：コントローラーパッド -->
+    <!-- 接続完了後：操作しやすい大口径バーチャルスティック＋ジャイロ併用リモコン -->
     <div id="ctrlActivePad" class="hidden w-full max-w-md h-full flex-col justify-between gap-2.5 my-auto pb-2 no-touch-scroll">
-      <!-- プレイヤー識別バナー -->
       <div id="ctrlPlayerBanner" class="w-full bg-cream-200 rounded-3xl p-3.5 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div id="ctrlColorBadge" class="w-11 h-11 rounded-2xl bg-brand-500 text-cream-50 font-extrabold text-sm flex items-center justify-center">
@@ -609,30 +693,29 @@
         </button>
       </div>
 
-      <!-- お邪魔受信アラートバナー（バトル中に妨害を受けたとき表示） -->
-      <div id="ctrlDebuffAlert" class="hidden w-full rounded-2xl bg-ink-800 text-cream-100 px-4 py-2.5 text-center font-extrabold text-xs tracking-wider animate-pulse">
+      <div id="ctrlDebuffAlert" class="hidden w-full rounded-2xl bg-ink-800 text-cream-100 px-4 py-2 text-center font-extrabold text-xs tracking-wider animate-pulse">
         WARNING: 妨害を受けています！
       </div>
 
-      <!-- 傾きビジュアルレーダー＆タッチパッド -->
-      <div id="ctrlTouchPad" class="relative flex-1 min-h-[175px] w-full bg-cream-200 rounded-3xl flex flex-col items-center justify-center p-3 overflow-hidden no-touch-scroll">
+      <!-- 広々とした親指スティック＆傾きレーダー -->
+      <div id="ctrlTouchPad" class="relative flex-1 min-h-[200px] w-full bg-cream-200 rounded-3xl flex flex-col items-center justify-center p-3 overflow-hidden no-touch-scroll">
         <div class="w-full flex justify-between items-center px-2 mb-1">
-          <span class="text-[11px] font-bold text-ink-400">TILT / TOUCH PAD</span>
+          <span class="text-[11px] font-bold text-ink-600">指スライド / スマホ傾き両対応</span>
           <span id="ctrlScoreLive" class="text-xs font-extrabold text-ink-800">0m / 0 pts</span>
         </div>
 
-        <div class="relative w-36 h-36 rounded-full bg-cream-100 flex items-center justify-center my-auto">
+        <div class="relative w-44 h-44 rounded-full bg-cream-100 flex items-center justify-center my-auto">
           <div class="absolute inset-x-0 h-0.5 bg-cream-300"></div>
           <div class="absolute inset-y-0 w-0.5 bg-cream-300"></div>
-          <div class="w-20 h-20 rounded-full border-2 border-dashed border-cream-300"></div>
-          <div id="ctrlRadarDot" class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center transition-transform duration-75">
-            <div class="w-2.5 h-2.5 rounded-full bg-cream-100"></div>
+          <div class="w-24 h-24 rounded-full border-2 border-dashed border-cream-300"></div>
+          <div id="ctrlRadarDot" class="w-12 h-12 rounded-full bg-brand-500 flex items-center justify-center transition-transform duration-75">
+            <div class="w-4 h-4 rounded-full bg-cream-100"></div>
           </div>
         </div>
 
         <div class="w-full px-3 mt-1.5 flex items-center gap-3">
           <span class="text-[11px] font-bold text-ink-600 shrink-0">感度</span>
-          <input type="range" min="1" max="100" value="55" oninput="gyro.setSensitivity(this.value)" class="flex-1">
+          <input type="range" min="1" max="100" value="65" oninput="gyro.setSensitivity(this.value)" class="flex-1">
         </div>
       </div>
 
@@ -665,16 +748,15 @@
   </section>
 
   <!-- =====================================================================
-       5. メイン3Dゲーム画面（Three.js Canvas ＋ 距離・コンボHUD ＋ お邪魔エフェクト）
+       5. メイン3Dゲーム画面（バーチャルスティック操作＋お邪魔バトル搭載）
        ===================================================================== -->
   <section id="screenGame" class="screen bg-cream-100 no-touch-scroll">
-    <!-- Three.js レンダリングコンテナ -->
     <div id="threeContainer"></div>
 
-    <!-- 視界妨害テスト／演出オーバーレイ -->
-    <div id="blindOverlay" class="hidden fixed inset-0 z-20 pointer-events-none flex-col items-center justify-center bg-ink-800/80 backdrop-blur-md text-cream-100">
+    <!-- 視界妨害オーバーレイ（BLIND攻撃を受けたとき表示） -->
+    <div id="blindOverlay" class="hidden fixed inset-0 z-20 pointer-events-none flex-col items-center justify-center bg-ink-800/85 backdrop-blur-md text-cream-100">
       <div class="px-6 py-3 rounded-full bg-brand-500 text-cream-50 font-extrabold text-lg mb-2">JAMMER: BLIND!</div>
-      <div class="text-sm font-bold text-cream-200">視界妨害発生中！</div>
+      <div class="text-sm font-bold text-cream-200">視界妨害を受けている！</div>
     </div>
 
     <!-- プレイ中HUD -->
@@ -694,7 +776,7 @@
           </div>
         </div>
 
-        <!-- 中央：走行距離（DISTANCE m） ＋ マルチ状態 -->
+        <!-- 中央：走行距離 ＋ マルチ状態 -->
         <div class="flex-1 max-w-md flex flex-col gap-1.5">
           <div class="bg-cream-200/95 rounded-2xl px-4 py-2 flex items-center justify-between gap-2">
             <div>
@@ -706,7 +788,6 @@
             </span>
           </div>
 
-          <!-- マルチプレイ用 協力エネルギー OR バトル生存数 -->
           <div id="hudMultiStatus" class="hidden bg-cream-200/95 rounded-2xl px-3.5 py-2">
             <div id="hudCoopBar" class="hidden flex-col">
               <div class="flex justify-between text-[10px] font-extrabold text-ink-800 mb-1">
@@ -719,22 +800,22 @@
             </div>
 
             <div id="hudBattleBar" class="hidden items-center justify-between">
-              <span class="text-[11px] font-extrabold text-ink-600">JAMMER BATTLE</span>
+              <span class="text-[11px] font-extrabold text-ink-600">SURVIVAL</span>
               <span class="text-xs sm:text-sm font-extrabold text-brand-600">ALIVE: <span id="hudAliveCount">0</span> / <span id="hudTotalCount">0</span></span>
             </div>
           </div>
         </div>
 
-        <!-- 右上：スピード＆速度レベル -->
+        <!-- 右上：スピード＆方角コンパス -->
         <div class="bg-cream-200/95 rounded-2xl px-3.5 py-2 sm:px-4 sm:py-2.5 text-right">
-          <div class="text-[10px] font-bold text-ink-600 tracking-wider">LV.<span id="hudSpeedLv">1</span> SPEED</div>
+          <div class="text-[10px] font-bold text-ink-600 tracking-wider">LV.<span id="hudSpeedLv">1</span> · <span id="hudCompassBadge">N 0°</span></div>
           <div class="text-lg sm:text-2xl font-extrabold text-brand-600 leading-none">
             <span id="hudSpeed">120</span><span class="text-xs ml-0.5">km/h</span>
           </div>
         </div>
       </div>
 
-      <!-- マルチプレイ時のプレイヤー状態チップ一覧 -->
+      <!-- マルチ／オンライン対戦時のプレイヤーチップ一覧 -->
       <div id="hudPlayerChips" class="hidden flex-wrap justify-center gap-1.5 mt-0.5"></div>
 
       <!-- 中央カウントダウン＆イベント通知ポップアップ -->
@@ -746,24 +827,39 @@
       </div>
     </div>
 
-    <!-- ソロプレイ用 右下ブースト＆水平リセットボタン -->
-    <div id="soloTouchControls" class="fixed bottom-5 right-5 z-30 flex items-center gap-3">
-      <button onclick="gyro.calibrate()" class="px-4 py-3.5 rounded-2xl bg-cream-200/95 text-ink-800 font-bold text-xs active:scale-95 transition">
-        水平リセット
-      </button>
-      <button
-        onpointerdown="game3d.setSoloBoost(true)"
-        onpointerup="game3d.setSoloBoost(false)"
-        onpointerleave="game3d.setSoloBoost(false)"
-        class="px-6 py-3.5 rounded-2xl bg-brand-500 active:bg-brand-700 text-cream-50 font-extrabold text-sm active:scale-95 transition flex items-center gap-1.5 no-touch-scroll">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-        </svg>
-        <span>BOOST</span>
-      </button>
+    <!-- ソロ＆オンライン対戦用：左下バーチャルスティック ＋ 右下アクションボタン -->
+    <div id="directPlayControls" class="fixed bottom-4 left-4 right-4 z-30 flex items-end justify-between pointer-events-none">
+      <!-- 左下：親指で操作しやすいバーチャルスティック -->
+      <div id="virtualStickZone" class="pointer-events-auto relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-cream-200/85 backdrop-blur-xs flex items-center justify-center no-touch-scroll">
+        <div class="absolute inset-x-4 h-0.5 bg-cream-300"></div>
+        <div class="absolute inset-y-4 w-0.5 bg-cream-300"></div>
+        <div id="virtualStickKnob" class="w-11 h-11 rounded-full bg-brand-500 flex items-center justify-center transition-transform duration-75">
+          <div class="w-3.5 h-3.5 rounded-full bg-cream-100"></div>
+        </div>
+      </div>
+
+      <!-- 右下：水平リセット・お邪魔発動（オンライン時）・BOOST -->
+      <div class="pointer-events-auto flex flex-col items-end gap-2">
+        <button id="btnDirectJammer" onclick="onlineNet.sendJammer()" class="hidden px-5 py-3 rounded-2xl bg-cream-300 text-ink-400 font-extrabold text-xs sm:text-sm transition active:scale-95">
+          お邪魔 (0%)
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button onclick="gyro.calibrate()" class="px-3.5 py-3.5 rounded-2xl bg-cream-200/95 text-ink-800 font-bold text-xs active:scale-95 transition">
+            水平・方角リセット
+          </button>
+          <button
+            onpointerdown="game3d.setDirectBoost(true)"
+            onpointerup="game3d.setDirectBoost(false)"
+            onpointerleave="game3d.setDirectBoost(false)"
+            class="px-6 py-3.5 rounded-2xl bg-brand-500 active:bg-brand-700 text-cream-50 font-extrabold text-sm active:scale-95 transition flex items-center gap-1.5 no-touch-scroll">
+            <span>BOOST</span>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- リザルトオーバーレイ（ソロ / 協力 / バトル対応） -->
+    <!-- リザルトオーバーレイ -->
     <div id="gameOverModal" class="hidden fixed inset-0 z-40 bg-cream-100/85 backdrop-blur-sm items-center justify-center p-5">
       <div class="w-full max-w-lg bg-cream-200 rounded-3xl p-6 sm:p-7 text-center flex flex-col items-center max-h-[90dvh] overflow-y-auto">
         <span id="resultBadge" class="px-4 py-1 rounded-full bg-brand-500 text-cream-50 font-extrabold text-xs mb-2">
@@ -771,7 +867,6 @@
         </span>
         <h2 id="resultTitle" class="text-3xl font-extrabold text-ink-800 mb-4">GAME OVER</h2>
 
-        <!-- ソロ＆協力用 メインスコアカード -->
         <div id="resultScoreCard" class="w-full bg-cream-100 rounded-2xl p-5 mb-4">
           <div id="resultScoreSubLabel" class="text-xs font-bold text-ink-600 mb-1">FINAL SCORE</div>
           <div id="resultScore" class="text-5xl font-extrabold text-brand-500 mb-1">0</div>
@@ -786,15 +881,14 @@
           </div>
         </div>
 
-        <!-- マルチプレイ用 ランキング表（最大10人・距離＆スコア表示） -->
         <div id="resultRankingList" class="hidden w-full bg-cream-100 rounded-2xl p-4 mb-4 flex-col gap-2 text-left"></div>
 
         <div class="w-full flex flex-col gap-2.5">
-          <button onclick="game3d.restart()" class="w-full py-4 rounded-2xl bg-brand-500 hover:bg-brand-600 active:scale-95 transition text-cream-50 font-extrabold text-lg">
+          <button id="btnResultRetry" onclick="game3d.restart()" class="w-full py-4 rounded-2xl bg-brand-500 hover:bg-brand-600 active:scale-95 transition text-cream-50 font-extrabold text-lg">
             もう一度プレイ
           </button>
           <button id="btnResultBackLobby" onclick="app.backToLobby()" class="hidden w-full py-3.5 rounded-2xl bg-ink-800 hover:bg-ink-600 active:scale-95 transition text-cream-100 font-bold text-sm">
-            ロビー（ルール・メンバー変更）へ戻る
+            ロビーへ戻る
           </button>
           <button onclick="app.goHome()" class="w-full py-3 rounded-2xl bg-cream-300 hover:bg-brand-400 hover:text-cream-50 active:scale-95 transition text-ink-800 font-bold text-sm">
             タイトルへ戻る
@@ -804,13 +898,7 @@
     </div>
   </section>
 
-  <!-- =====================================================================
-       JavaScript ロジック一式
-       ===================================================================== -->
   <script>
-    /**
-     * ユーザー収録済み全7ボイスデータ（Base64内蔵）
-     */
     const EMBEDDED_VOICES = {
       hello: {
         fileName: 'Mくん-ヤッホー。.mp3',
@@ -842,6 +930,70 @@
       }
     };
 
+    
+
+    /**
+     * 全4種類の3Dステージ（マップ）テーマ定義
+     */
+    const MAPS = [
+      {
+        id: 'CANYON',
+        name: 'サンセット・キャニオン',
+        tag: 'バランス標準',
+        bgHex: 0xFFF7ED,
+        fogHex: 0xFFF7ED,
+        floorHex: 0xFFEDD5,
+        ringHex: 0xFED7AA,
+        railHex: 0xFB923C,
+        blockHex: 0x431407,
+        stripeHex: 0xF97316,
+        accentCss: '#F97316',
+        spawnPattern: 'STANDARD'
+      },
+      {
+        id: 'FOREST',
+        name: 'エメラルド・フォレスト',
+        tag: 'リング多数',
+        bgHex: 0xF0FDF4,
+        fogHex: 0xF0FDF4,
+        floorHex: 0xDCFCE7,
+        ringHex: 0xBBF7D0,
+        railHex: 0x22C55E,
+        blockHex: 0x14532D,
+        stripeHex: 0x4ADE80,
+        accentCss: '#16A34A',
+        spawnPattern: 'RINGS_HEAVY'
+      },
+      {
+        id: 'GLACIER',
+        name: 'クリスタル・グレイシャー',
+        tag: '超高速スリップ',
+        bgHex: 0xF0F9FF,
+        fogHex: 0xF0F9FF,
+        floorHex: 0xE0F2FE,
+        ringHex: 0xBAE6FD,
+        railHex: 0x0EA5E9,
+        blockHex: 0x0C4A6E,
+        stripeHex: 0x38BDF8,
+        accentCss: '#0284C7',
+        spawnPattern: 'HIGH_SPEED'
+      },
+      {
+        id: 'VOLCANO',
+        name: 'マグマ・ボルケーノ',
+        tag: '高難度迷路',
+        bgHex: 0xFEF2F2,
+        fogHex: 0xFEF2F2,
+        floorHex: 0xFEE2E2,
+        ringHex: 0xFECACA,
+        railHex: 0xEF4444,
+        blockHex: 0x450A0A,
+        stripeHex: 0xF97316,
+        accentCss: '#DC2626',
+        spawnPattern: 'DENSE_WALLS'
+      }
+    ];
+
     /**
      * 10人分のハイコントラスト・フラットカラーパレット
      */
@@ -858,59 +1010,14 @@
       { id: 'P10', name: 'LIME',    hex: '#65A30D', num: 0x65A30D }
     ];
 
-    /**
-     * 全7種類のカスタムボイス定義
-     */
     const VOICE_SLOTS = [
-      {
-        key: 'hello',
-        title: '1. ヤッホー（タイトル / 参加時）',
-        phrase: '「ヤッホー」',
-        keywords: ['ヤッホー', 'ヤッホ', 'hello', 'yahoo'],
-        desc: '起動・ロビー参加時に再生'
-      },
-      {
-        key: 'start',
-        title: '2. 準備はできた？よーい。スタート！',
-        phrase: '「準備はできた？よーい。スタート！」',
-        keywords: ['準備', 'よーい', 'スタート', 'start'],
-        desc: 'カウントダウン＆スタート時に再生'
-      },
-      {
-        key: 'nearmiss',
-        title: '3. あぶなっ！（ギリギリ回避）',
-        phrase: '「あぶなっ！」',
-        keywords: ['あぶな', '危な', 'abuna', 'miss'],
-        desc: '障害物をギリギリで避けた瞬間に再生'
-      },
-      {
-        key: 'good',
-        title: '4. いいよ！その調子！（連続コンボ）',
-        phrase: '「いいよ！その調子！」',
-        keywords: ['いいよ', '調子', 'good', 'combo'],
-        desc: '3連続・5連続ニアミス達成時などに再生'
-      },
-      {
-        key: 'speedup',
-        title: '5. スピードアップ（速度レベル上昇）',
-        phrase: '「スピードアップ」',
-        keywords: ['スピード', 'speed'],
-        desc: 'コースのスピードレベルが上がった時に再生'
-      },
-      {
-        key: 'clear',
-        title: '6. クリア！おめでとう！（優勝 / 目標達成）',
-        phrase: '「クリア！おめでとう！」',
-        keywords: ['クリア', 'おめでとう', 'clear', 'win'],
-        desc: 'バトル1位優勝・ソロ500mクリア達成時に再生'
-      },
-      {
-        key: 'gameover',
-        title: '7. 残念、ゲーム失敗（クラッシュ / 脱落）',
-        phrase: '「残念、ゲーム失敗」',
-        keywords: ['残念', '失敗', 'gameover', 'fail'],
-        desc: '障害物に衝突してゲーム終了時に再生'
-      }
+      { key: 'hello', title: '1. ヤッホー（タイトル / 参加時）', keywords: ['ヤッホー', 'ヤッホ', 'hello'], desc: '起動・ロビー参加時に再生' },
+      { key: 'start', title: '2. 準備はできた？よーい。スタート！', keywords: ['準備', 'よーい', 'スタート', 'start'], desc: 'カウントダウン＆スタート時に再生' },
+      { key: 'nearmiss', title: '3. あぶなっ！（ギリギリ回避）', keywords: ['あぶな', '危な', 'abuna'], desc: '障害物をギリギリで避けた瞬間に再生' },
+      { key: 'good', title: '4. いいよ！その調子！（連続コンボ）', keywords: ['いいよ', '調子', 'good'], desc: '3連続・5連続ニアミス達成時などに再生' },
+      { key: 'speedup', title: '5. スピードアップ（速度レベル上昇）', keywords: ['スピード', 'speed'], desc: 'コースのスピードレベルが上がった時に再生' },
+      { key: 'clear', title: '6. クリア！おめでとう！（優勝 / 目標達成）', keywords: ['クリア', 'おめでとう', 'clear'], desc: '優勝・500mクリア達成時に再生' },
+      { key: 'gameover', title: '7. 残念、ゲーム失敗（クラッシュ / 脱落）', keywords: ['残念', '失敗', 'gameover'], desc: '障害物に衝突してゲーム終了時に再生' }
     ];
 
     /**
@@ -930,9 +1037,7 @@
           const AudioCtx = window.AudioContext || window.webkitAudioContext;
           this.ctx = new AudioCtx();
         }
-        if (this.ctx.state === 'suspended') {
-          this.ctx.resume();
-        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
       },
 
       loadEmbeddedVoices() {
@@ -942,12 +1047,7 @@
           }
           const el = new Audio(item.dataUri);
           el.preload = 'auto';
-          this.customVoices[key] = {
-            url: item.dataUri,
-            isObjectUrl: false,
-            fileName: item.fileName,
-            audioEl: el
-          };
+          this.customVoices[key] = { url: item.dataUri, isObjectUrl: false, fileName: item.fileName, audioEl: el };
         }
       },
 
@@ -956,11 +1056,8 @@
         document.getElementById('iconSoundOn').classList.toggle('hidden', this.muted);
         document.getElementById('iconSoundOff').classList.toggle('hidden', !this.muted);
         document.getElementById('labelSound').textContent = this.muted ? 'OFF' : 'ON';
-        if (this.muted) {
-          this.stopBgm();
-        } else if (game3d.state === 'PLAYING') {
-          this.startBgm();
-        }
+        if (this.muted) this.stopBgm();
+        else if (game3d.state === 'PLAYING') this.startBgm();
       },
 
       registerVoice(key, file) {
@@ -970,25 +1067,16 @@
         const url = URL.createObjectURL(file);
         const el = new Audio(url);
         el.preload = 'auto';
-        this.customVoices[key] = {
-          url: url,
-          isObjectUrl: true,
-          fileName: file.name,
-          audioEl: el
-        };
+        this.customVoices[key] = { url, isObjectUrl: true, fileName: file.name, audioEl: el };
       },
 
       playCustomVoice(key, cooldownMs = 800, force = false) {
         if (this.muted) return false;
         const entry = this.customVoices[key];
         if (!entry || !entry.audioEl) return false;
-
         const now = Date.now();
-        if (!force && this.lastVoiceTime[key] && (now - this.lastVoiceTime[key]) < cooldownMs) {
-          return true;
-        }
+        if (!force && this.lastVoiceTime[key] && (now - this.lastVoiceTime[key]) < cooldownMs) return true;
         this.lastVoiceTime[key] = now;
-
         try {
           entry.audioEl.currentTime = 0;
           entry.audioEl.play().catch(() => {});
@@ -1006,9 +1094,7 @@
         const gain = this.ctx.createGain();
         osc.type = type;
         osc.frequency.setValueAtTime(freq, now);
-        if (slideFreq) {
-          osc.frequency.exponentialRampToValueAtTime(slideFreq, now + duration);
-        }
+        if (slideFreq) osc.frequency.exponentialRampToValueAtTime(slideFreq, now + duration);
         gain.gain.setValueAtTime(vol, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
         osc.connect(gain);
@@ -1023,77 +1109,43 @@
           setTimeout(() => this.playTone(659.25, 'triangle', 0.18, 0.18), 90);
         }
       },
-
       playCountdown(isGo = false) {
-        if (isGo) {
-          this.playTone(880, 'triangle', 0.35, 0.22, 1320);
-        } else {
-          this.playTone(440, 'sine', 0.16, 0.18);
-        }
+        if (isGo) this.playTone(880, 'triangle', 0.35, 0.22, 1320);
+        else this.playTone(440, 'sine', 0.16, 0.18);
       },
-
-      playStartVoice() {
-        return this.playCustomVoice('start', 1500, true);
-      },
-
+      playStartVoice() { return this.playCustomVoice('start', 1500, true); },
       playNearMiss(comboCount = 1) {
         if (comboCount === 3 || comboCount === 5 || (comboCount > 5 && comboCount % 4 === 0)) {
-          if (!this.playCustomVoice('good', 1800)) {
-            this.playTone(659.25, 'triangle', 0.12, 0.2);
-            setTimeout(() => this.playTone(987.77, 'triangle', 0.22, 0.22), 80);
-          }
+          if (!this.playCustomVoice('good', 1800)) this.playTone(987.77, 'triangle', 0.22, 0.22);
         } else {
-          if (!this.playCustomVoice('nearmiss', 900)) {
-            this.playTone(740, 'sine', 0.1, 0.18, 1180);
-          }
+          if (!this.playCustomVoice('nearmiss', 900)) this.playTone(740, 'sine', 0.1, 0.18, 1180);
         }
       },
-
       playRingCollect() {
         this.playTone(587.33, 'triangle', 0.12, 0.18);
         setTimeout(() => this.playTone(880, 'triangle', 0.22, 0.2), 60);
       },
-
       playSpeedUp() {
-        if (!this.playCustomVoice('speedup', 2500)) {
-          this.playTone(440, 'sawtooth', 0.14, 0.15, 880);
-          setTimeout(() => this.playTone(660, 'sawtooth', 0.2, 0.16, 1100), 110);
-        }
+        if (!this.playCustomVoice('speedup', 2500)) this.playTone(440, 'sawtooth', 0.14, 0.15, 880);
       },
-
       playJammerLaunch() {
         this.playTone(300, 'square', 0.12, 0.2, 720);
         setTimeout(() => this.playTone(220, 'sawtooth', 0.22, 0.2, 110), 90);
       },
-
       playRescue() {
         this.playTone(523.25, 'sine', 0.12, 0.22);
-        setTimeout(() => this.playTone(659.25, 'sine', 0.12, 0.22), 70);
-        setTimeout(() => this.playTone(1046.5, 'triangle', 0.25, 0.24), 140);
+        setTimeout(() => this.playTone(1046.5, 'triangle', 0.25, 0.24), 120);
       },
-
-      playHit() {
-        this.playTone(180, 'sawtooth', 0.3, 0.24, 55);
-      },
-
+      playHit() { this.playTone(180, 'sawtooth', 0.3, 0.24, 55); },
       playClear() {
         this.stopBgm();
-        if (!this.playCustomVoice('clear', 1500, true)) {
-          this.playTone(523.25, 'triangle', 0.14, 0.22);
-          setTimeout(() => this.playTone(659.25, 'triangle', 0.14, 0.22), 110);
-          setTimeout(() => this.playTone(783.99, 'triangle', 0.14, 0.22), 220);
-          setTimeout(() => this.playTone(1046.5, 'triangle', 0.36, 0.25), 330);
-        }
+        if (!this.playCustomVoice('clear', 1500, true)) this.playTone(1046.5, 'triangle', 0.36, 0.25);
       },
-
       playCrash() {
         this.stopBgm();
         this.playTone(150, 'sawtooth', 0.35, 0.24, 36);
-        setTimeout(() => {
-          this.playCustomVoice('gameover', 1500, true);
-        }, 180);
+        setTimeout(() => this.playCustomVoice('gameover', 1500, true), 180);
       },
-
       startBgm() {
         if (this.muted || this.isPlayingBgm) return;
         this.init();
@@ -1102,36 +1154,26 @@
         const bassline = [130.81, 130.81, 164.81, 196.00, 146.83, 146.83, 174.61, 220.00];
         this.beatTimer = setInterval(() => {
           if (this.muted || game3d.state !== 'PLAYING') return;
-          const freq = bassline[this.step % bassline.length];
-          this.playTone(freq, 'triangle', 0.14, 0.065);
-          if (this.step % 2 === 1) {
-            this.playTone(1200, 'sine', 0.03, 0.02);
-          }
+          this.playTone(bassline[this.step % bassline.length], 'triangle', 0.14, 0.06);
           this.step++;
         }, 165);
       },
-
       stopBgm() {
         this.isPlayingBgm = false;
-        if (this.beatTimer) {
-          clearInterval(this.beatTimer);
-          this.beatTimer = null;
-        }
+        if (this.beatTimer) { clearInterval(this.beatTimer); this.beatTimer = null; }
       }
     };
 
     /**
-     * 1.5 ボイス設定スタジオ UI管理
+     * ボイススタジオ管理
      */
     const voiceStudio = {
       prevScreen: 'screenHome',
-
       init() {
         audio.loadEmbeddedVoices();
         this.renderSlots();
         this.updateBadges();
       },
-
       restoreEmbeddedVoices() {
         audio.loadEmbeddedVoices();
         this.renderSlots();
@@ -1140,16 +1182,13 @@
         if (fb) fb.textContent = '初期の7ボイスに戻しました！';
         audio.playHello();
       },
-
       renderSlots() {
         const container = document.getElementById('voiceSlotsContainer');
         container.innerHTML = '';
-
         for (const slot of VOICE_SLOTS) {
           const loaded = audio.customVoices[slot.key];
           const card = document.createElement('div');
           card.className = 'bg-cream-100 rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5';
-
           card.innerHTML = `
             <div class="text-left min-w-0 flex-1">
               <div class="flex items-center gap-2">
@@ -1157,26 +1196,19 @@
                 <span class="font-extrabold text-xs sm:text-sm text-ink-800 truncate">${slot.title}</span>
               </div>
               <div class="text-[11px] text-ink-600 font-medium mt-0.5 truncate">
-                ${loaded ? `登録済: ${loaded.fileName}` : `${slot.desc}（未登録時は標準SE）`}
+                ${loaded ? `登録済: ${loaded.fileName}` : slot.desc}
               </div>
             </div>
             <div class="flex items-center gap-2 shrink-0">
-              <button onclick="voiceStudio.previewSlot('${slot.key}')" class="px-3 py-2 rounded-xl bg-cream-200 hover:bg-cream-300 active:scale-95 transition text-ink-800 font-bold text-xs flex items-center gap-1">
-                <svg class="w-3.5 h-3.5 text-brand-500" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="5 3 19 12 5 21 5 3"/>
-                </svg>
-                <span>試聴</span>
-              </button>
-              <label class="cursor-pointer px-3 py-2 rounded-xl ${loaded ? 'bg-ink-800 text-cream-100' : 'bg-brand-500 text-cream-50'} hover:opacity-90 active:scale-95 transition font-bold text-xs">
+              <button onclick="voiceStudio.previewSlot('${slot.key}')" class="px-3 py-2 rounded-xl bg-cream-200 hover:bg-cream-300 active:scale-95 transition text-ink-800 font-bold text-xs">試聴</button>
+              <label class="cursor-pointer px-3 py-2 rounded-xl ${loaded ? 'bg-ink-800 text-cream-100' : 'bg-brand-500 text-cream-50'} font-bold text-xs">
                 <span>${loaded ? '変更' : '選択'}</span>
                 <input type="file" accept="audio/*" onchange="voiceStudio.handleSingleUpload('${slot.key}', this.files[0])" class="hidden">
               </label>
-            </div>
-          `;
+            </div>`;
           container.appendChild(card);
         }
       },
-
       handleSingleUpload(key, file) {
         if (!file) return;
         audio.init();
@@ -1185,132 +1217,137 @@
         this.renderSlots();
         this.updateBadges();
       },
-
       handleBulkUpload(fileList) {
         if (!fileList || fileList.length === 0) return;
         audio.init();
         let matchedCount = 0;
-
         for (const file of Array.from(fileList)) {
           const fname = file.name.normalize('NFC');
-          let matchedSlot = null;
-
           for (const slot of VOICE_SLOTS) {
             if (slot.keywords.some(kw => fname.toLowerCase().includes(kw.toLowerCase()))) {
-              matchedSlot = slot;
+              audio.registerVoice(slot.key, file);
+              matchedCount++;
               break;
             }
           }
-
-          if (matchedSlot) {
-            audio.registerVoice(matchedSlot.key, file);
-            matchedCount++;
-          }
         }
-
         const fb = document.getElementById('voiceBulkFeedback');
-        if (matchedCount > 0) {
-          fb.textContent = `${matchedCount}個の音声ファイルを自動マッチングして登録しました！`;
-          audio.playHello();
-        } else {
-          fb.textContent = 'ファイル名から自動判別できませんでした。各枠の「選択」ボタンから個別に選んでください。';
-        }
-
+        fb.textContent = matchedCount > 0 ? `${matchedCount}個の音声を自動登録しました！` : '各枠から個別に選択してください。';
         this.renderSlots();
         this.updateBadges();
       },
-
       previewSlot(key) {
         audio.init();
-        if (audio.customVoices[key]) {
-          audio.playCustomVoice(key, 0, true);
-        } else {
-          if (key === 'hello') audio.playHello();
-          else if (key === 'start') audio.playCountdown(true);
-          else if (key === 'nearmiss') audio.playNearMiss(1);
-          else if (key === 'good') audio.playNearMiss(3);
-          else if (key === 'speedup') audio.playSpeedUp();
-          else if (key === 'clear') audio.playClear();
-          else if (key === 'gameover') audio.playTone(150, 'sawtooth', 0.35, 0.24, 36);
-        }
+        if (audio.customVoices[key]) audio.playCustomVoice(key, 0, true);
       },
-
       updateBadges() {
         const count = Object.keys(audio.customVoices).length;
-        const hCount = document.getElementById('headerVoiceCount');
-        const homeBadge = document.getElementById('homeVoiceBadge');
-        if (hCount) hCount.textContent = count;
-        if (homeBadge) homeBadge.textContent = `${count} / 7 登録済`;
+        document.getElementById('headerVoiceCount').textContent = count;
+        document.getElementById('homeVoiceBadge').textContent = `${count} / 7 登録済`;
       },
-
-      close() {
-        app.showScreen(this.prevScreen || 'screenHome');
-      }
+      close() { app.showScreen(this.prevScreen || 'screenHome'); }
     };
 
     /**
-     * 2. ジャイロセンサー＆感度・キャリブレーション管理（画面向き・自動基準角・スムージング対応）
+     * 2. 操作性大幅改善コントローラー（バーチャルスティック ＋ 画面ドラッグ ＋ 高精度ジャイロ両対応）
      */
     const gyro = {
+      controlMode: 'HYBRID', // 'HYBRID' | 'TOUCH' | 'GYRO'
+      gyroAxisMode: 'MIX',   // 'MIX' (傾き+方角) | 'COMPASS' (方角メイン) | 'TILT' (傾きのみ)
       active: false,
       hasZero: false,
       rawScreenX: 0,
       rawScreenY: 0,
       baseScreenX: 0,
       baseScreenY: 0,
+      rawHeading: null,
+      baseHeading: null,
+      headingDelta: 0,
       smoothX: 0,
       smoothY: 0,
+      stickX: 0,
+      stickY: 0,
+      stickDragging: false,
       normX: 0,
       normY: 0,
-      sensitivity: 55,
+      sensitivity: 65,
       invertX: false,
       invertY: false,
       keys: { left: false, right: false, up: false, down: false },
-      pointerActive: false,
+
+      setGyroAxisMode(mode) {
+        this.gyroAxisMode = mode;
+        const map = {
+          MIX: 'btnGyroAxisMix',
+          COMPASS: 'btnGyroAxisCompass',
+          TILT: 'btnGyroAxisTilt'
+        };
+        Object.entries(map).forEach(([k, id]) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (k === mode) {
+            el.className = 'py-1.5 px-1.5 rounded-xl bg-ink-800 text-cream-100 font-extrabold text-[11px] transition';
+          } else {
+            el.className = 'py-1.5 px-1.5 rounded-xl text-ink-600 font-extrabold text-[11px] transition';
+          }
+        });
+        this.calibrate();
+      },
+
+      getCardinalLabel(deg) {
+        const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+        const idx = Math.round(((deg % 360) + 360) % 360 / 45) % 8;
+        return dirs[idx];
+      },
+
+      setControlMode(mode) {
+        this.controlMode = mode;
+        const map = {
+          HYBRID: 'btnCtrlModeHybrid',
+          TOUCH: 'btnCtrlModeTouch',
+          GYRO: 'btnCtrlModeGyro'
+        };
+        Object.entries(map).forEach(([k, id]) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (k === mode) {
+            el.className = 'py-2 px-2 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs transition';
+          } else {
+            el.className = 'py-2 px-2 rounded-xl text-ink-600 font-extrabold text-xs transition';
+          }
+        });
+      },
 
       getScreenAngle() {
-        if (screen.orientation && typeof screen.orientation.angle === 'number') {
-          return screen.orientation.angle;
-        }
-        if (typeof window.orientation === 'number') {
-          return window.orientation;
-        }
+        if (screen.orientation && typeof screen.orientation.angle === 'number') return screen.orientation.angle;
+        if (typeof window.orientation === 'number') return window.orientation;
         return 0;
       },
 
       mapScreenTilt(beta, gamma) {
         const angle = ((this.getScreenAngle() % 360) + 360) % 360;
-        if (angle === 0) {
-          // 縦画面: 左右傾き=gamma, 前後傾き=beta
-          return { sx: gamma, sy: beta };
-        } else if (angle === 90) {
-          // 横画面（左向き）: 左右傾き=beta, 前後傾き=-gamma
-          return { sx: beta, sy: -gamma };
-        } else if (angle === 270) {
-          // 横画面（右向き）: 左右傾き=-beta, 前後傾き=gamma
-          return { sx: -beta, sy: gamma };
-        } else {
-          return { sx: -gamma, sy: -beta };
-        }
+        if (angle === 0) return { sx: gamma, sy: beta };
+        if (angle === 90) return { sx: beta, sy: -gamma };
+        if (angle === 270) return { sx: -beta, sy: gamma };
+        return { sx: -gamma, sy: -beta };
       },
 
       init() {
         window.addEventListener('deviceorientation', (e) => this.handleOrientation(e));
-        window.addEventListener('orientationchange', () => {
-          this.hasZero = false;
-        });
+        window.addEventListener('orientationchange', () => { this.hasZero = false; });
 
         window.addEventListener('keydown', (e) => {
           if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') this.keys.left = true;
           if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') this.keys.right = true;
           if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') this.keys.up = true;
           if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') this.keys.down = true;
-          if (e.key === ' ' && game3d.state === 'PLAYING' && app.mode === 'SOLO') {
-            game3d.setSoloBoost(true);
-          }
-          if ((e.key === 'j' || e.key === 'J') && game3d.state === 'PLAYING' && app.mode === 'HOST') {
-            const readyCraft = game3d.crafts.find(c => c.alive && c.jammerCharge >= 100);
-            if (readyCraft) game3d.activateJammer(readyCraft.slotIndex);
+          if (e.key === ' ' && game3d.state === 'PLAYING') game3d.setDirectBoost(true);
+          if ((e.key === 'j' || e.key === 'J') && game3d.state === 'PLAYING') {
+            if (app.mode === 'ONLINE') onlineNet.sendJammer();
+            else if (app.mode === 'HOST') {
+              const readyCraft = game3d.crafts.find(c => c.alive && c.jammerCharge >= 100);
+              if (readyCraft) game3d.activateJammer(readyCraft.slotIndex);
+            }
           }
         });
         window.addEventListener('keyup', (e) => {
@@ -1318,48 +1355,96 @@
           if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') this.keys.right = false;
           if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') this.keys.up = false;
           if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') this.keys.down = false;
-          if (e.key === ' ') game3d.setSoloBoost(false);
+          if (e.key === ' ') game3d.setDirectBoost(false);
         });
 
-        const container = document.getElementById('threeContainer');
-        const updateFromPointer = (clientX, clientY) => {
-          const rect = container.getBoundingClientRect();
+        // 1. 左下バーチャルスティック（親指でグリグリ操作可能）
+        const stickZone = document.getElementById('virtualStickZone');
+        const stickKnob = document.getElementById('virtualStickKnob');
+        let stickPointerId = null;
+
+        const updateVirtualStick = (clientX, clientY) => {
+          const rect = stickZone.getBoundingClientRect();
           const cx = rect.left + rect.width / 2;
           const cy = rect.top + rect.height / 2;
-          this.normX = Math.max(-1, Math.min(1, (clientX - cx) / (rect.width * 0.35)));
-          this.normY = Math.max(-1, Math.min(1, (clientY - cy) / (rect.height * 0.35)));
+          const maxR = rect.width * 0.36;
+          let dx = clientX - cx;
+          let dy = clientY - cy;
+          const dist = Math.hypot(dx, dy);
+          if (dist > maxR) {
+            dx = (dx / dist) * maxR;
+            dy = (dy / dist) * maxR;
+          }
+          this.stickX = dx / maxR;
+          this.stickY = dy / maxR;
+          stickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+          this.recomputeCombinedInput();
         };
 
+        stickZone.addEventListener('pointerdown', (e) => {
+          stickPointerId = e.pointerId;
+          this.stickDragging = true;
+          stickZone.setPointerCapture(e.pointerId);
+          updateVirtualStick(e.clientX, e.clientY);
+        });
+        stickZone.addEventListener('pointermove', (e) => {
+          if (!this.stickDragging || e.pointerId !== stickPointerId) return;
+          updateVirtualStick(e.clientX, e.clientY);
+        });
+        const releaseStick = (e) => {
+          if (e.pointerId !== stickPointerId) return;
+          this.stickDragging = false;
+          stickPointerId = null;
+          this.stickX = 0;
+          this.stickY = 0;
+          stickKnob.style.transform = 'translate(0px, 0px)';
+          this.recomputeCombinedInput();
+        };
+        stickZone.addEventListener('pointerup', releaseStick);
+        stickZone.addEventListener('pointercancel', releaseStick);
+
+        // 2. 画面中央ドラッグ操作（どこを触っても相対移動でスムーズ追従）
+        const container = document.getElementById('threeContainer');
+        let dragStartX = 0, dragStartY = 0;
+        let canvasDragging = false;
         container.addEventListener('pointerdown', (e) => {
-          if (app.mode === 'SOLO') {
-            this.pointerActive = true;
-            updateFromPointer(e.clientX, e.clientY);
+          if (this.controlMode === 'GYRO') return;
+          if (app.mode === 'SOLO' || app.mode === 'ONLINE') {
+            canvasDragging = true;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
           }
         });
         window.addEventListener('pointermove', (e) => {
-          if (this.pointerActive && app.mode === 'SOLO') {
-            updateFromPointer(e.clientX, e.clientY);
-          }
+          if (!canvasDragging) return;
+          const scale = Math.min(window.innerWidth, window.innerHeight) * 0.22;
+          this.stickX = Math.max(-1, Math.min(1, (e.clientX - dragStartX) / scale));
+          this.stickY = Math.max(-1, Math.min(1, (e.clientY - dragStartY) / scale));
+          this.stickDragging = true;
+          this.recomputeCombinedInput();
         });
         window.addEventListener('pointerup', () => {
-          if (this.pointerActive) {
-            this.pointerActive = false;
-            if (!this.active) {
-              this.normX = 0;
-              this.normY = 0;
-            }
+          if (canvasDragging) {
+            canvasDragging = false;
+            this.stickDragging = false;
+            this.stickX = 0;
+            this.stickY = 0;
+            this.recomputeCombinedInput();
           }
         });
 
+        // 3. リモコンモードの大型タッチパッド
         const pad = document.getElementById('ctrlTouchPad');
         let padDragging = false;
         const updatePad = (clientX, clientY) => {
           const rect = pad.getBoundingClientRect();
           const cx = rect.left + rect.width / 2;
           const cy = rect.top + rect.height / 2;
-          this.normX = Math.max(-1, Math.min(1, (clientX - cx) / (rect.width * 0.35)));
-          this.normY = Math.max(-1, Math.min(1, (clientY - cy) / (rect.height * 0.35)));
-          this.updateDiagnostics();
+          const r = rect.width * 0.34;
+          this.stickX = Math.max(-1, Math.min(1, (clientX - cx) / r));
+          this.stickY = Math.max(-1, Math.min(1, (clientY - cy) / r));
+          this.stickDragging = true;
+          this.recomputeCombinedInput();
         };
         pad.addEventListener('pointerdown', (e) => {
           if (e.target.tagName === 'INPUT') return;
@@ -1367,24 +1452,21 @@
           updatePad(e.clientX, e.clientY);
         });
         window.addEventListener('pointermove', (e) => {
-          if (padDragging && app.mode === 'CONTROLLER') {
-            updatePad(e.clientX, e.clientY);
-          }
+          if (padDragging && app.mode === 'CONTROLLER') updatePad(e.clientX, e.clientY);
         });
         window.addEventListener('pointerup', () => {
           if (padDragging) {
             padDragging = false;
-            if (!this.active) {
-              this.normX = 0;
-              this.normY = 0;
-              this.updateDiagnostics();
-            }
+            this.stickDragging = false;
+            this.stickX = 0;
+            this.stickY = 0;
+            this.recomputeCombinedInput();
           }
         });
       },
 
       setSensitivity(val) {
-        this.sensitivity = parseInt(val, 10) || 55;
+        this.sensitivity = parseInt(val, 10) || 65;
         const lbl = document.getElementById('soloSensLabel');
         if (lbl) lbl.textContent = this.sensitivity;
       },
@@ -1398,13 +1480,8 @@
               this.active = true;
               this.hasZero = false;
               this.markGranted(context);
-            } else {
-              const st = document.getElementById('soloGyroStatus');
-              if (st) st.textContent = '許可拒否（タッチ操作可）';
             }
-          } catch (err) {
-            console.warn(err);
-          }
+          } catch (err) {}
         } else {
           this.active = true;
           this.hasZero = false;
@@ -1415,28 +1492,38 @@
       markGranted(context) {
         if (context === 'solo') {
           document.getElementById('soloGyroStatus').textContent = 'ジャイロ有効';
-          document.getElementById('btnRequestGyroSolo').textContent = 'ジャイロセンサー有効化済み';
+          document.getElementById('btnRequestGyroSolo').textContent = 'ジャイロ有効化済み';
         } else {
-          document.getElementById('btnRequestGyroCtrl').textContent = 'ジャイロセンサー有効化済み';
+          document.getElementById('btnRequestGyroCtrl').textContent = 'ジャイロ有効化済み';
         }
       },
 
       handleOrientation(e) {
         if (e.gamma === null || e.beta === null) return;
         this.active = true;
-
         const { sx, sy } = this.mapScreenTilt(e.beta, e.gamma);
         this.rawScreenX = sx;
         this.rawScreenY = sy;
 
-        // 初回受信時に現在の構え角度を自動でゼロ点（水平基準）に設定
+        // 方角（コンパス／ヨー角）の取得：iOSはwebkitCompassHeading、Android/標準は360 - alpha
+        let heading = null;
+        if (typeof e.webkitCompassHeading === 'number' && !isNaN(e.webkitCompassHeading)) {
+          heading = e.webkitCompassHeading;
+        } else if (typeof e.alpha === 'number' && !isNaN(e.alpha)) {
+          heading = (360 - e.alpha) % 360;
+        }
+        if (heading !== null) {
+          this.rawHeading = heading;
+        }
+
         if (!this.hasZero) {
           this.baseScreenX = sx;
           this.baseScreenY = sy;
+          if (heading !== null) this.baseHeading = heading;
           this.hasZero = true;
         }
 
-        // -180〜180度の最短差分（角度ジャンプ防止）
+        // 傾き差分 (-180..180)
         let dxDeg = sx - this.baseScreenX;
         let dyDeg = sy - this.baseScreenY;
         if (dxDeg > 180) dxDeg -= 360;
@@ -1444,21 +1531,56 @@
         if (dyDeg > 180) dyDeg -= 360;
         if (dyDeg < -180) dyDeg += 360;
 
-        // 感度に応じたフル傾き角（約14°〜45°）と微小デッドゾーン（1.6°）
-        const maxTilt = 46 - (this.sensitivity * 0.32);
-        let rawNormX = Math.abs(dxDeg) < 1.6 ? 0 : Math.max(-1, Math.min(1, dxDeg / maxTilt));
-        let rawNormY = Math.abs(dyDeg) < 1.6 ? 0 : Math.max(-1, Math.min(1, dyDeg / maxTilt));
+        // 方角（ヨー回転）差分 (-180..180): 右に体を向けると正(+)、左に向けると負(-)
+        let dYawDeg = 0;
+        if (heading !== null && this.baseHeading !== null) {
+          dYawDeg = heading - this.baseHeading;
+          if (dYawDeg > 180) dYawDeg -= 360;
+          if (dYawDeg < -180) dYawDeg += 360;
+        }
+        this.headingDelta = dYawDeg;
+
+        // 感度に応じたフル舵角（傾き: 14°〜35° / 方角回転: 18°〜45°）
+        const maxTilt = 38 - (this.sensitivity * 0.24);
+        const maxYaw = 48 - (this.sensitivity * 0.28);
+
+        const tiltNormX = Math.abs(dxDeg) < 1.2 ? 0 : Math.max(-1, Math.min(1, dxDeg / maxTilt));
+        const yawNormX = Math.abs(dYawDeg) < 1.5 ? 0 : Math.max(-1, Math.min(1, dYawDeg / maxYaw));
+
+        let rawNormX = 0;
+        if (this.gyroAxisMode === 'COMPASS') {
+          rawNormX = heading !== null ? yawNormX : tiltNormX;
+        } else if (this.gyroAxisMode === 'TILT') {
+          rawNormX = tiltNormX;
+        } else {
+          // MIXモード：傾き（ロール）と方角（ヨー）を自然な比率で合成
+          rawNormX = Math.max(-1, Math.min(1, tiltNormX * 0.75 + yawNormX * 0.65));
+        }
+
+        let rawNormY = Math.abs(dyDeg) < 1.2 ? 0 : Math.max(-1, Math.min(1, dyDeg / maxTilt));
 
         if (this.invertX) rawNormX = -rawNormX;
         if (this.invertY) rawNormY = -rawNormY;
 
-        // ローパスフィルタで手ブレを除去して滑らかに追従
-        this.smoothX += (rawNormX - this.smoothX) * 0.35;
-        this.smoothY += (rawNormY - this.smoothY) * 0.35;
+        this.smoothX += (rawNormX - this.smoothX) * 0.42;
+        this.smoothY += (rawNormY - this.smoothY) * 0.42;
 
-        if (!this.pointerActive) {
+        this.recomputeCombinedInput();
+      },
+
+      recomputeCombinedInput() {
+        const useTouch = (this.controlMode !== 'GYRO') && this.stickDragging;
+        const useGyro = (this.controlMode !== 'TOUCH') && this.active;
+
+        if (useTouch) {
+          this.normX = this.stickX;
+          this.normY = this.stickY;
+        } else if (useGyro) {
           this.normX = this.smoothX;
           this.normY = this.smoothY;
+        } else {
+          this.normX = 0;
+          this.normY = 0;
         }
         this.updateDiagnostics();
       },
@@ -1467,12 +1589,18 @@
         if (this.active) {
           this.baseScreenX = this.rawScreenX;
           this.baseScreenY = this.rawScreenY;
+          if (this.rawHeading !== null) {
+            this.baseHeading = this.rawHeading;
+          }
+          this.headingDelta = 0;
           this.hasZero = true;
         } else {
           this.hasZero = false;
         }
         this.smoothX = 0;
         this.smoothY = 0;
+        this.stickX = 0;
+        this.stickY = 0;
         this.normX = 0;
         this.normY = 0;
         this.updateDiagnostics();
@@ -1482,33 +1610,357 @@
         if (this.keys.left || this.keys.right || this.keys.up || this.keys.down) {
           this.normX = (this.keys.right ? 1 : 0) - (this.keys.left ? 1 : 0);
           this.normY = (this.keys.down ? 1 : 0) - (this.keys.up ? 1 : 0);
-        } else if (!this.active && !this.pointerActive && app.mode === 'SOLO') {
-          this.normX *= 0.85;
-          this.normY *= 0.85;
+        } else {
+          this.recomputeCombinedInput();
         }
       },
 
       updateDiagnostics() {
         const soloDot = document.getElementById('soloRadarDot');
         if (soloDot) {
-          soloDot.style.transform = `translate(${this.normX * 36}px, ${this.normY * 36}px)`;
-          if (this.active) {
-            document.getElementById('soloGyroStatus').textContent = 'ジャイロ受信中';
-          }
+          soloDot.style.transform = `translate(${this.normX * 32}px, ${this.normY * 32}px)`;
+          if (this.active) document.getElementById('soloGyroStatus').textContent = '傾き＋方角受信中';
         }
-        const dbg = document.getElementById('soloGyroDebug');
-        if (dbg) {
-          dbg.textContent = `傾き X: ${this.normX.toFixed(2)} / Y: ${this.normY.toFixed(2)}`;
+        const compassEl = document.getElementById('soloCompassReadout');
+        const hudCompassEl = document.getElementById('hudCompassBadge');
+        if (this.rawHeading !== null) {
+          const degInt = Math.round(this.rawHeading) % 360;
+          const card = this.getCardinalLabel(degInt);
+          const diffInt = Math.round(this.headingDelta);
+          const diffStr = diffInt > 0 ? `+${diffInt}°` : `${diffInt}°`;
+          if (compassEl) compassEl.textContent = `方角(Yaw): ${card} ${degInt}° (基準差: ${diffStr})`;
+          if (hudCompassEl) hudCompassEl.textContent = `${card} ${degInt}°`;
         }
         const ctrlDot = document.getElementById('ctrlRadarDot');
         if (ctrlDot) {
-          ctrlDot.style.transform = `translate(${this.normX * 48}px, ${this.normY * 48}px)`;
+          ctrlDot.style.transform = `translate(${this.normX * 56}px, ${this.normY * 56}px)`;
         }
       }
     };
 
     /**
-     * 3. メインモニター側 PeerJS ホスト＆最大10人ロビー管理
+     * 3. オンライン対戦ネットワーク（各自のスマホ・PCで直接対戦）
+     */
+    const onlineNet = {
+      peer: null,
+      isHost: false,
+      roomCode: '',
+      myId: '',
+      myName: 'PLAYER',
+      hostConn: null,
+      guestConns: {}, // peerId -> conn
+      roster: [], // { id, name, colorIndex, score, distance, alive, rank, x, y }
+      syncTimer: null,
+
+      getMyName() {
+        const inp = document.getElementById('onlineMyName');
+        const val = inp ? inp.value.trim() : '';
+        return (val || 'PLAYER').slice(0, 10);
+      },
+
+      createRoom() {
+        this.destroy();
+        this.isHost = true;
+        this.myName = this.getMyName();
+        this.roomCode = Math.floor(1000 + Math.random() * 9000).toString();
+        const peerId = `gyrododge3d-online-${this.roomCode}`;
+
+        document.getElementById('onlineStatusMsg').textContent = 'オンラインルームを作成中...';
+        this.peer = new Peer(peerId);
+
+        this.peer.on('open', (id) => {
+          this.myId = id;
+          this.roster = [{
+            id: id,
+            name: this.myName,
+            colorIndex: 0,
+            score: 0,
+            distance: 0,
+            alive: true,
+            rank: 1,
+            x: 0,
+            y: 0
+          }];
+
+          document.getElementById('onlineEntryTabs').classList.add('hidden');
+          document.getElementById('onlineRoomBox').classList.remove('hidden');
+          document.getElementById('onlineRoomBox').classList.add('flex');
+          document.getElementById('onlineDisplayCode').textContent = this.roomCode;
+          document.getElementById('btnOnlineStart').classList.remove('hidden');
+          document.getElementById('btnOnlineCycleMap').classList.remove('hidden');
+          document.getElementById('onlineGuestWaitMsg').classList.add('hidden');
+          this.renderRoster();
+          audio.playHello();
+        });
+
+        this.peer.on('connection', (conn) => {
+          conn.on('open', () => {
+            if (this.roster.length >= 8) {
+              conn.send({ type: 'FULL' });
+              setTimeout(() => conn.close(), 200);
+              return;
+            }
+            this.guestConns[conn.peer] = conn;
+            const cIdx = this.roster.length;
+            this.roster.push({
+              id: conn.peer,
+              name: `P${cIdx + 1}`,
+              colorIndex: cIdx,
+              score: 0,
+              distance: 0,
+              alive: true,
+              rank: cIdx + 1,
+              x: 0,
+              y: 0
+            });
+            audio.playHello();
+            this.broadcastRoster();
+            this.renderRoster();
+          });
+
+          conn.on('data', (data) => {
+            const member = this.roster.find(r => r.id === conn.peer);
+            if (!member) return;
+
+            if (data.type === 'HELLO') {
+              member.name = (data.name || member.name).slice(0, 10);
+              this.broadcastRoster();
+              this.renderRoster();
+            } else if (data.type === 'STATE') {
+              member.score = data.score || 0;
+              member.distance = data.distance || 0;
+              member.alive = Boolean(data.alive);
+              member.x = data.x || 0;
+              member.y = data.y || 0;
+              this.recalcRanks();
+              this.broadcastRoster();
+            } else if (data.type === 'JAM_ATTACK') {
+              // 攻撃者以外の全生存プレイヤーへお邪魔攻撃を転送
+              const kind = data.kind || 'BLIND';
+              const attackerName = member.name;
+              // ホスト自身にも適用
+              if (game3d.state === 'PLAYING' && game3d.crafts[0] && game3d.crafts[0].alive) {
+                game3d.applyDirectDebuff(kind, attackerName);
+              }
+              // 他のゲストへ転送
+              Object.entries(this.guestConns).forEach(([pid, gConn]) => {
+                if (pid !== conn.peer && gConn.open) {
+                  gConn.send({ type: 'JAM_HIT', kind, from: attackerName });
+                }
+              });
+            }
+          });
+
+          conn.on('close', () => {
+            delete this.guestConns[conn.peer];
+            this.roster = this.roster.filter(r => r.id !== conn.peer);
+            this.broadcastRoster();
+            this.renderRoster();
+          });
+        });
+
+        this.peer.on('error', () => {
+          document.getElementById('onlineStatusMsg').textContent = '接続エラーが発生しました。再試行してください。';
+        });
+      },
+
+      joinRoom(prefillCode = '') {
+        const code = (prefillCode || document.getElementById('onlineJoinCodeInput').value).trim();
+        if (!/^\d{4}$/.test(code)) {
+          document.getElementById('onlineStatusMsg').textContent = '4桁の数字を入力してください';
+          return;
+        }
+        this.destroy();
+        this.isHost = false;
+        this.roomCode = code;
+        this.myName = this.getMyName();
+
+        document.getElementById('onlineStatusMsg').textContent = 'オンラインルームへ接続中...';
+        this.peer = new Peer();
+
+        this.peer.on('open', (id) => {
+          this.myId = id;
+          this.hostConn = this.peer.connect(`gyrododge3d-online-${code}`);
+
+          this.hostConn.on('open', () => {
+            this.hostConn.send({ type: 'HELLO', name: this.myName });
+            document.getElementById('onlineEntryTabs').classList.add('hidden');
+            document.getElementById('onlineRoomBox').classList.remove('hidden');
+            document.getElementById('onlineRoomBox').classList.add('flex');
+            document.getElementById('onlineDisplayCode').textContent = code;
+            document.getElementById('btnOnlineStart').classList.add('hidden');
+            document.getElementById('btnOnlineCycleMap').classList.add('hidden');
+            document.getElementById('onlineGuestWaitMsg').classList.remove('hidden');
+            audio.playHello();
+          });
+
+          this.hostConn.on('data', (data) => {
+            if (data.type === 'ROSTER') {
+              this.roster = data.roster || [];
+              if (typeof data.mapIndex === 'number') {
+                app.setMapIndex(data.mapIndex);
+              }
+              this.renderRoster();
+              game3d.syncOnlineRivals(this.roster, this.myId);
+            } else if (data.type === 'START_MATCH') {
+              if (typeof data.mapIndex === 'number') app.setMapIndex(data.mapIndex);
+              app.launchOnlineGame();
+            } else if (data.type === 'JAM_HIT') {
+              if (game3d.state === 'PLAYING' && game3d.crafts[0] && game3d.crafts[0].alive) {
+                game3d.applyDirectDebuff(data.kind, data.from);
+              }
+            } else if (data.type === 'FULL') {
+              document.getElementById('onlineStatusMsg').textContent = '満員のため参加できませんでした';
+            }
+          });
+
+          this.hostConn.on('close', () => {
+            document.getElementById('onlineStatusMsg').textContent = 'ホストとの接続が切れました';
+          });
+        });
+      },
+
+      cycleHostMap() {
+        if (!this.isHost) return;
+        app.cycleMap();
+        this.broadcastRoster();
+      },
+
+      recalcRanks() {
+        const sorted = [...this.roster].sort((a, b) => {
+          if (a.alive !== b.alive) return a.alive ? -1 : 1;
+          return b.score - a.score;
+        });
+        sorted.forEach((item, idx) => { item.rank = idx + 1; });
+      },
+
+      broadcastRoster() {
+        if (!this.isHost) return;
+        this.recalcRanks();
+        const payload = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex };
+        Object.values(this.guestConns).forEach(c => {
+          if (c.open) c.send(payload);
+        });
+        game3d.syncOnlineRivals(this.roster, this.myId);
+      },
+
+      renderRoster() {
+        const list = document.getElementById('onlineRosterList');
+        const countEl = document.getElementById('onlinePlayerCount');
+        const mapEl = document.getElementById('onlineMapName');
+        if (mapEl) mapEl.textContent = MAPS[app.currentMapIndex].name;
+        if (countEl) countEl.textContent = this.roster.length;
+        if (!list) return;
+
+        list.innerHTML = '';
+        this.roster.forEach((r, idx) => {
+          const pal = PLAYER_PALETTE[r.colorIndex % PLAYER_PALETTE.length];
+          const div = document.createElement('div');
+          div.className = 'bg-cream-200 rounded-xl px-3 py-2 flex items-center gap-2';
+          div.innerHTML = `
+            <span class="w-6 h-6 rounded-lg text-cream-50 font-extrabold text-xs flex items-center justify-center shrink-0" style="background-color:${pal.hex}">P${idx + 1}</span>
+            <span class="text-xs font-extrabold text-ink-800 truncate">${r.name} ${r.id === this.myId ? '(自分)' : ''}</span>
+          `;
+          list.appendChild(div);
+        });
+      },
+
+      hostStartMatch() {
+        if (!this.isHost) return;
+        // 全員リセット
+        this.roster.forEach(r => {
+          r.score = 0;
+          r.distance = 0;
+          r.alive = true;
+        });
+        const msg = { type: 'START_MATCH', mapIndex: app.currentMapIndex };
+        Object.values(this.guestConns).forEach(c => {
+          if (c.open) c.send(msg);
+        });
+        app.launchOnlineGame();
+      },
+
+      startSyncLoop() {
+        if (this.syncTimer) clearInterval(this.syncTimer);
+        this.syncTimer = setInterval(() => {
+          if (app.mode !== 'ONLINE') return;
+          const myCraft = game3d.crafts[0];
+          if (!myCraft) return;
+
+          if (this.isHost) {
+            const me = this.roster.find(r => r.id === this.myId);
+            if (me) {
+              me.score = game3d.teamScore;
+              me.distance = Math.floor(game3d.teamDistance);
+              me.alive = myCraft.alive;
+              me.x = myCraft.x;
+              me.y = myCraft.y;
+            }
+            this.broadcastRoster();
+          } else if (this.hostConn && this.hostConn.open) {
+            this.hostConn.send({
+              type: 'STATE',
+              score: game3d.teamScore,
+              distance: Math.floor(game3d.teamDistance),
+              alive: myCraft.alive,
+              x: myCraft.x,
+              y: myCraft.y
+            });
+          }
+        }, 120);
+      },
+
+      sendJammer() {
+        const myCraft = game3d.crafts[0];
+        if (!myCraft || !myCraft.alive || myCraft.jammerCharge < 100) return;
+
+        myCraft.jammerCharge = 0;
+        game3d.teamScore += 200;
+        const kinds = ['BLIND', 'REVERSE', 'HEAVY'];
+        const kind = kinds[Math.floor(Math.random() * kinds.length)];
+        audio.playJammerLaunch();
+        game3d.showPopup(`ライバル全員にお邪魔【${kind}】発動！`, '#431407');
+
+        if (this.isHost) {
+          Object.values(this.guestConns).forEach(c => {
+            if (c.open) c.send({ type: 'JAM_HIT', kind, from: this.myName });
+          });
+        } else if (this.hostConn && this.hostConn.open) {
+          this.hostConn.send({ type: 'JAM_ATTACK', kind });
+        }
+      },
+
+      copyShareUrl() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('online', this.roomCode);
+        const inp = document.createElement('input');
+        inp.value = url.toString();
+        document.body.appendChild(inp);
+        inp.select();
+        document.execCommand('copy');
+        document.body.removeChild(inp);
+        document.getElementById('onlineCopyBtnText').textContent = 'コピーしました！';
+        setTimeout(() => {
+          document.getElementById('onlineCopyBtnText').textContent = '招待URLをコピー';
+        }, 2000);
+      },
+
+      destroy() {
+        if (this.syncTimer) { clearInterval(this.syncTimer); this.syncTimer = null; }
+        if (this.hostConn) { this.hostConn.close(); this.hostConn = null; }
+        Object.values(this.guestConns).forEach(c => c.close());
+        this.guestConns = {};
+        if (this.peer) { this.peer.destroy(); this.peer = null; }
+        this.roster = [];
+        const entry = document.getElementById('onlineEntryTabs');
+        const box = document.getElementById('onlineRoomBox');
+        if (entry) entry.classList.remove('hidden');
+        if (box) { box.classList.add('hidden'); box.classList.remove('flex'); }
+      }
+    };
+
+    /**
+     * 4. メインモニター側 PeerJS ホスト＆最大10人ロビー管理
      */
     const hostNet = {
       peer: null,
@@ -1601,11 +2053,8 @@
                 game3d.activateJammer(p.slotIndex);
               }
             } else if (data.type === 'action') {
-              if (app.currentScreen === 'screenHostLobby') {
-                app.launchHostGame();
-              } else if (game3d.state === 'GAMEOVER') {
-                game3d.restart();
-              }
+              if (app.currentScreen === 'screenHostLobby') app.launchHostGame();
+              else if (game3d.state === 'GAMEOVER') game3d.restart();
             }
           });
 
@@ -1619,9 +2068,7 @@
         });
 
         this.peer.on('error', (err) => {
-          if (err.type === 'unavailable-id') {
-            this.initHost();
-          }
+          if (err.type === 'unavailable-id') this.initHost();
         });
       },
 
@@ -1632,13 +2079,13 @@
         const descEl = document.getElementById('lobbyRuleText');
 
         if (mode === 'COOP') {
-          btnCoop.className = 'px-4 py-2.5 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs sm:text-sm transition flex items-center justify-center gap-1.5';
-          btnBattle.className = 'px-4 py-2.5 rounded-xl bg-transparent text-ink-600 hover:bg-cream-200 font-extrabold text-xs sm:text-sm transition flex items-center justify-center gap-1.5';
+          btnCoop.className = 'px-4 py-2.5 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs sm:text-sm transition';
+          btnBattle.className = 'px-4 py-2.5 rounded-xl bg-transparent text-ink-600 hover:bg-cream-200 font-extrabold text-xs sm:text-sm transition';
           descEl.textContent = '【協力モード】全員でチームエネルギーを共有！青い「RESCUE」ゲートを通過すると脱落した仲間を復活させられます。';
         } else {
-          btnBattle.className = 'px-4 py-2.5 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs sm:text-sm transition flex items-center justify-center gap-1.5';
-          btnCoop.className = 'px-4 py-2.5 rounded-xl bg-transparent text-ink-600 hover:bg-cream-200 font-extrabold text-xs sm:text-sm transition flex items-center justify-center gap-1.5';
-          descEl.textContent = '【お邪魔バトル】ニアミスでゲージを溜めて「お邪魔スキル(視界妨害・操作反転・重力)」を発動！最後まで生き残った1人が優勝！';
+          btnBattle.className = 'px-4 py-2.5 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs sm:text-sm transition';
+          btnCoop.className = 'px-4 py-2.5 rounded-xl bg-transparent text-ink-600 hover:bg-cream-200 font-extrabold text-xs sm:text-sm transition';
+          descEl.textContent = '【お邪魔バトル】ニアミスでゲージを溜めて「お邪魔スキル」を発動！最後まで生き残った1人が優勝！';
         }
       },
 
@@ -1664,9 +2111,7 @@
 
       clearBots() {
         for (let i = 0; i < 10; i++) {
-          if (this.slots[i] && this.slots[i].isBot) {
-            this.slots[i] = null;
-          }
+          if (this.slots[i] && this.slots[i].isBot) this.slots[i] = null;
         }
         this.renderLobbySlots();
       },
@@ -1697,7 +2142,7 @@
                 <span class="w-7 h-7 rounded-xl text-cream-50 font-extrabold text-xs flex items-center justify-center shrink-0" style="background-color:${pal.hex}">${pal.id}</span>
                 <span class="font-extrabold text-xs sm:text-sm text-ink-800 truncate">${p.name}</span>
               </div>
-              <button onclick="hostNet.removeSlot(${i})" class="text-xs font-bold text-ink-400 hover:text-brand-600 px-1.5" title="削除">×</button>
+              <button onclick="hostNet.removeSlot(${i})" class="text-xs font-bold text-ink-400 hover:text-brand-600 px-1.5">×</button>
             `;
           } else {
             cell.className = 'flex items-center gap-2.5 bg-cream-50/70 rounded-2xl px-3 py-2 opacity-60';
@@ -1766,15 +2211,12 @@
           if (s && s.conn) s.conn.close();
         }
         this.slots = new Array(10).fill(null);
-        if (this.peer) {
-          this.peer.destroy();
-          this.peer = null;
-        }
+        if (this.peer) { this.peer.destroy(); this.peer = null; }
       }
     };
 
     /**
-     * 4. スマホリモコン側 PeerJS クライアント通信
+     * 5. スマホリモコン側 PeerJS クライアント通信
      */
     const ctrlNet = {
       peer: null,
@@ -1811,10 +2253,7 @@
           this.conn.on('open', () => {
             errEl.textContent = '';
             audio.playHello();
-
-            if (customName) {
-              this.conn.send({ type: 'join_info', name: customName });
-            }
+            if (customName) this.conn.send({ type: 'join_info', name: customName });
 
             document.getElementById('ctrlConnectBox').classList.add('hidden');
             document.getElementById('ctrlActivePad').classList.remove('hidden');
@@ -1823,12 +2262,7 @@
 
             this.sendInterval = setInterval(() => {
               if (this.conn && this.conn.open) {
-                this.conn.send({
-                  type: 'gyro',
-                  x: gyro.normX,
-                  y: gyro.normY,
-                  boost: this.boost
-                });
+                this.conn.send({ type: 'gyro', x: gyro.normX, y: gyro.normY, boost: this.boost });
               }
             }, 33);
           });
@@ -1842,21 +2276,15 @@
               document.getElementById('btnCtrlBoost').style.backgroundColor = data.colorHex;
               document.getElementById('ctrlDisplayName').textContent = displayName;
               document.getElementById('ctrlLiveStatus').textContent = `ROOM ${code} / READY`;
-              if (customName) {
-                this.conn.send({ type: 'join_info', name: customName });
-              }
+              if (customName) this.conn.send({ type: 'join_info', name: customName });
             } else if (data.type === 'full') {
               this.disconnectUI('満員（最大10人）のため参加できませんでした');
             } else if (data.type === 'snapshot') {
               document.getElementById('ctrlScoreLive').textContent = `${data.distance}m / ${data.score.toLocaleString()} pts`;
               const statusEl = document.getElementById('ctrlLiveStatus');
-              if (data.state === 'GAMEOVER') {
-                statusEl.textContent = `FINISH! RANK #${data.rank}`;
-              } else if (data.alive) {
-                statusEl.textContent = `ALIVE (RANK #${data.rank})`;
-              } else {
-                statusEl.textContent = 'ELIMINATED / SPECTATING';
-              }
+              if (data.state === 'GAMEOVER') statusEl.textContent = `FINISH! RANK #${data.rank}`;
+              else if (data.alive) statusEl.textContent = `ALIVE (RANK #${data.rank})`;
+              else statusEl.textContent = 'ELIMINATED / SPECTATING';
 
               const jamBtn = document.getElementById('btnCtrlJammer');
               const jamLabel = document.getElementById('ctrlJamLabel');
@@ -1878,26 +2306,18 @@
               const debuffAlert = document.getElementById('ctrlDebuffAlert');
               if (data.debuffType && data.alive) {
                 debuffAlert.classList.remove('hidden');
-                const names = {
-                  BLIND: '視界妨害（BLIND）発生中！',
-                  REVERSE: '操作反転（REVERSE）発生中！',
-                  HEAVY: '重力増加（HEAVY）発生中！'
-                };
+                const names = { BLIND: '視界妨害 (BLIND)', REVERSE: '操作反転 (REVERSE)', HEAVY: '重力増加 (HEAVY)' };
                 debuffAlert.textContent = `WARNING: ${names[data.debuffType] || '妨害発生中！'}`;
               } else {
                 debuffAlert.classList.add('hidden');
               }
 
-              if (this.lastAlive && !data.alive && navigator.vibrate) {
-                navigator.vibrate([120, 60, 180]);
-              }
+              if (this.lastAlive && !data.alive && navigator.vibrate) navigator.vibrate([120, 60, 180]);
               this.lastAlive = data.alive;
             }
           });
 
-          this.conn.on('close', () => {
-            this.disconnectUI('モニターとの接続が終了しました');
-          });
+          this.conn.on('close', () => this.disconnectUI('モニターとの接続が終了しました'));
         });
 
         this.peer.on('error', () => {
@@ -1909,32 +2329,25 @@
         this.boost = val;
         if (val && navigator.vibrate) navigator.vibrate(25);
       },
-
       triggerJammer() {
         if (this.conn && this.conn.open) {
           this.conn.send({ type: 'jammer' });
           if (navigator.vibrate) navigator.vibrate([40, 30, 60]);
         }
       },
-
       sendAction() {
         if (this.conn && this.conn.open) {
           this.conn.send({ type: 'action' });
           if (navigator.vibrate) navigator.vibrate(30);
         }
       },
-
       disconnectUI(msg = '') {
-        if (this.sendInterval) {
-          clearInterval(this.sendInterval);
-          this.sendInterval = null;
-        }
+        if (this.sendInterval) { clearInterval(this.sendInterval); this.sendInterval = null; }
         document.getElementById('ctrlConnectBox').classList.remove('hidden');
         document.getElementById('ctrlActivePad').classList.add('hidden');
         document.getElementById('ctrlActivePad').classList.remove('flex');
         document.getElementById('ctrlErrorMsg').textContent = msg;
       },
-
       destroy() {
         if (this.sendInterval) clearInterval(this.sendInterval);
         if (this.conn) this.conn.close();
@@ -1944,7 +2357,7 @@
     };
 
     /**
-     * 5. Three.js 3Dトンネル＆ハードコアスコア・距離・お邪魔バトルエンジン
+     * 6. Three.js 3Dトンネル（4マップ対応＆オンラインライバル同期＆お邪魔バトル）
      */
     const game3d = {
       scene: null,
@@ -1954,9 +2367,13 @@
       lastTime: 0,
 
       tunnelGroup: null,
+      floorMat: null,
+      ringMat: null,
+      railMat: null,
       tunnelRings: [],
       crafts: [],
-      soloBoost: false,
+      rivalMeshes: {}, // peerId -> mesh
+      directBoost: false,
 
       obstacles: [],
       particles: [],
@@ -1966,6 +2383,8 @@
       teamDistance: 0,
       highScore: 0,
       bestDistance: 0,
+      bestCombo: 1.0,
+      bestNearMiss: 0,
       teamEnergy: 100,
       gatesPassed: 0,
       nearMissCount: 0,
@@ -2013,6 +2432,7 @@
         this.scene.add(dirLight);
 
         this.buildEnvironment();
+        this.applyMapTheme(MAPS[app.currentMapIndex]);
 
         window.addEventListener('resize', () => this.onResize());
         requestAnimationFrame((t) => this.loop(t));
@@ -2031,9 +2451,7 @@
         if (bd) bd.textContent = this.bestDistance.toLocaleString();
         if (bc) bc.textContent = `x${this.bestCombo.toFixed(1)}`;
         if (bn) bn.textContent = this.bestNearMiss.toLocaleString();
-        if (crown && (this.highScore > 0 || this.bestDistance > 0)) {
-          crown.classList.remove('hidden');
-        }
+        if (crown && (this.highScore > 0 || this.bestDistance > 0)) crown.classList.remove('hidden');
         if (hudHs) hudHs.textContent = Math.max(this.highScore, this.teamScore).toLocaleString();
         if (hudBd) hudBd.textContent = Math.max(this.bestDistance, Math.floor(this.teamDistance)).toLocaleString();
       },
@@ -2043,16 +2461,16 @@
         this.scene.add(this.tunnelGroup);
 
         const floorGeo = new THREE.PlaneGeometry(16, 140);
-        const floorMat = new THREE.MeshLambertMaterial({ color: 0xFFEDD5 });
-        const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+        this.floorMat = new THREE.MeshLambertMaterial({ color: 0xFFEDD5 });
+        const floorMesh = new THREE.Mesh(floorGeo, this.floorMat);
         floorMesh.rotation.x = -Math.PI / 2;
         floorMesh.position.set(0, -4.6, -55);
         this.tunnelGroup.add(floorMesh);
 
         const archGeo = new THREE.TorusGeometry(8.2, 0.14, 6, 8);
-        const archMat = new THREE.MeshLambertMaterial({ color: 0xFED7AA });
+        this.ringMat = new THREE.MeshLambertMaterial({ color: 0xFED7AA });
         for (let i = 0; i < 12; i++) {
-          const ring = new THREE.Mesh(archGeo, archMat);
+          const ring = new THREE.Mesh(archGeo, this.ringMat);
           ring.rotation.z = Math.PI / 8;
           ring.position.z = 10 - i * 11;
           this.tunnelGroup.add(ring);
@@ -2060,12 +2478,21 @@
         }
 
         const railGeo = new THREE.BoxGeometry(0.22, 0.22, 140);
-        const railMat = new THREE.MeshLambertMaterial({ color: 0xFB923C });
-        const leftRail = new THREE.Mesh(railGeo, railMat);
+        this.railMat = new THREE.MeshLambertMaterial({ color: 0xFB923C });
+        const leftRail = new THREE.Mesh(railGeo, this.railMat);
         leftRail.position.set(-7.4, -4.4, -55);
-        const rightRail = new THREE.Mesh(railGeo, railMat);
+        const rightRail = new THREE.Mesh(railGeo, this.railMat);
         rightRail.position.set(7.4, -4.4, -55);
         this.tunnelGroup.add(leftRail, rightRail);
+      },
+
+      applyMapTheme(mapObj) {
+        if (!this.scene || !mapObj) return;
+        this.scene.background.setHex(mapObj.bgHex);
+        this.scene.fog.color.setHex(mapObj.fogHex);
+        if (this.floorMat) this.floorMat.color.setHex(mapObj.floorHex);
+        if (this.ringMat) this.ringMat.color.setHex(mapObj.ringHex);
+        if (this.railMat) this.railMat.color.setHex(mapObj.railHex);
       },
 
       onResize() {
@@ -2075,17 +2502,27 @@
         this.renderer.setSize(window.innerWidth, window.innerHeight);
       },
 
-      createCraftMesh(colorNum) {
+      createCraftMesh(colorNum, isGhost = false) {
         const group = new THREE.Group();
 
         const bodyGeo = new THREE.ConeGeometry(0.55, 1.8, 6);
         bodyGeo.rotateX(-Math.PI / 2);
-        const bodyMat = new THREE.MeshLambertMaterial({ color: colorNum, flatShading: true });
+        const bodyMat = new THREE.MeshLambertMaterial({
+          color: colorNum,
+          flatShading: true,
+          transparent: isGhost,
+          opacity: isGhost ? 0.55 : 1.0
+        });
         const body = new THREE.Mesh(bodyGeo, bodyMat);
         group.add(body);
 
         const wingGeo = new THREE.BoxGeometry(1.9, 0.1, 0.65);
-        const wingMat = new THREE.MeshLambertMaterial({ color: colorNum, flatShading: true });
+        const wingMat = new THREE.MeshLambertMaterial({
+          color: colorNum,
+          flatShading: true,
+          transparent: isGhost,
+          opacity: isGhost ? 0.55 : 1.0
+        });
         const wing = new THREE.Mesh(wingGeo, wingMat);
         wing.position.set(0, -0.04, 0.25);
         group.add(wing);
@@ -2114,25 +2551,65 @@
       },
 
       clearEntities() {
-        for (const c of this.crafts) {
-          this.scene.remove(c.mesh);
-        }
+        for (const c of this.crafts) this.scene.remove(c.mesh);
         this.crafts = [];
-
-        for (const o of this.obstacles) {
-          this.scene.remove(o.mesh);
-        }
+        Object.values(this.rivalMeshes).forEach(m => this.scene.remove(m));
+        this.rivalMeshes = {};
+        for (const o of this.obstacles) this.scene.remove(o.mesh);
         this.obstacles = [];
-
-        for (const p of this.particles) {
-          this.scene.remove(p.mesh);
-        }
+        for (const p of this.particles) this.scene.remove(p.mesh);
         this.particles = [];
+      },
+
+      syncOnlineRivals(roster, myId) {
+        if (app.mode !== 'ONLINE' || !this.scene) return;
+        const activeIds = new Set();
+        roster.forEach((r, idx) => {
+          if (r.id === myId) return;
+          activeIds.add(r.id);
+          let mesh = this.rivalMeshes[r.id];
+          if (!mesh) {
+            const pal = PLAYER_PALETTE[(r.colorIndex || idx) % PLAYER_PALETTE.length];
+            mesh = this.createCraftMesh(pal.num, true).group;
+            this.scene.add(mesh);
+            this.rivalMeshes[r.id] = mesh;
+          }
+          mesh.visible = Boolean(r.alive);
+          mesh.position.set(r.x || 0, r.y || 0, this.PLAYER_Z - 1.5);
+        });
+        Object.keys(this.rivalMeshes).forEach(id => {
+          if (!activeIds.has(id)) {
+            this.scene.remove(this.rivalMeshes[id]);
+            delete this.rivalMeshes[id];
+          }
+        });
+      },
+
+      applyDirectDebuff(kind, fromName) {
+        const c = this.crafts[0];
+        if (!c || !c.alive) return;
+        c.debuffType = kind;
+        c.debuffTimer = 3.8;
+        audio.playHit();
+        const names = { BLIND: '視界妨害', REVERSE: '操作反転', HEAVY: '重力増加' };
+        this.showPopup(`${fromName} から【${names[kind] || kind}】を受けた！`, '#431407');
+        if (kind === 'BLIND') {
+          const blind = document.getElementById('blindOverlay');
+          blind.classList.remove('hidden');
+          blind.classList.add('flex');
+          setTimeout(() => {
+            blind.classList.add('hidden');
+            blind.classList.remove('flex');
+          }, 3600);
+        }
       },
 
       start() {
         audio.init();
         this.clearEntities();
+        const curMap = MAPS[app.currentMapIndex];
+        this.applyMapTheme(curMap);
+
         this.state = 'COUNTDOWN';
         this.teamScore = 0;
         this.teamDistance = 0;
@@ -2142,22 +2619,23 @@
         this.comboCount = 0;
         this.maxComboMult = 1.0;
         this.comboDecayTimer = 0;
-        this.baseSpeed = 40;
-        this.currentSpeed = 40;
+        this.baseSpeed = curMap.spawnPattern === 'HIGH_SPEED' ? 48 : 40;
+        this.currentSpeed = this.baseSpeed;
         this.speedLevel = 1;
-        this.soloBoost = false;
+        this.directBoost = false;
         this.shakeTime = 0;
         this.spawnTimer = 0.22;
 
-        if (app.mode === 'SOLO') {
-          const pal = PLAYER_PALETTE[0];
-          const { group, shadow, debuffRing } = this.createCraftMesh(pal.num);
+        if (app.mode === 'SOLO' || app.mode === 'ONLINE') {
+          const myEntry = app.mode === 'ONLINE' ? onlineNet.roster.find(r => r.id === onlineNet.myId) : null;
+          const pal = PLAYER_PALETTE[(myEntry ? myEntry.colorIndex : 0) % PLAYER_PALETTE.length];
+          const { group, shadow, debuffRing } = this.createCraftMesh(pal.num, false);
           group.position.set(0, 0, this.PLAYER_Z);
           this.scene.add(group);
           this.crafts.push({
             slotIndex: 0,
             slotId: pal.id,
-            name: 'YOU',
+            name: myEntry ? myEntry.name : 'YOU',
             colorHex: pal.hex,
             isBot: false,
             mesh: group,
@@ -2170,7 +2648,7 @@
             score: 0,
             distance: 0,
             rank: 1,
-            jammerCharge: 0,
+            jammerCharge: 35,
             debuffType: null,
             debuffTimer: 0,
             botPhase: 0
@@ -2179,7 +2657,7 @@
           const activeSlots = hostNet.slots.filter(s => s !== null);
           const count = activeSlots.length;
           activeSlots.forEach((slot, idx) => {
-            const { group, shadow, debuffRing } = this.createCraftMesh(slot.colorNum);
+            const { group, shadow, debuffRing } = this.createCraftMesh(slot.colorNum, false);
             const spreadX = count > 1 ? ((idx / (count - 1)) - 0.5) * 6.0 : 0;
             group.position.set(spreadX, 0, this.PLAYER_Z);
             this.scene.add(group);
@@ -2211,20 +2689,29 @@
         document.getElementById('gameOverModal').classList.remove('flex');
         document.getElementById('blindOverlay').classList.add('hidden');
         document.getElementById('blindOverlay').classList.remove('flex');
-        document.getElementById('soloTouchControls').classList.toggle('hidden', app.mode !== 'SOLO');
 
-        const isMulti = app.mode === 'HOST';
+        const isDirect = (app.mode === 'SOLO' || app.mode === 'ONLINE');
+        document.getElementById('directPlayControls').classList.toggle('hidden', !isDirect);
+        document.getElementById('btnDirectJammer').classList.toggle('hidden', app.mode !== 'ONLINE');
+
+        const isMulti = (app.mode === 'HOST' || app.mode === 'ONLINE');
         document.getElementById('hudMultiStatus').classList.toggle('hidden', !isMulti);
         document.getElementById('hudPlayerChips').classList.toggle('hidden', !isMulti);
         document.getElementById('hudPlayerChips').classList.toggle('flex', isMulti);
 
-        if (isMulti) {
+        if (app.mode === 'HOST') {
           const isCoop = hostNet.ruleMode === 'COOP';
           document.getElementById('hudScoreLabel').textContent = isCoop ? 'TEAM SCORE' : 'TOP SCORE';
           document.getElementById('hudCoopBar').classList.toggle('hidden', !isCoop);
           document.getElementById('hudCoopBar').classList.toggle('flex', isCoop);
           document.getElementById('hudBattleBar').classList.toggle('hidden', isCoop);
           document.getElementById('hudBattleBar').classList.toggle('flex', !isCoop);
+        } else if (app.mode === 'ONLINE') {
+          document.getElementById('hudScoreLabel').textContent = 'ONLINE SCORE';
+          document.getElementById('hudCoopBar').classList.add('hidden');
+          document.getElementById('hudBattleBar').classList.remove('hidden');
+          document.getElementById('hudBattleBar').classList.add('flex');
+          onlineNet.startSyncLoop();
         } else {
           document.getElementById('hudScoreLabel').textContent = 'SCORE';
         }
@@ -2234,21 +2721,19 @@
       },
 
       restart() {
+        if (app.mode === 'ONLINE') {
+          if (onlineNet.isHost) onlineNet.hostStartMatch();
+          return;
+        }
         this.start();
       },
 
-      setSoloBoost(val) {
-        this.soloBoost = val;
-      },
-
-      getComboMultiplier() {
-        return Math.min(5.0, 1.0 + this.comboCount * 0.5);
-      },
+      setDirectBoost(val) { this.directBoost = val; },
+      getComboMultiplier() { return Math.min(5.0, 1.0 + this.comboCount * 0.5); },
 
       runCountdown() {
         const cdEl = document.getElementById('hudCountdown');
         cdEl.classList.remove('hidden');
-
         const hasVoice = audio.playStartVoice();
         let count = 3;
         cdEl.textContent = count;
@@ -2283,15 +2768,12 @@
         el.style.backgroundColor = bgHex;
         el.classList.remove('opacity-0');
         clearTimeout(this._popupTimer);
-        this._popupTimer = setTimeout(() => {
-          el.classList.add('opacity-0');
-        }, 1050);
+        this._popupTimer = setTimeout(() => el.classList.add('opacity-0'), 1050);
       },
 
       activateJammer(attackerSlotIndex) {
         const attacker = this.crafts.find(c => c.slotIndex === attackerSlotIndex && c.alive);
         if (!attacker || attacker.jammerCharge < 100) return;
-
         const targets = this.crafts.filter(c => c.alive && c.slotIndex !== attackerSlotIndex);
         if (targets.length === 0) return;
 
@@ -2301,22 +2783,16 @@
 
         const debuffTypes = ['BLIND', 'REVERSE', 'HEAVY'];
         const chosen = debuffTypes[Math.floor(Math.random() * debuffTypes.length)];
-        const labelMap = {
-          BLIND: '視界妨害 (BLIND)',
-          REVERSE: '操作反転 (REVERSE)',
-          HEAVY: '重力増加 (HEAVY)'
-        };
-
         for (const t of targets) {
           t.debuffType = chosen;
           t.debuffTimer = 3.8;
         }
-
         audio.playJammerLaunch();
-        this.showPopup(`${attacker.name} が【${labelMap[chosen]}】発動！`, '#431407');
+        this.showPopup(`${attacker.name} が【${chosen}】発動！`, '#431407');
       },
 
       spawnWave() {
+        const curMap = MAPS[app.currentMapIndex];
         const isCoopMulti = app.mode === 'HOST' && hostNet.ruleMode === 'COOP';
         const hasDownedAlly = isCoopMulti && this.crafts.some(c => !c.alive);
         const roll = Math.random();
@@ -2329,39 +2805,22 @@
           const mesh = new THREE.Mesh(geo, mat);
           mesh.position.set(gx, gy, this.SPAWN_Z);
           this.scene.add(mesh);
-
-          this.obstacles.push({
-            kind: 'RESCUE',
-            mesh: mesh,
-            x: gx,
-            y: gy,
-            z: this.SPAWN_Z,
-            radius: 1.75,
-            collectedBy: new Set()
-          });
+          this.obstacles.push({ kind: 'RESCUE', mesh, x: gx, y: gy, z: this.SPAWN_Z, radius: 1.75, collectedBy: new Set() });
           return;
         }
 
-        if (roll < 0.22) {
+        const ringChance = curMap.spawnPattern === 'RINGS_HEAVY' ? 0.36 : 0.22;
+        if (roll < ringChance) {
           const gx = (Math.random() - 0.5) * 8.0;
           const gy = (Math.random() - 0.5) * 4.5;
           const geo = new THREE.TorusGeometry(1.35, 0.18, 8, 18);
-          const mat = new THREE.MeshLambertMaterial({ color: 0xF97316, flatShading: true });
+          const mat = new THREE.MeshLambertMaterial({ color: curMap.stripeHex, flatShading: true });
           const mesh = new THREE.Mesh(geo, mat);
           mesh.position.set(gx, gy, this.SPAWN_Z);
           this.scene.add(mesh);
-
-          this.obstacles.push({
-            kind: 'RING',
-            mesh: mesh,
-            x: gx,
-            y: gy,
-            z: this.SPAWN_Z,
-            radius: 1.55,
-            collectedBy: new Set()
-          });
+          this.obstacles.push({ kind: 'RING', mesh, x: gx, y: gy, z: this.SPAWN_Z, radius: 1.55, collectedBy: new Set() });
         } else if (roll < 0.72) {
-          const count = Math.random() < 0.52 ? 2 : 1;
+          const count = (curMap.spawnPattern === 'DENSE_WALLS' || Math.random() < 0.52) ? 2 : 1;
           for (let i = 0; i < count; i++) {
             const w = 2.3 + Math.random() * 1.9;
             const h = 2.5 + Math.random() * 2.5;
@@ -2370,30 +2829,13 @@
             const oy = (Math.random() - 0.5) * 4.8;
 
             const group = new THREE.Group();
-            const boxGeo = new THREE.BoxGeometry(w, h, d);
-            const boxMat = new THREE.MeshLambertMaterial({ color: 0x431407, flatShading: true });
-            group.add(new THREE.Mesh(boxGeo, boxMat));
-
-            const bandGeo = new THREE.BoxGeometry(w + 0.08, 0.35, d + 0.08);
-            const bandMat = new THREE.MeshLambertMaterial({ color: 0xF97316, flatShading: true });
-            group.add(new THREE.Mesh(bandGeo, bandMat));
+            group.add(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: curMap.blockHex, flatShading: true })));
+            group.add(new THREE.Mesh(new THREE.BoxGeometry(w + 0.08, 0.35, d + 0.08), new THREE.MeshLambertMaterial({ color: curMap.stripeHex, flatShading: true })));
 
             const spawnZ = this.SPAWN_Z - i * 5.5;
             group.position.set(ox, oy, spawnZ);
             this.scene.add(group);
-
-            this.obstacles.push({
-              kind: 'BLOCK',
-              mesh: group,
-              x: ox,
-              y: oy,
-              z: spawnZ,
-              halfW: w / 2,
-              halfH: h / 2,
-              halfD: d / 2,
-              hitBy: new Set(),
-              nearMissedBy: new Set()
-            });
+            this.obstacles.push({ kind: 'BLOCK', mesh: group, x: ox, y: oy, z: spawnZ, halfW: w / 2, halfH: h / 2, halfD: d / 2, hitBy: new Set(), nearMissedBy: new Set() });
           }
         } else {
           const isHorizontal = Math.random() < 0.5;
@@ -2404,29 +2846,11 @@
           const oy = isHorizontal ? (Math.random() < 0.5 ? -2.2 : 2.2) : 0;
 
           const group = new THREE.Group();
-          const boxGeo = new THREE.BoxGeometry(w, h, d);
-          const boxMat = new THREE.MeshLambertMaterial({ color: 0x7C2D12, flatShading: true });
-          group.add(new THREE.Mesh(boxGeo, boxMat));
-
-          const stripeGeo = new THREE.BoxGeometry(w + 0.06, 0.3, d + 0.06);
-          const stripeMat = new THREE.MeshLambertMaterial({ color: 0xFB923C, flatShading: true });
-          group.add(new THREE.Mesh(stripeGeo, stripeMat));
-
+          group.add(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: curMap.blockHex, flatShading: true })));
+          group.add(new THREE.Mesh(new THREE.BoxGeometry(w + 0.06, 0.3, d + 0.06), new THREE.MeshLambertMaterial({ color: curMap.stripeHex, flatShading: true })));
           group.position.set(ox, oy, this.SPAWN_Z);
           this.scene.add(group);
-
-          this.obstacles.push({
-            kind: 'BLOCK',
-            mesh: group,
-            x: ox,
-            y: oy,
-            z: this.SPAWN_Z,
-            halfW: w / 2,
-            halfH: h / 2,
-            halfD: d / 2,
-            hitBy: new Set(),
-            nearMissedBy: new Set()
-          });
+          this.obstacles.push({ kind: 'BLOCK', mesh: group, x: ox, y: oy, z: this.SPAWN_Z, halfW: w / 2, halfH: h / 2, halfD: d / 2, hitBy: new Set(), nearMissedBy: new Set() });
         }
       },
 
@@ -2437,62 +2861,44 @@
           const mesh = new THREE.Mesh(geo, mat);
           mesh.position.set(x, y, z);
           this.scene.add(mesh);
-          this.particles.push({
-            mesh: mesh,
-            vx: (Math.random() - 0.5) * 18,
-            vy: (Math.random() - 0.5) * 18,
-            vz: (Math.random() - 0.5) * 14,
-            life: 1.0
-          });
+          this.particles.push({ mesh, vx: (Math.random() - 0.5) * 18, vy: (Math.random() - 0.5) * 18, vz: (Math.random() - 0.5) * 14, life: 1.0 });
         }
       },
 
       update(dt) {
         if (this.shakeTime > 0) this.shakeTime -= dt;
-
         for (let i = this.particles.length - 1; i >= 0; i--) {
           const p = this.particles[i];
           p.mesh.position.x += p.vx * dt;
           p.mesh.position.y += p.vy * dt;
           p.mesh.position.z += p.vz * dt;
-          p.mesh.rotation.x += dt * 6;
-          p.mesh.rotation.y += dt * 6;
           p.life -= dt * 1.6;
           p.mesh.scale.setScalar(Math.max(0.01, p.life));
-          if (p.life <= 0) {
-            this.scene.remove(p.mesh);
-            this.particles.splice(i, 1);
-          }
+          if (p.life <= 0) { this.scene.remove(p.mesh); this.particles.splice(i, 1); }
         }
 
         if (this.state !== 'PLAYING' && this.state !== 'COUNTDOWN') return;
 
-        let anyBoost = false;
-        if (app.mode === 'SOLO') {
-          anyBoost = this.soloBoost;
-        } else if (app.mode === 'HOST') {
-          anyBoost = this.crafts.some(c => c.alive && hostNet.slots[c.slotIndex]?.boost);
-        }
+        const curMap = MAPS[app.currentMapIndex];
+        let anyBoost = (app.mode === 'SOLO' || app.mode === 'ONLINE')
+          ? this.directBoost
+          : this.crafts.some(c => c.alive && hostNet.slots[c.slotIndex]?.boost);
 
         if (this.state === 'PLAYING') {
-          const deltaDist = this.currentSpeed * dt * 0.45;
-          this.teamDistance += deltaDist;
-
+          this.teamDistance += this.currentSpeed * dt * 0.45;
           const newLevel = Math.min(8, 1 + Math.floor(this.teamDistance / 120));
           if (newLevel > this.speedLevel) {
             this.speedLevel = newLevel;
             audio.playSpeedUp();
             this.showPopup(`SPEED UP! LV.${this.speedLevel}`, '#EA580C');
           }
-
-          this.baseSpeed = Math.min(86, 40 + (this.speedLevel - 1) * 6.5);
+          const startSpd = curMap.spawnPattern === 'HIGH_SPEED' ? 48 : 40;
+          this.baseSpeed = Math.min(92, startSpd + (this.speedLevel - 1) * 6.5);
           this.currentSpeed = anyBoost ? this.baseSpeed * 1.42 : this.baseSpeed;
 
           if (this.comboCount > 0) {
             this.comboDecayTimer -= dt;
-            if (this.comboDecayTimer <= 0) {
-              this.comboCount = 0;
-            }
+            if (this.comboDecayTimer <= 0) this.comboCount = 0;
           }
         } else {
           this.currentSpeed = 16;
@@ -2500,9 +2906,7 @@
 
         for (const ring of this.tunnelRings) {
           ring.position.z += this.currentSpeed * dt;
-          if (ring.position.z > 14) {
-            ring.position.z -= 12 * 11;
-          }
+          if (ring.position.z > 14) ring.position.z -= 12 * 11;
         }
 
         for (const c of this.crafts) {
@@ -2511,10 +2915,7 @@
             c.debuffTimer -= dt;
             c.debuffRing.visible = true;
             c.debuffRing.rotation.y += dt * 5;
-            if (c.debuffTimer <= 0) {
-              c.debuffType = null;
-              c.debuffRing.visible = false;
-            }
+            if (c.debuffTimer <= 0) { c.debuffType = null; c.debuffRing.visible = false; }
           } else {
             c.debuffRing.visible = false;
           }
@@ -2522,10 +2923,8 @@
           c.mesh.visible = c.alive && (c.invuln <= 0 || Math.floor(c.invuln * 16) % 2 === 0);
           if (!c.alive) continue;
 
-          let inX = 0;
-          let inY = 0;
-
-          if (app.mode === 'SOLO') {
+          let inX = 0, inY = 0;
+          if (app.mode === 'SOLO' || app.mode === 'ONLINE') {
             gyro.updateKeyInput();
             inX = gyro.normX;
             inY = -gyro.normY;
@@ -2535,13 +2934,6 @@
               c.botPhase += dt * 2.1;
               inX = Math.sin(c.botPhase + c.slotIndex) * 0.72;
               inY = Math.cos(c.botPhase * 0.8 + c.slotIndex) * 0.65;
-              for (const obs of this.obstacles) {
-                if (obs.kind === 'BLOCK' && obs.z > -32 && obs.z < 2) {
-                  if (Math.abs(obs.x - c.x) < obs.halfW + 1.2) {
-                    inX = obs.x > 0 ? -0.9 : 0.9;
-                  }
-                }
-              }
               if (hostNet.ruleMode === 'BATTLE' && c.jammerCharge >= 100 && Math.random() < dt * 0.6) {
                 this.activateJammer(c.slotIndex);
               }
@@ -2551,13 +2943,10 @@
             }
           }
 
-          let steerLerp = 11;
+          let steerLerp = 12;
           if (c.debuffTimer > 0) {
-            if (c.debuffType === 'REVERSE') {
-              inX = -inX;
-            } else if (c.debuffType === 'HEAVY') {
-              steerLerp = 4.2;
-            }
+            if (c.debuffType === 'REVERSE') inX = -inX;
+            else if (c.debuffType === 'HEAVY') steerLerp = 4.2;
           }
 
           const targetX = Math.max(-this.BOUNDS_X, Math.min(this.BOUNDS_X, inX * this.BOUNDS_X));
@@ -2574,17 +2963,17 @@
           c.shadow.position.y = -4.55 - c.y;
 
           if (this.state === 'PLAYING') {
-            const pBoost = app.mode === 'SOLO' ? this.soloBoost : hostNet.slots[c.slotIndex]?.boost;
+            const pBoost = (app.mode === 'SOLO' || app.mode === 'ONLINE') ? this.directBoost : hostNet.slots[c.slotIndex]?.boost;
             c.distance += this.currentSpeed * dt * 0.45;
             c.score += Math.floor(dt * 25 * (pBoost ? 1.5 : 1.0));
 
-            if (app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') {
+            if ((app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') || app.mode === 'ONLINE') {
               c.jammerCharge = Math.min(100, c.jammerCharge + dt * (pBoost ? 14 : 9));
             }
           }
         }
 
-        if (app.mode === 'SOLO' && this.crafts[0]) {
+        if ((app.mode === 'SOLO' || app.mode === 'ONLINE') && this.crafts[0]) {
           const p = this.crafts[0];
           this.camera.position.x += (p.x * 0.32 - this.camera.position.x) * Math.min(1, dt * 6);
           this.camera.position.y += ((1.4 + p.y * 0.25) - this.camera.position.y) * Math.min(1, dt * 6);
@@ -2594,49 +2983,37 @@
         }
 
         if (this.state !== 'PLAYING') return;
-
         this.teamScore += Math.floor(dt * 25 * (anyBoost ? 1.5 : 1.0));
 
         this.spawnTimer -= dt * (this.currentSpeed / 40);
         if (this.spawnTimer <= 0) {
           this.spawnWave();
-          this.spawnTimer = Math.max(0.38, 0.90 - (this.speedLevel * 0.055));
+          this.spawnTimer = Math.max(0.36, 0.88 - (this.speedLevel * 0.055));
         }
 
         for (let i = this.obstacles.length - 1; i >= 0; i--) {
           const obs = this.obstacles[i];
           obs.z += this.currentSpeed * dt;
           obs.mesh.position.z = obs.z;
-
-          if (obs.kind === 'RING' || obs.kind === 'RESCUE') {
-            obs.mesh.rotation.z += dt * 2.5;
-          }
+          if (obs.kind === 'RING' || obs.kind === 'RESCUE') obs.mesh.rotation.z += dt * 2.5;
 
           if (obs.z > -1.4 && obs.z < 1.4) {
             for (const c of this.crafts) {
               if (!c.alive) continue;
-
               if (obs.kind === 'RING' && !obs.collectedBy.has(c.slotIndex)) {
-                const dist = Math.hypot(c.x - obs.x, c.y - obs.y);
-                if (dist <= obs.radius + 0.5) {
+                if (Math.hypot(c.x - obs.x, c.y - obs.y) <= obs.radius + 0.5) {
                   obs.collectedBy.add(c.slotIndex);
                   const mult = this.getComboMultiplier();
                   const pts = Math.round(250 * mult);
                   c.score += pts;
                   this.teamScore += pts;
-                  this.gatesPassed++;
-                  if (app.mode === 'HOST' && hostNet.ruleMode === 'COOP') {
-                    this.teamEnergy = Math.min(100, this.teamEnergy + 12);
-                  }
-                  if (app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') {
-                    c.jammerCharge = Math.min(100, c.jammerCharge + 35);
-                  }
+                  if (app.mode === 'HOST' && hostNet.ruleMode === 'COOP') this.teamEnergy = Math.min(100, this.teamEnergy + 12);
+                  if ((app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') || app.mode === 'ONLINE') c.jammerCharge = Math.min(100, c.jammerCharge + 35);
                   audio.playRingCollect();
                   this.showPopup(`RING +${pts} (x${mult.toFixed(1)})`);
                 }
               } else if (obs.kind === 'RESCUE' && !obs.collectedBy.has(c.slotIndex)) {
-                const dist = Math.hypot(c.x - obs.x, c.y - obs.y);
-                if (dist <= obs.radius + 0.5) {
+                if (Math.hypot(c.x - obs.x, c.y - obs.y) <= obs.radius + 0.5) {
                   obs.collectedBy.add(c.slotIndex);
                   const downed = this.crafts.find(ally => !ally.alive);
                   if (downed) {
@@ -2649,7 +3026,6 @@
                   } else {
                     this.teamEnergy = Math.min(100, this.teamEnergy + 25);
                     audio.playRescue();
-                    this.showPopup('TEAM SHIELD +25%', '#0284C7');
                   }
                 }
               } else if (obs.kind === 'BLOCK' && !obs.hitBy.has(c.slotIndex)) {
@@ -2668,22 +3044,15 @@
                   this.comboDecayTimer = 4.2;
                   const mult = this.getComboMultiplier();
                   if (mult > this.maxComboMult) this.maxComboMult = mult;
-
                   const bonusPts = Math.round(200 * mult);
                   c.score += bonusPts;
                   this.teamScore += bonusPts;
                   this.nearMissCount++;
-
-                  if (app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') {
+                  if ((app.mode === 'HOST' && hostNet.ruleMode === 'BATTLE') || app.mode === 'ONLINE') {
                     c.jammerCharge = Math.min(100, c.jammerCharge + 30);
                   }
-
                   audio.playNearMiss(this.comboCount);
-                  if (app.mode === 'SOLO') {
-                    this.showPopup(`あぶなっ！ +${bonusPts} (x${mult.toFixed(1)})`);
-                  } else {
-                    this.showPopup(`${c.name} ニアミス！ +${bonusPts}`);
-                  }
+                  this.showPopup(`あぶなっ！ +${bonusPts} (x${mult.toFixed(1)})`);
                 }
               }
             }
@@ -2712,7 +3081,7 @@
         this.comboCount = 0;
         this.spawnExplosion(craft.x, craft.y, this.PLAYER_Z, PLAYER_PALETTE[craft.slotIndex].num);
 
-        if (app.mode === 'SOLO') {
+        if (app.mode === 'SOLO' || app.mode === 'ONLINE') {
           craft.alive = false;
           const isClear = this.teamDistance >= 500;
           this.triggerGameOver(isClear);
@@ -2725,17 +3094,13 @@
             craft.alive = false;
             audio.playHit();
             this.showPopup(`${craft.name} DOWN! RESCUEゲートで復活`);
-
-            const anyAlive = this.crafts.some(c => c.alive);
-            if (this.teamEnergy <= 0 || !anyAlive) {
-              const isCoopClear = this.teamDistance >= 500;
-              this.triggerGameOver(isCoopClear);
+            if (this.teamEnergy <= 0 || !this.crafts.some(c => c.alive)) {
+              this.triggerGameOver(this.teamDistance >= 500);
             }
           } else {
             craft.alive = false;
             audio.playHit();
             this.showPopup(`${craft.name} ELIMINATED!`);
-
             const aliveList = this.crafts.filter(c => c.alive);
             if (this.crafts.length > 1 && aliveList.length <= 1) {
               if (aliveList[0]) aliveList[0].score += 1000;
@@ -2748,39 +3113,31 @@
       },
 
       updateRanks() {
-        const sorted = [...this.crafts].sort((a, b) => {
-          if (a.alive !== b.alive) return a.alive ? -1 : 1;
-          return b.score - a.score;
-        });
-        sorted.forEach((c, idx) => {
-          c.rank = idx + 1;
-        });
+        const sorted = [...this.crafts].sort((a, b) => (a.alive !== b.alive ? (a.alive ? -1 : 1) : b.score - a.score));
+        sorted.forEach((c, idx) => { c.rank = idx + 1; });
       },
 
       triggerGameOver(isVictoryOrClear = false) {
         this.state = 'GAMEOVER';
-        if (isVictoryOrClear) {
-          audio.playClear();
-        } else {
-          audio.playCrash();
-        }
+        if (isVictoryOrClear) audio.playClear();
+        else audio.playCrash();
         this.updateRanks();
 
-        if (app.mode === 'HOST') {
-          hostNet.broadcastSnapshots(this.crafts);
-        }
+        if (app.mode === 'HOST') hostNet.broadcastSnapshots(this.crafts);
 
-        const isMulti = app.mode === 'HOST';
+        const isHostMulti = app.mode === 'HOST';
+        const isOnline = app.mode === 'ONLINE';
         const scoreCard = document.getElementById('resultScoreCard');
         const rankList = document.getElementById('resultRankingList');
         const backLobbyBtn = document.getElementById('btnResultBackLobby');
+        const retryBtn = document.getElementById('btnResultRetry');
 
-        backLobbyBtn.classList.toggle('hidden', !isMulti);
+        backLobbyBtn.classList.toggle('hidden', !(isHostMulti || isOnline));
+        retryBtn.classList.toggle('hidden', isOnline && !onlineNet.isHost);
 
-        if (!isMulti) {
+        if (!isHostMulti) {
           scoreCard.classList.remove('hidden');
-          rankList.classList.add('hidden');
-          document.getElementById('resultBadge').textContent = isVictoryOrClear ? '500m CLEAR!' : 'SOLO RUN';
+          document.getElementById('resultBadge').textContent = isVictoryOrClear ? '500m CLEAR!' : (isOnline ? 'ONLINE MATCH' : 'SOLO RUN');
           document.getElementById('resultTitle').textContent = isVictoryOrClear ? 'CLEAR! おめでとう!' : 'GAME OVER';
           document.getElementById('resultScoreSubLabel').textContent = 'FINAL SCORE';
 
@@ -2814,48 +3171,40 @@
           document.getElementById('resultMaxCombo').textContent = `x${this.maxComboMult.toFixed(1)}`;
           document.getElementById('resultNearMiss').textContent = this.nearMissCount;
           document.getElementById('resultNewRecord').classList.toggle('hidden', !isNewBest);
+
+          if (isOnline && onlineNet.roster.length > 0) {
+            rankList.classList.remove('hidden');
+            rankList.classList.add('flex');
+            onlineNet.recalcRanks();
+            rankList.innerHTML = [...onlineNet.roster].sort((a, b) => a.rank - b.rank).map(r => `
+              <div class="flex items-center justify-between bg-cream-200 rounded-xl px-3.5 py-2">
+                <span class="font-extrabold text-sm text-ink-800">#${r.rank} ${r.name}</span>
+                <span class="font-extrabold text-sm text-brand-600">${r.score.toLocaleString()} pts (${r.distance}m)</span>
+              </div>
+            `).join('');
+          } else {
+            rankList.classList.add('hidden');
+          }
         } else {
           const isCoop = hostNet.ruleMode === 'COOP';
           document.getElementById('resultNewRecord').classList.add('hidden');
-
+          scoreCard.classList.toggle('hidden', !isCoop);
           if (isCoop) {
-            scoreCard.classList.remove('hidden');
-            document.getElementById('resultBadge').textContent = isVictoryOrClear ? 'CO-OP CLEAR!' : 'CO-OP SURVIVAL';
             document.getElementById('resultTitle').textContent = isVictoryOrClear ? 'CLEAR! おめでとう!' : 'TEAM RESULT';
-            document.getElementById('resultScoreSubLabel').textContent = 'COMBINED TEAM SCORE';
             document.getElementById('resultScore').textContent = this.teamScore.toLocaleString();
             document.getElementById('resultDistance').textContent = Math.floor(this.teamDistance).toLocaleString();
-            document.getElementById('resultBest').textContent = '-';
-            document.getElementById('resultMaxCombo').textContent = `x${this.maxComboMult.toFixed(1)}`;
-            document.getElementById('resultNearMiss').textContent = this.nearMissCount;
           } else {
-            scoreCard.classList.add('hidden');
             const champ = [...this.crafts].sort((a, b) => a.rank - b.rank)[0];
-            document.getElementById('resultBadge').textContent = 'BATTLE ROYALE CHAMPION';
             document.getElementById('resultTitle').textContent = champ ? `優勝: ${champ.name}` : 'FINISH';
           }
-
           rankList.classList.remove('hidden');
           rankList.classList.add('flex');
-          rankList.innerHTML = '';
-
-          const sorted = [...this.crafts].sort((a, b) => a.rank - b.rank);
-          for (const c of sorted) {
-            const row = document.createElement('div');
-            row.className = 'flex items-center justify-between bg-cream-200 rounded-xl px-3.5 py-2';
-            row.innerHTML = `
-              <div class="flex items-center gap-2.5">
-                <span class="w-6 text-xs font-extrabold text-ink-600">#${c.rank}</span>
-                <span class="px-2 py-0.5 rounded-lg text-cream-50 font-extrabold text-xs" style="background-color:${c.colorHex}">${c.slotId}</span>
-                <span class="font-extrabold text-sm text-ink-800">${c.name}</span>
-              </div>
-              <div class="text-right">
-                <span class="font-extrabold text-sm text-brand-600">${c.score.toLocaleString()} pts</span>
-                <span class="text-xs font-bold text-ink-600 ml-2">${Math.floor(c.distance)}m</span>
-              </div>
-            `;
-            rankList.appendChild(row);
-          }
+          rankList.innerHTML = [...this.crafts].sort((a, b) => a.rank - b.rank).map(c => `
+            <div class="flex items-center justify-between bg-cream-200 rounded-xl px-3.5 py-2">
+              <span class="font-extrabold text-sm text-ink-800">#${c.rank} ${c.name}</span>
+              <span class="font-extrabold text-sm text-brand-600">${c.score.toLocaleString()} pts (${Math.floor(c.distance)}m)</span>
+            </div>
+          `).join('');
         }
 
         setTimeout(() => {
@@ -2877,47 +3226,48 @@
         const mult = this.getComboMultiplier();
         const comboEl = document.getElementById('hudComboBadge');
         comboEl.textContent = `x${mult.toFixed(1)}`;
-        if (mult >= 3.0) {
-          comboEl.className = 'px-2.5 py-1 rounded-xl bg-brand-500 text-cream-50 font-extrabold text-xs sm:text-sm';
-        } else if (mult > 1.0) {
-          comboEl.className = 'px-2.5 py-1 rounded-xl bg-cream-300 text-ink-800 font-extrabold text-xs sm:text-sm';
-        } else {
-          comboEl.className = 'px-2.5 py-1 rounded-xl bg-cream-100 text-ink-600 font-extrabold text-xs sm:text-sm';
-        }
 
         const curDistInt = Math.floor(this.teamDistance);
         document.getElementById('hudDistance').textContent = curDistInt.toLocaleString();
-        const hudHsEl = document.getElementById('hudBestScore');
-        const hudBdEl = document.getElementById('hudBestDist');
-        if (hudHsEl) hudHsEl.textContent = Math.max(this.highScore, this.teamScore).toLocaleString();
-        if (hudBdEl) hudBdEl.textContent = Math.max(this.bestDistance, curDistInt).toLocaleString();
+        document.getElementById('hudBestScore').textContent = Math.max(this.highScore, this.teamScore).toLocaleString();
+        document.getElementById('hudBestDist').textContent = Math.max(this.bestDistance, curDistInt).toLocaleString();
         document.getElementById('hudSpeedLv').textContent = this.speedLevel;
         document.getElementById('hudSpeed').textContent = Math.round(this.currentSpeed * 3.4);
 
-        if (app.mode === 'HOST') {
+        if (app.mode === 'ONLINE' && this.crafts[0]) {
+          const pct = Math.floor(this.crafts[0].jammerCharge);
+          const jamBtn = document.getElementById('btnDirectJammer');
+          if (pct >= 100 && this.crafts[0].alive) {
+            jamBtn.className = 'px-5 py-3 rounded-2xl bg-ink-800 text-cream-50 font-extrabold text-xs sm:text-sm animate-pulse';
+            jamBtn.textContent = 'お邪魔発動！';
+          } else {
+            jamBtn.className = 'px-5 py-3 rounded-2xl bg-cream-300 text-ink-400 font-extrabold text-xs sm:text-sm';
+            jamBtn.textContent = `お邪魔 (${pct}%)`;
+          }
+          const alive = onlineNet.roster.filter(r => r.alive).length;
+          document.getElementById('hudAliveCount').textContent = alive;
+          document.getElementById('hudTotalCount').textContent = onlineNet.roster.length;
+
+          const chipsEl = document.getElementById('hudPlayerChips');
+          chipsEl.innerHTML = onlineNet.roster.map((r, i) => `
+            <div class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-cream-200/95 text-ink-800 ${r.alive ? '' : 'opacity-45 line-through'}">
+              #${r.rank || (i + 1)} ${r.name} (${r.distance}m)
+            </div>
+          `).join('');
+        } else if (app.mode === 'HOST') {
           if (hostNet.ruleMode === 'COOP') {
             document.getElementById('hudTeamHpText').textContent = `${Math.round(this.teamEnergy)}%`;
             document.getElementById('hudTeamHpFill').style.width = `${this.teamEnergy}%`;
           } else {
-            const alive = this.crafts.filter(c => c.alive).length;
-            document.getElementById('hudAliveCount').textContent = alive;
+            document.getElementById('hudAliveCount').textContent = this.crafts.filter(c => c.alive).length;
             document.getElementById('hudTotalCount').textContent = this.crafts.length;
           }
-
           const chipsEl = document.getElementById('hudPlayerChips');
-          chipsEl.innerHTML = '';
-          for (const c of this.crafts) {
-            const chip = document.createElement('div');
-            const isBattle = hostNet.ruleMode === 'BATTLE';
-            const jamReady = isBattle && c.alive && c.jammerCharge >= 100;
-            chip.className = `px-2.5 py-1 rounded-full text-[11px] font-extrabold flex items-center gap-1.5 transition ${c.alive ? 'bg-cream-200/95 text-ink-800' : 'bg-cream-200/40 text-ink-400 line-through'}`;
-            chip.innerHTML = `
-              <span class="w-2.5 h-2.5 rounded-full" style="background-color:${c.colorHex}"></span>
-              <span>${c.name}</span>
-              ${isBattle && c.alive ? `<span class="text-[10px] ${jamReady ? 'text-brand-600' : 'text-ink-400'}">${Math.floor(c.jammerCharge)}%</span>` : ''}
-            `;
-            chipsEl.appendChild(chip);
-          }
+          chipsEl.innerHTML = this.crafts.map(c => `
+            <div class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-cream-200/95 text-ink-800 ${c.alive ? '' : 'opacity-45 line-through'}">
+              ${c.name}
+            </div>
+          `).join('');
         }
       },
 
@@ -2925,7 +3275,6 @@
         if (!this.lastTime) this.lastTime = timestamp;
         const dt = Math.min(0.05, (timestamp - this.lastTime) / 1000);
         this.lastTime = timestamp;
-
         this.update(dt);
 
         if (this.shakeTime > 0 && this.camera) {
@@ -2933,21 +3282,58 @@
           this.camera.position.x += (Math.random() - 0.5) * mag;
           this.camera.position.y += (Math.random() - 0.5) * mag;
         }
-
         if (this.renderer && this.scene && this.camera) {
           this.renderer.render(this.scene, this.camera);
         }
-
         requestAnimationFrame((t) => this.loop(t));
       }
     };
 
     /**
-     * 6. アプリ画面遷移コントローラー
+     * 7. アプリ画面遷移コントローラー
      */
     const app = {
       currentScreen: 'screenHome',
       mode: 'NONE',
+      currentMapIndex: 0,
+
+      renderMapGrid() {
+        const grid = document.getElementById('homeMapGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        MAPS.forEach((m, idx) => {
+          const selected = (idx === this.currentMapIndex);
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.onclick = () => this.setMapIndex(idx);
+          btn.className = selected
+            ? 'p-2.5 rounded-2xl bg-brand-500 text-cream-50 text-left transition'
+            : 'p-2.5 rounded-2xl bg-cream-100 hover:bg-cream-300 text-ink-800 text-left transition';
+          btn.innerHTML = `
+            <div class="flex items-center justify-between mb-0.5">
+              <span class="w-2.5 h-2.5 rounded-full" style="background-color:${selected ? '#FFF7ED' : m.accentCss}"></span>
+              <span class="text-[9px] font-extrabold ${selected ? 'text-cream-100' : 'text-ink-400'}">${m.tag}</span>
+            </div>
+            <div class="text-xs font-extrabold truncate">${m.name}</div>
+          `;
+          grid.appendChild(btn);
+        });
+        const badge = document.getElementById('homeSelectedMapBadge');
+        const lobbyLbl = document.getElementById('lobbyMapLabel');
+        if (badge) badge.textContent = MAPS[this.currentMapIndex].name;
+        if (lobbyLbl) lobbyLbl.textContent = MAPS[this.currentMapIndex].name;
+      },
+
+      setMapIndex(idx) {
+        this.currentMapIndex = idx % MAPS.length;
+        this.renderMapGrid();
+        game3d.applyMapTheme(MAPS[this.currentMapIndex]);
+        if (typeof onlineNet !== 'undefined') onlineNet.renderRoster();
+      },
+
+      cycleMap() {
+        this.setMapIndex((this.currentMapIndex + 1) % MAPS.length);
+      },
 
       showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
@@ -2963,9 +3349,7 @@
           backBtn.classList.add('flex');
         }
         const floatAdBtn = document.getElementById('floatingAdCloseBtn');
-        if (floatAdBtn) {
-          floatAdBtn.classList.toggle('hidden', adManager.hidden || screenId !== 'screenHome');
-        }
+        if (floatAdBtn) floatAdBtn.classList.toggle('hidden', adManager.hidden || screenId !== 'screenHome');
       },
 
       goHome() {
@@ -2974,15 +3358,14 @@
         game3d.clearEntities();
         hostNet.destroy();
         ctrlNet.destroy();
+        onlineNet.destroy();
         this.mode = 'NONE';
         this.showScreen('screenHome');
       },
 
       openVoiceStudio() {
         audio.init();
-        if (this.currentScreen !== 'screenVoiceStudio') {
-          voiceStudio.prevScreen = this.currentScreen;
-        }
+        if (this.currentScreen !== 'screenVoiceStudio') voiceStudio.prevScreen = this.currentScreen;
         voiceStudio.renderSlots();
         this.showScreen('screenVoiceStudio');
       },
@@ -2991,8 +3374,13 @@
         audio.stopBgm();
         game3d.state = 'IDLE';
         game3d.clearEntities();
-        this.showScreen('screenHostLobby');
-        hostNet.renderLobbySlots();
+        if (this.mode === 'ONLINE') {
+          this.showScreen('screenOnlineLobby');
+          onlineNet.renderRoster();
+        } else {
+          this.showScreen('screenHostLobby');
+          hostNet.renderLobbySlots();
+        }
       },
 
       startSoloSetup() {
@@ -3011,7 +3399,28 @@
         game3d.start();
       },
 
+      startOnlineLobby(prefillCode = '') {
+        if (!netStatus.isOnline) return;
+        audio.init();
+        audio.playHello();
+        this.mode = 'ONLINE';
+        this.showScreen('screenOnlineLobby');
+        if (prefillCode) {
+          document.getElementById('onlineJoinCodeInput').value = prefillCode;
+          onlineNet.joinRoom(prefillCode);
+        }
+      },
+
+      launchOnlineGame() {
+        this.mode = 'ONLINE';
+        gyro.calibrate();
+        this.showScreen('screenGame');
+        game3d.onResize();
+        game3d.start();
+      },
+
       startHostSetup() {
+        if (!netStatus.isOnline) return;
         audio.init();
         audio.playHello();
         this.mode = 'HOST';
@@ -3020,8 +3429,7 @@
       },
 
       launchHostGame() {
-        const activeCount = hostNet.slots.filter(s => s !== null).length;
-        if (activeCount < 1) return;
+        if (hostNet.slots.filter(s => s !== null).length < 1) return;
         this.mode = 'HOST';
         this.showScreen('screenGame');
         game3d.onResize();
@@ -3029,94 +3437,174 @@
       },
 
       startControllerSetup(prefillCode = '') {
+        if (!netStatus.isOnline) return;
         audio.init();
         this.mode = 'CONTROLLER';
         this.showScreen('screenController');
-        if (prefillCode) {
-          document.getElementById('inputRoomCode').value = prefillCode;
+        if (prefillCode) document.getElementById('inputRoomCode').value = prefillCode;
+      }
+    };
+
+    /**
+     * ネットワーク状態管理（基本オフライン動作＆未接続時のオンライン機能制限）
+     */
+    const netStatus = {
+      isOnline: navigator.onLine !== false,
+
+      init() {
+        this.isOnline = navigator.onLine !== false;
+        this.applyState();
+
+        window.addEventListener('online', () => {
+          this.isOnline = true;
+          this.applyState();
+          adManager.applyState();
+        });
+
+        window.addEventListener('offline', () => {
+          this.isOnline = false;
+          this.applyState();
+          adManager.applyState();
+
+          // オンラインロビーやリモコン待機画面にいる間に切断された場合はホームへ戻して通知
+          if (['screenOnlineLobby', 'screenHostLobby', 'screenController'].includes(app.currentScreen)) {
+            app.goHome();
+            const badge = document.getElementById('homeNetBadge');
+            if (badge) badge.textContent = 'オフライン切断のため制限中';
+          }
+        });
+      },
+
+      applyState() {
+        const online = this.isOnline;
+        const badge = document.getElementById('homeNetBadge');
+        if (badge) {
+          badge.textContent = online ? 'ONLINE（対戦可能）' : 'OFFLINE（ソロ専用モード）';
+          badge.className = online
+            ? 'px-3 py-1 rounded-full bg-cream-200 text-brand-600 font-extrabold text-xs'
+            : 'px-3 py-1 rounded-full bg-ink-800 text-cream-100 font-extrabold text-xs';
+        }
+
+        // オンライン対戦ボタンの制限
+        const btnOnline = document.getElementById('btnModeOnline');
+        const iconOnline = document.getElementById('iconModeOnline');
+        const badgeOnline = document.getElementById('badgeModeOnline');
+        const descOnline = document.getElementById('descModeOnline');
+        if (btnOnline) {
+          btnOnline.disabled = !online;
+          if (iconOnline) iconOnline.className = online ? 'w-12 h-12 rounded-2xl bg-brand-500 flex items-center justify-center shrink-0' : 'w-12 h-12 rounded-2xl bg-cream-300 flex items-center justify-center shrink-0';
+          if (badgeOnline) {
+            badgeOnline.textContent = online ? '各自の端末で対戦' : 'オフライン制限中';
+            badgeOnline.className = online ? 'px-2.5 py-0.5 rounded-full bg-brand-500 text-cream-50 text-[10px] font-extrabold' : 'px-2.5 py-0.5 rounded-full bg-cream-300 text-ink-600 text-[10px] font-extrabold';
+          }
+          if (descOnline) {
+            descOnline.textContent = online
+              ? '離れた友達とそれぞれのスマホ・PC画面を見ながらリアルタイムお邪魔バトル！'
+              : 'インターネット未接続のため利用できません（接続すると自動で有効になります）';
+            descOnline.className = online ? 'text-xs text-cream-200 font-medium mt-0.5' : 'text-xs text-ink-400 font-medium mt-0.5';
+          }
+        }
+
+        // モニター＋スマホリモコン（P2P通信）の制限
+        const cardMulti = document.getElementById('cardModeMulti');
+        const badgeMulti = document.getElementById('badgeModeMulti');
+        const descMulti = document.getElementById('descModeMulti');
+        const btnHost = document.getElementById('btnModeHost');
+        const btnRemote = document.getElementById('btnModeRemote');
+        if (cardMulti) cardMulti.classList.toggle('opacity-65', !online);
+        if (btnHost) btnHost.disabled = !online;
+        if (btnRemote) btnRemote.disabled = !online;
+        if (badgeMulti) {
+          badgeMulti.textContent = online ? '最大10人' : 'オフライン制限中';
+          badgeMulti.className = online ? 'px-2.5 py-0.5 rounded-full bg-brand-500 text-cream-50 text-[10px] font-extrabold' : 'px-2.5 py-0.5 rounded-full bg-cream-300 text-ink-600 text-[10px] font-extrabold';
+        }
+        if (descMulti) {
+          descMulti.textContent = online
+            ? '1つの大画面に全員の機体を映して協力＆バトル'
+            : 'インターネット未接続のためリモコン連携は制限されています';
         }
       }
     };
 
     /**
-     * 広告表示・非表示マネージャー（オーバーレイ広告・状態保存対応）
+     * 広告表示・非表示マネージャー（オフライン時は通信ゼロ・非表示維持）
      */
     const adManager = {
       hidden: false,
+      scriptLoaded: false,
       observer: null,
-
       init() {
         this.hidden = localStorage.getItem('gyrododge3d_ad_hidden') === '1';
         this.applyState();
-
-        // Shinobi AdMaxが後からbody直下に挿入するオーバーレイ広告も監視して制御
         this.observer = new MutationObserver(() => {
-          if (this.hidden) this.hideInjectedOverlays(true);
+          if (this.hidden || !netStatus.isOnline) this.hideInjectedOverlays(true);
         });
         this.observer.observe(document.body, { childList: true, subtree: true });
       },
-
+      ensureScriptLoaded() {
+        if (this.scriptLoaded || this.hidden || !netStatus.isOnline) return;
+        const wrap = document.getElementById('admaxScriptWrap');
+        if (!wrap) return;
+        this.scriptLoaded = true;
+        const s = document.createElement('script');
+        s.src = 'https://adm.shinobi.jp/s/6deabf2adba66b7bba510d1b374de414';
+        wrap.appendChild(s);
+      },
       hideInjectedOverlays(hide) {
-        // Shinobi AdMaxがbody直下に生成するオーバーレイコンテナやiframeを検出して表示切替
-        const candidates = document.querySelectorAll(
-          'iframe[src*="shinobi.jp"], [id*="admax"], [class*="admax"], [id*="shinobi"], [class*="shinobi"]'
-        );
+        const candidates = document.querySelectorAll('iframe[src*="shinobi.jp"], [id*="admax"], [class*="admax"], [id*="shinobi"], [class*="shinobi"]');
         candidates.forEach(el => {
           if (el.id === 'admaxContainer' || el.id === 'admaxScriptWrap' || el.id === 'admaxHiddenBar') return;
           el.style.setProperty('display', hide ? 'none' : '', 'important');
         });
-
-        // body直下の固定配置広告ラッパー（アプリ自身の要素以外）も制御
         Array.from(document.body.children).forEach(child => {
           if (['SCRIPT', 'STYLE', 'HEADER', 'MAIN', 'SECTION', 'BUTTON'].includes(child.tagName)) return;
           if (child.id === 'floatingAdCloseBtn') return;
           child.style.setProperty('display', hide ? 'none' : '', 'important');
         });
       },
-
       hideAd() {
         this.hidden = true;
         localStorage.setItem('gyrododge3d_ad_hidden', '1');
         this.applyState();
       },
-
       showAd() {
         this.hidden = false;
         localStorage.setItem('gyrododge3d_ad_hidden', '0');
         this.applyState();
       },
-
-      toggleAd() {
-        if (this.hidden) this.showAd();
-        else this.hideAd();
-      },
-
       applyState() {
+        const online = netStatus.isOnline;
+        const shouldHide = this.hidden || !online;
         const box = document.getElementById('admaxContainer');
         const hiddenBar = document.getElementById('admaxHiddenBar');
         const floatBtn = document.getElementById('floatingAdCloseBtn');
 
-        if (box) box.classList.toggle('hidden', this.hidden);
-        if (hiddenBar) hiddenBar.classList.toggle('hidden', !this.hidden);
-        if (floatBtn) floatBtn.classList.toggle('hidden', this.hidden);
+        if (!shouldHide) this.ensureScriptLoaded();
 
-        this.hideInjectedOverlays(this.hidden);
+        if (box) box.classList.toggle('hidden', shouldHide);
+        if (hiddenBar) hiddenBar.classList.toggle('hidden', !this.hidden || !online);
+        if (floatBtn) floatBtn.classList.toggle('hidden', shouldHide || app.currentScreen !== 'screenHome');
+        this.hideInjectedOverlays(shouldHide);
       }
     };
 
     window.addEventListener('DOMContentLoaded', () => {
+      netStatus.init();
       adManager.init();
+      app.renderMapGrid();
       gyro.init();
       voiceStudio.init();
       game3d.init();
 
       const params = new URLSearchParams(window.location.search);
+      const onlineCode = params.get('online');
       const roomCode = params.get('room') || params.get('join');
-      if (roomCode && /^\d{4}$/.test(roomCode)) {
+      if (onlineCode && /^\d{4}$/.test(onlineCode)) {
+        app.startOnlineLobby(onlineCode);
+      } else if (roomCode && /^\d{4}$/.test(roomCode)) {
         app.startControllerSetup(roomCode);
       }
 
-      // PWA Service Worker 登録＆インストール案内
       if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       }
@@ -3124,13 +3612,11 @@
       let deferredPrompt = null;
       const installBtn = document.getElementById('btnPwaInstall');
       const installHint = document.getElementById('pwaInstallHint');
-
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
         if (installBtn) installBtn.classList.remove('hidden');
       });
-
       if (installBtn) {
         installBtn.addEventListener('click', async () => {
           if (!deferredPrompt) return;
@@ -3142,14 +3628,6 @@
           }
           deferredPrompt = null;
         });
-      }
-
-      const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-      if (isStandalone && installHint) {
-        installHint.textContent = 'アプリモード（PWA）で起動中！';
-      } else if (isIos && installHint) {
-        installHint.textContent = 'Safariの共有（□↑）→「ホーム画面に追加」でアプリ化できます';
       }
     });
   </script>
