@@ -2467,122 +2467,138 @@ const EMBEDDED_VOICES = {
       }
     };
 
-    // 動的に生成するボタンの onclick からも各機能へアクセスできるようにする。
-    // const は自動では window に公開されないため、明示的に別名を設定する。
-    Object.assign(window, {
-      app, voiceStudio, accountMgr, onlineNet, hostNet, ctrlNet, gyro, game3d,
-      audio, netStatus, adManager
-    });
+    const BUTTON_ACTIONS = {
+      btnBackHome: () => app.goHome(),
+      btnOpenVoice: () => app.openVoiceStudio(),
+      btnToggleSound: () => audio.toggleMute(),
+      btnOpenAccount: () => accountMgr.openModal(),
+      btnHomeCoins: () => app.openShop('ALL'),
+      btnStartStory: () => app.openStoryMap(),
+      btnStartRandom: () => { gyro.requestPermission('solo'); app.launchQuickRandom(); },
+      btnStartFree: () => app.startSoloSetup(),
+      btnOpenCustom: () => app.openCustomGarage(),
+      btnOpenShop: () => app.openShop('ALL'),
+      btnOpenVault: () => app.openCollectionVault(),
+      btnOpenTasks: () => app.openTasksModal(),
+      btnModeOnline: () => app.startOnlineLobby(),
+      btnModeHost: () => app.startHostSetup(),
+      btnModeRemote: () => app.startControllerSetup(),
+      btnHideAdInline: () => adManager.hideAd(),
+      btnShowAdInline: () => adManager.showAd(),
+      floatingAdCloseBtn: () => adManager.hideAd(),
+
+      btnStoryDlgCancel: () => app.closeStoryDialogue(),
+      btnStoryDlgAction: () => { gyro.requestPermission('solo'); app.confirmStoryDialogue(); },
+      btnCloseTasks: () => app.closeTasksModal(),
+      btnCloseAccount: () => accountMgr.closeModal(),
+      btnSwitchGuest: () => accountMgr.switchToGuest(),
+      btnRegisterAccount: () => accountMgr.registerAccount(),
+      btnDoneCustom: () => app.goHome(),
+
+      shopTabALL: () => app.setShopFilter('ALL'),
+      shopTabOUTFIT: () => app.setShopFilter('OUTFIT'),
+      shopTabITEM: () => app.setShopFilter('ITEM'),
+      shopTabCOLLECTION: () => app.setShopFilter('COLLECTION'),
+
+      vaultTabALL: () => app.setVaultFilter('ALL'),
+      vaultTabOUTFIT: () => app.setVaultFilter('OUTFIT'),
+      vaultTabITEM: () => app.setVaultFilter('ITEM'),
+      vaultTabCOLLECTION: () => app.setVaultFilter('COLLECTION'),
+
+      btnResetVoices: () => voiceStudio.restoreEmbeddedVoices(),
+      btnCloseVoice: () => voiceStudio.close(),
+
+      btnCtrlModeHybrid: () => gyro.setControlMode('HYBRID'),
+      btnCtrlModeTouch: () => gyro.setControlMode('TOUCH'),
+      btnCtrlModeGyro: () => gyro.setControlMode('GYRO'),
+      btnGyroAxisMix: () => gyro.setGyroAxisMode('MIX'),
+      btnGyroAxisCompass: () => gyro.setGyroAxisMode('COMPASS'),
+      btnGyroAxisTilt: () => gyro.setGyroAxisMode('TILT'),
+      btnRequestGyroSolo: () => gyro.requestPermission('solo'),
+      btnCalibSolo: () => gyro.calibrate(),
+      btnLaunchSolo: () => { gyro.requestPermission('solo'); app.launchSoloGame(); },
+
+      btnOnlineCreate: () => onlineNet.createRoom(),
+      btnOnlineJoin: () => onlineNet.joinRoom(),
+      btnOnlineCopy: () => onlineNet.copyShareUrl(),
+      btnOnlineCycleMap: () => onlineNet.cycleHostMap(),
+      btnOnlineStart: () => onlineNet.hostStartMatch(),
+
+      btnRuleCoop: () => hostNet.setRuleMode('COOP'),
+      btnRuleBattle: () => hostNet.setRuleMode('BATTLE'),
+      btnRuleRing: () => hostNet.setRuleMode('RING_BATTLE'),
+      btnAddBot: () => hostNet.addBotPlayer(),
+      btnHostStartGame: () => app.launchHostGame(),
+
+      btnRequestGyroCtrl: () => gyro.requestPermission('ctrl'),
+      btnConnectHost: () => ctrlNet.connect(),
+      btnCtrlReset: () => gyro.calibrate(),
+      btnCtrlJammer: () => ctrlNet.triggerJammer(),
+      btnCtrlSendAction: () => ctrlNet.sendAction(),
+
+      btnIngameAutoBoost: () => game3d.toggleAutoBoost(),
+      btnIngameReset: () => gyro.calibrate(),
+      btnDirectJammer: () => game3d.triggerDirectJammer(),
+
+      btnResultNextStory: () => app.advanceNextStoryChapter(),
+      btnResultRetry: () => game3d.restart(),
+      btnResultBackLobby: () => app.backToLobby(),
+      btnResultHome: () => app.goHome()
+    };
 
     function bindAllButtons() {
-      const on = (id, fn) => {
+      Object.entries(BUTTON_ACTIONS).forEach(([id, fn]) => {
         const el = document.getElementById(id);
-        if (!el || el.dataset.boundV32) return;
-        el.dataset.boundV32 = '1';
-        let lastFire = 0;
-        const invoke = (e) => {
-          if (el.disabled) return;
-          const now = Date.now();
-          if (now - lastFire < 220) return;
-          lastFire = now;
-          fn(e);
-        };
-        // iOS Safariではtouchendとclickを併用すると二重発火や
-        // preventDefaultによるクリック抑止が起きるため、clickに統一する。
-        el.addEventListener('click', invoke);
-      };
-      on('btnBackHome', () => app.goHome());
-      on('btnOpenVoice', () => app.openVoiceStudio());
-      on('btnToggleSound', () => audio.toggleMute());
-      on('btnOpenAccount', () => accountMgr.openModal());
-      on('btnHomeCoins', () => app.openShop('ALL'));
-      on('btnStartStory', () => app.openStoryMap());
-      on('btnStartRandom', () => { gyro.requestPermission('solo'); app.launchQuickRandom(); });
-      on('btnStartFree', () => app.startSoloSetup());
-      on('btnOpenCustom', () => app.openCustomGarage());
-      on('btnOpenShop', () => app.openShop('ALL'));
-      on('btnOpenVault', () => app.openCollectionVault());
-      on('btnOpenTasks', () => app.openTasksModal());
-      on('btnModeOnline', () => app.startOnlineLobby());
-      on('btnModeHost', () => app.startHostSetup());
-      on('btnModeRemote', () => app.startControllerSetup());
-      on('btnHideAdInline', () => adManager.hideAd());
-      on('btnShowAdInline', () => adManager.showAd());
-      on('floatingAdCloseBtn', () => adManager.hideAd());
-
-      on('btnStoryDlgCancel', () => app.closeStoryDialogue());
-      on('btnStoryDlgAction', () => { gyro.requestPermission('solo'); app.confirmStoryDialogue(); });
-      on('btnCloseTasks', () => app.closeTasksModal());
-      on('btnCloseAccount', () => accountMgr.closeModal());
-      on('btnSwitchGuest', () => accountMgr.switchToGuest());
-      on('btnRegisterAccount', () => accountMgr.registerAccount());
-      on('btnDoneCustom', () => app.goHome());
-
-      ['ALL','OUTFIT','ITEM','COLLECTION'].forEach(k => {
-        on('shopTab'+k, () => app.setShopFilter(k));
-        on('vaultTab'+k, () => app.setVaultFilter(k));
+        if (el) {
+          el.onclick = (e) => {
+            if (el.disabled) return;
+            fn(e);
+          };
+        }
       });
 
-      on('btnResetVoices', () => voiceStudio.restoreEmbeddedVoices());
-      on('btnCloseVoice', () => voiceStudio.close());
-
-      on('btnCtrlModeHybrid', () => gyro.setControlMode('HYBRID'));
-      on('btnCtrlModeTouch', () => gyro.setControlMode('TOUCH'));
-      on('btnCtrlModeGyro', () => gyro.setControlMode('GYRO'));
-      on('btnGyroAxisMix', () => gyro.setGyroAxisMode('MIX'));
-      on('btnGyroAxisCompass', () => gyro.setGyroAxisMode('COMPASS'));
-      on('btnGyroAxisTilt', () => gyro.setGyroAxisMode('TILT'));
-      on('btnRequestGyroSolo', () => gyro.requestPermission('solo'));
-      on('btnCalibSolo', () => gyro.calibrate());
-      on('btnLaunchSolo', () => { gyro.requestPermission('solo'); app.launchSoloGame(); });
-
       const sens = document.getElementById('soloSensSlider');
-      if (sens) sens.addEventListener('input', e => gyro.setSensitivity(e.target.value));
+      if (sens) sens.oninput = e => gyro.setSensitivity(e.target.value);
       const mapSel = document.getElementById('quickMapSelect');
-      if (mapSel) mapSel.addEventListener('change', e => app.setMapIndex(parseInt(e.target.value, 10)));
+      if (mapSel) mapSel.onchange = e => app.setMapIndex(parseInt(e.target.value, 10));
       const diffSel = document.getElementById('quickDiffSelect');
-      if (diffSel) diffSel.addEventListener('change', e => app.setDifficultyIndex(parseInt(e.target.value, 10)));
+      if (diffSel) diffSel.onchange = e => app.setDifficultyIndex(parseInt(e.target.value, 10));
       const botHome = document.getElementById('selectBotLevelHome');
-      if (botHome) botHome.addEventListener('change', e => app.setBotLevelSetting(e.target.value));
+      if (botHome) botHome.onchange = e => app.setBotLevelSetting(e.target.value);
       const botHost = document.getElementById('selectBotLevelHost');
-      if (botHost) botHost.addEventListener('change', e => app.setBotLevelSetting(e.target.value));
+      if (botHost) botHost.onchange = e => app.setBotLevelSetting(e.target.value);
 
-      on('btnOnlineCreate', () => onlineNet.createRoom());
-      on('btnOnlineJoin', () => onlineNet.joinRoom());
-      on('btnOnlineCopy', () => onlineNet.copyShareUrl());
-      on('btnOnlineCycleMap', () => onlineNet.cycleHostMap());
-      on('btnOnlineStart', () => onlineNet.hostStartMatch());
-
-      on('btnRuleCoop', () => hostNet.setRuleMode('COOP'));
-      on('btnRuleBattle', () => hostNet.setRuleMode('BATTLE'));
-      on('btnRuleRing', () => hostNet.setRuleMode('RING_BATTLE'));
-      on('btnAddBot', () => hostNet.addBotPlayer());
-      on('btnHostStartGame', () => app.launchHostGame());
-
-      on('btnRequestGyroCtrl', () => gyro.requestPermission('ctrl'));
-      on('btnConnectHost', () => ctrlNet.connect());
-      on('btnCtrlReset', () => gyro.calibrate());
-      on('btnCtrlJammer', () => ctrlNet.triggerJammer());
-      on('btnCtrlSendAction', () => ctrlNet.sendAction());
       const cb = document.getElementById('btnCtrlBoost');
-      if (cb) { cb.addEventListener('pointerdown', () => ctrlNet.setBoost(true)); cb.addEventListener('pointerup', () => ctrlNet.setBoost(false)); cb.addEventListener('pointerleave', () => ctrlNet.setBoost(false)); }
-
-      on('btnIngameAutoBoost', () => game3d.toggleAutoBoost());
-      on('btnIngameReset', () => gyro.calibrate());
+      if (cb) {
+        cb.onpointerdown = () => ctrlNet.setBoost(true);
+        cb.onpointerup = () => ctrlNet.setBoost(false);
+        cb.onpointerleave = () => ctrlNet.setBoost(false);
+      }
       const ib = document.getElementById('btnIngameBoost');
-      if (ib) { ib.addEventListener('pointerdown', () => game3d.setDirectBoost(true)); ib.addEventListener('pointerup', () => game3d.setDirectBoost(false)); ib.addEventListener('pointerleave', () => game3d.setDirectBoost(false)); }
-      on('btnDirectJammer', () => game3d.triggerDirectJammer());
+      if (ib) {
+        ib.onpointerdown = () => game3d.setDirectBoost(true);
+        ib.onpointerup = () => game3d.setDirectBoost(false);
+        ib.onpointerleave = () => game3d.setDirectBoost(false);
+      }
+    }
 
-      on('btnResultNextStory', () => app.advanceNextStoryChapter());
-      on('btnResultRetry', () => game3d.restart());
-      on('btnResultBackLobby', () => app.backToLobby());
-      on('btnResultHome', () => app.goHome());
+    // ドキュメント全体でのクリック委譲（動的再描画や環境差があっても確実に反応）
+    if (!window.__tenkyuuClickDelegated) {
+      window.__tenkyuuClickDelegated = true;
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[id]');
+        if (!btn || btn.disabled) return;
+        const fn = BUTTON_ACTIONS[btn.id];
+        if (fn && !btn.onclick) {
+          fn(e);
+        }
+      });
     }
 
     function bootApp() {
       if (window.__tenkyuuBooted) return;
       window.__tenkyuuBooted = true;
-      const run = fn => { try { fn(); } catch (e) { console.error('アプリ初期化エラー:', e); } };
+      const run = fn => { try { fn(); } catch (e) {} };
       run(() => bindAllButtons());
       run(() => netStatus.init());
       run(() => adManager.init());

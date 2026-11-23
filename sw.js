@@ -1,4 +1,4 @@
-const CACHE_NAME = "tenkyuu-gravity-runner-v32";
+const CACHE_NAME = "tenkyuu-gravity-runner-v33";
 const CORE_ASSETS = [
   "./",
   "./index.html",
