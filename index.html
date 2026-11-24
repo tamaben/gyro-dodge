@@ -632,9 +632,19 @@
           <div id="onlineDisplayCode" class="text-2xl font-black text-brand-500 tracking-widest">----</div>
           <button id="btnOnlineCopy" type="button" class="btn-peach px-3 py-1.5 text-xs font-extrabold"><span id="onlineCopyBtnText">URLコピー</span></button>
         </div>
-        <div class="bg-[#FBF7F2] rounded-2xl p-2.5 flex justify-between text-xs font-extrabold">
-          <span>マップ: <span id="onlineMapName" class="text-brand-600">サンセット</span></span>
-          <button id="btnOnlineCycleMap" type="button" class="px-2.5 py-1 rounded-lg bg-cream-200">変更</button>
+        <div id="onlineMapPreviewCard" class="bg-[#FBF7F2] rounded-2xl p-3 flex flex-col gap-2 text-left">
+          <div class="flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div class="text-[10px] font-black text-sage-600">選択中のステージ</div>
+              <div id="onlineMapName" class="text-sm sm:text-base font-black text-cocoa-800 truncate">1. サンセット・キャニオン</div>
+            </div>
+            <button id="btnOnlineCycleMap" type="button" class="btn-orange px-3 py-1.5 rounded-xl text-xs font-black shrink-0">マップ変更 ↻</button>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5 text-[10px] font-extrabold">
+            <span id="onlineMapStars" class="px-2 py-0.5 rounded-full bg-[#FFFDF9] text-brand-600">★</span>
+            <span id="onlineMapGimmick" class="px-2 py-0.5 rounded-full bg-sage-100 text-sage-600">八角トンネル</span>
+            <span id="onlineMapTraits" class="px-2 py-0.5 rounded-full bg-[#FFFDF9] text-cocoa-600">標準コース</span>
+          </div>
         </div>
         <div id="onlineRosterList" class="grid grid-cols-2 gap-1.5"></div>
         <button id="btnOnlineStart" type="button" class="btn-sage w-full py-3 text-sm font-black">対戦スタート！</button>
@@ -1191,7 +1201,7 @@ const EMBEDDED_VOICES = {
     };
 
     function createBotProfile(forcedLevel = null) {
-      const level = forcedLevel !== null ? forcedLevel : (1 + Math.floor(Math.random() * 10));
+      const level = forcedLevel !== null ? forcedLevel : (1 + Math.floor(this.nextMatchRand() * 10));
       const t = (level - 1) / 9;
       return {
         level,
@@ -1659,7 +1669,7 @@ const EMBEDDED_VOICES = {
       peer: null, roomCode: '', ruleMode: 'COOP', slots: new Array(10).fill(null),
       initHost() {
         this.destroy(); this.slots = new Array(10).fill(null);
-        this.roomCode = String(Math.floor(1000 + Math.random() * 9000));
+        this.roomCode = String(Math.floor(1000 + this.nextMatchRand() * 9000));
         document.getElementById('hostRoomCode').textContent = this.roomCode;
         this.renderLobbySlots();
         const qr = document.getElementById('qrcode'); qr.innerHTML = '';
@@ -1758,7 +1768,7 @@ const EMBEDDED_VOICES = {
       getMyName() { return (document.getElementById('onlineMyName')?.value.trim() || 'PLAYER').slice(0, 10); },
       createRoom() {
         this.destroy(); this.isHost = true; this.myName = this.getMyName();
-        this.roomCode = String(Math.floor(1000 + Math.random() * 9000));
+        this.roomCode = String(Math.floor(1000 + this.nextMatchRand() * 9000));
         this.peer = new Peer('tenkyuu-online-' + this.roomCode);
         this.peer.on('open', id => {
           this.myId = id;
@@ -1810,6 +1820,7 @@ const EMBEDDED_VOICES = {
             } else if (data.type === 'START_MATCH') {
               if (typeof data.mapIndex === 'number') app.setMapIndex(data.mapIndex);
               if (typeof data.diffIndex === 'number') app.setDifficultyIndex(data.diffIndex);
+              game3d.setMatchSeed(data.matchSeed);
               app.launchOnlineGame();
             } else if (data.type === 'JAM_HIT' && game3d.state === 'PLAYING' && game3d.crafts[0]?.alive) {
               game3d.applyDirectDebuff(data.kind, data.from);
@@ -1827,14 +1838,30 @@ const EMBEDDED_VOICES = {
       },
       renderRoster() {
         const list = document.getElementById('onlineRosterList');
-        if (document.getElementById('onlineMapName')) document.getElementById('onlineMapName').textContent = MAPS[app.currentMapIndex].name;
+        const m = MAPS[app.currentMapIndex] || MAPS[0];
+        const nameEl = document.getElementById('onlineMapName');
+        if (nameEl) nameEl.textContent = `${m.chapter}. ${m.name}`;
+        const stEl = document.getElementById('onlineMapStars');
+        if (stEl) stEl.textContent = '★'.repeat(m.difficultyStars || 1);
+        const gmEl = document.getElementById('onlineMapGimmick');
+        if (gmEl) gmEl.textContent = m.gimmick || m.tag;
+        const trEl = document.getElementById('onlineMapTraits');
+        if (trEl) {
+          const traits = [];
+          if (m.hasWind) traits.push('横風あり');
+          if (m.slippery) traits.push('氷スリップ');
+          if (m.hasMoving) traits.push('動く壁');
+          if (m.hasSpinner) traits.push('回転ブレード');
+          if (!traits.length) traits.push('見やすい標準コース');
+          trEl.textContent = traits.join(' · ');
+        }
         if (!list) return;
         list.innerHTML = this.roster.map((r, i) => `<div class="bg-cream-200 rounded-xl px-2.5 py-1 text-xs font-extrabold truncate">#${i+1} ${r.name}</div>`).join('');
       },
       hostStartMatch() {
         if (!this.isHost) return;
         this.roster.forEach(r => { r.score = 0; r.distance = 0; r.alive = true; });
-        const msg = { type: 'START_MATCH', mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex };
+        const seed = Math.floor(Math.random() * 900000) + 100000; game3d.setMatchSeed(seed); const msg = { type: 'START_MATCH', mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, matchSeed: seed };
         Object.values(this.guestConns).forEach(c => { if (c.open) c.send(msg); });
         app.launchOnlineGame();
       },
@@ -1861,13 +1888,15 @@ const EMBEDDED_VOICES = {
         if (!mc?.alive) return;
         const hasHeld = Boolean(mc.heldSabotageItem);
         if (!hasHeld && mc.jammerCharge < 100) return;
-        const chosenId = hasHeld ? mc.heldSabotageItem : SABOTAGE_ITEMS[Math.floor(Math.random() * SABOTAGE_ITEMS.length)].id;
+        const chosenId = hasHeld ? mc.heldSabotageItem : SABOTAGE_ITEMS[Math.floor(this.nextMatchRand() * SABOTAGE_ITEMS.length)].id;
         const meta = getSabotageMeta(chosenId);
         if (hasHeld) mc.heldSabotageItem = null;
         else mc.jammerCharge = 0;
         mc.score += 250;
         game3d.teamScore += 250;
         audio.playJammerLaunch();
+        mc.itemUseAnimTimer = 0.65;
+        game3d.spawnSabotageProjectileAnim(meta.colorNum);
         game3d.showPopup(`【${meta.name}】を相手へ発射！`, meta.colorHex);
         if (this.isHost) Object.values(this.guestConns).forEach(c => { if (c.open) c.send({ type: 'JAM_HIT', kind: meta.id, from: this.myName }); });
         else if (this.hostConn?.open) this.hostConn.send({ type: 'JAM_ATTACK', kind: meta.id });
@@ -1994,10 +2023,27 @@ const EMBEDDED_VOICES = {
       },
       applyMapTheme(mapObj) {
         if (!this.scene || !mapObj) return;
-        this.scene.background.setHex(mapObj.bgHex); this.scene.fog.color.setHex(mapObj.fogHex);
+        this.scene.background.setHex(mapObj.bgHex);
+        this.scene.fog.color.setHex(mapObj.fogHex);
+        if (this.runMode === 'ONLINE' && this.scene.fog) {
+          this.scene.fog.near = 28;
+          this.scene.fog.far = 135;
+        }
         if (this.floorMat) this.floorMat.color.setHex(mapObj.floorHex);
-        if (this.ringMat) this.ringMat.color.setHex(mapObj.ringHex);
-        if (this.railMat) this.railMat.color.setHex(mapObj.railHex);
+        if (this.ringMat) {
+          this.ringMat.color.setHex(mapObj.ringHex);
+          if (this.runMode === 'ONLINE' && this.ringMat.emissive) {
+            this.ringMat.emissive.setHex(mapObj.ringHex);
+            this.ringMat.emissiveIntensity = 0.22;
+          }
+        }
+        if (this.railMat) {
+          this.railMat.color.setHex(mapObj.railHex);
+          if (this.runMode === 'ONLINE' && this.railMat.emissive) {
+            this.railMat.emissive.setHex(mapObj.railHex);
+            this.railMat.emissiveIntensity = 0.25;
+          }
+        }
         if (this.currentTunnelShape !== mapObj.tunnelShape) { this.currentTunnelShape = mapObj.tunnelShape; this.rebuildTunnelRings(mapObj.tunnelShape); }
       },
       onResize() { if (!this.renderer || !this.camera) return; this.camera.aspect = window.innerWidth / window.innerHeight; this.camera.updateProjectionMatrix(); this.renderer.setSize(window.innerWidth, window.innerHeight); },
@@ -2151,7 +2197,7 @@ const EMBEDDED_VOICES = {
         const meta = getSabotageMeta(kind);
         c.debuffType = meta.id;
         c.debuffTimer = meta.duration;
-        c.debuffWindDir = Math.random() < 0.5 ? -1 : 1;
+        c.debuffWindDir = this.nextMatchRand() < 0.5 ? -1 : 1;
         audio.playHit();
         this.showPopup(`${fromName} から【${meta.name}】！`, meta.colorHex);
       },
@@ -2254,6 +2300,9 @@ const EMBEDDED_VOICES = {
 
         const sudden = (mMode === 'SOLO' && soloMode === 'SUDDEN_DEATH') ? 1.25 : 1;
         const speedScale = isStory ? curMap.storySpeedMult : (curMap.speedBonus * curDiff.speedMult * sudden);
+        this.stageRollAngle = 0;
+        if (this.tunnelGroup) this.tunnelGroup.rotation.z = 0;
+        if (mMode === 'ONLINE') this.rngSeed = this.matchSeed;
         this.baseSpeed = 40 * speedScale; this.currentSpeed = this.baseSpeed;
 
         if (this.scene && (mMode === 'SOLO' || mMode === 'ONLINE' || isStory)) {
@@ -2273,7 +2322,7 @@ const EMBEDDED_VOICES = {
               const bSh = CRAFT_SHAPES[b % CRAFT_SHAPES.length].id;
               const { group: bg, shadow: bs, debuffRing: bd, wings: bw } = this.createCraftMesh(bPal.num, false, bSh, 'NONE');
               const sx = ((b - 3) * 1.65); const sy = (b % 2 === 0 ? 0.55 : -0.45); bg.position.set(sx, sy, this.PLAYER_Z - 1.4); this.scene.add(bg);
-              this.crafts.push({ slotIndex: b, wings: bw, vx: 0, vy: 0, flapPhase: b * 1.1, slotId: bPal.id, name: `BOT-${b} Lv.${prof.level}`, colorHex: bPal.hex, isBot: true, botProfile: prof, partId: 'NONE', shieldCharges: 0, shieldMesh: null, mesh: bg, shadow: bs, debuffRing: bd, x: sx, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: b+1, jammerCharge: 30, debuffType: null, debuffTimer: 0, botTargetX: sx, botTargetY: 0, botThinkTimer: Math.random()*0.2, botWobbleSeed: b*17, botBoostTimer: 0, botJamWait: prof.jamDelay, botBoostActive: false });
+              this.crafts.push({ slotIndex: b, wings: bw, vx: 0, vy: 0, flapPhase: b * 1.1, slotId: bPal.id, name: `BOT-${b} Lv.${prof.level}`, colorHex: bPal.hex, isBot: true, botProfile: prof, partId: 'NONE', shieldCharges: 0, shieldMesh: null, mesh: bg, shadow: bs, debuffRing: bd, x: sx, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: b+1, jammerCharge: 30, debuffType: null, debuffTimer: 0, botTargetX: sx, botTargetY: 0, botThinkTimer: this.nextMatchRand()*0.2, botWobbleSeed: b*17, botBoostTimer: 0, botJamWait: prof.jamDelay, botBoostActive: false });
             }
           }
         } else if (this.scene && mMode === 'HOST') {
@@ -2283,7 +2332,7 @@ const EMBEDDED_VOICES = {
             const { group, shadow, debuffRing, wings } = this.createCraftMesh(slot.colorNum, false, slot.isBot ? CRAFT_SHAPES[idx%CRAFT_SHAPES.length].id : app.custom.shapeId, 'NONE');
             const sx = active.length > 1 ? ((idx / (active.length - 1)) - 0.5) * 6.0 : 0;
             group.position.set(sx, 0, this.PLAYER_Z); this.scene.add(group);
-            this.crafts.push({ slotIndex: slot.slotIndex, wings, vx: 0, vy: 0, flapPhase: idx * 0.9, slotId: PLAYER_PALETTE[slot.slotIndex].id, name: slot.name, colorHex: slot.colorHex, isBot: slot.isBot, botProfile: prof, partId: 'NONE', shieldCharges: 0, shieldMesh: null, mesh: group, shadow, debuffRing, x: sx, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: idx+1, jammerCharge: 35, debuffType: null, debuffTimer: 0, botTargetX: sx, botTargetY: 0, botThinkTimer: Math.random()*0.2, botWobbleSeed: idx*11, botBoostTimer: 0, botJamWait: prof ? prof.jamDelay : 1, botBoostActive: false });
+            this.crafts.push({ slotIndex: slot.slotIndex, wings, vx: 0, vy: 0, flapPhase: idx * 0.9, slotId: PLAYER_PALETTE[slot.slotIndex].id, name: slot.name, colorHex: slot.colorHex, isBot: slot.isBot, botProfile: prof, partId: 'NONE', shieldCharges: 0, shieldMesh: null, mesh: group, shadow, debuffRing, x: sx, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: idx+1, jammerCharge: 35, debuffType: null, debuffTimer: 0, botTargetX: sx, botTargetY: 0, botThinkTimer: this.nextMatchRand()*0.2, botWobbleSeed: idx*11, botBoostTimer: 0, botJamWait: prof ? prof.jamDelay : 1, botBoostActive: false });
           });
         }
 
@@ -2378,10 +2427,10 @@ const EMBEDDED_VOICES = {
         const canJam = (this.runMode === 'HOST' && hostNet.ruleMode === 'BATTLE') || (this.runMode === 'SOLO' && app.currentSoloMode === 'VS_BOT');
         if (canJam && (c.heldSabotageItem || c.jammerCharge >= 100)) {
           c.botJamWait -= dt;
-          if (c.botJamWait <= 0) { c.botJamWait = prof.jamDelay * (0.7 + Math.random()*0.7); this.activateJammer(c.slotIndex); }
+          if (c.botJamWait <= 0) { c.botJamWait = prof.jamDelay * (0.7 + this.nextMatchRand()*0.7); this.activateJammer(c.slotIndex); }
         }
         if (c.botThinkTimer <= 0) {
-          c.botThinkTimer = prof.reactionInterval * (0.8 + Math.random()*0.4);
+          c.botThinkTimer = prof.reactionInterval * (0.8 + this.nextMatchRand()*0.4);
           const upcoming = this.obstacles.filter(o => o.z < 1.2 && o.z > -prof.lookahead);
           const pts = [{x:c.x,y:c.y},{x:0,y:0},{x:-4.2,y:0},{x:4.2,y:0},{x:0,y:2.5},{x:0,y:-2.5},{x:-3.8,y:2.2},{x:3.8,y:2.2},{x:-3.8,y:-2.2},{x:3.8,y:-2.2}];
           upcoming.forEach(o => { if (o.kind === 'RING' || o.kind === 'RESCUE') pts.push({x:o.x, y:o.y}); });
@@ -2398,12 +2447,12 @@ const EMBEDDED_VOICES = {
                 if (d < 1.25) sc -= (1.45 - d) * 150;
               } else if ((o.kind === 'RING' || o.kind === 'RESCUE') && Math.hypot(pt.x - o.x, pt.y - o.y) < o.radius) sc += 35 * prof.ringGreed;
             }
-            sc += (Math.random() - 0.5) * (10 - prof.level);
+            sc += (this.nextMatchRand() - 0.5) * (10 - prof.level);
             if (sc > bestSc) { bestSc = sc; best = pt; }
           }
-          if (Math.random() < prof.mistakeChance) best = { x: Math.max(-this.BOUNDS_X, Math.min(this.BOUNDS_X, best.x + (Math.random()-0.5)*3)), y: Math.max(-this.BOUNDS_Y, Math.min(this.BOUNDS_Y, best.y + (Math.random()-0.5)*2.2)) };
+          if (this.nextMatchRand() < prof.mistakeChance) best = { x: Math.max(-this.BOUNDS_X, Math.min(this.BOUNDS_X, best.x + (this.nextMatchRand()-0.5)*3)), y: Math.max(-this.BOUNDS_Y, Math.min(this.BOUNDS_Y, best.y + (this.nextMatchRand()-0.5)*2.2)) };
           c.botTargetX = best.x; c.botTargetY = best.y;
-          if (Math.random() < prof.boostAggro * 0.2) c.botBoostTimer = 0.7;
+          if (this.nextMatchRand() < prof.boostAggro * 0.2) c.botBoostTimer = 0.7;
         }
         const wx = Math.sin(nowSec * 2.3 + c.botWobbleSeed) * prof.wobbleAmp * 0.5;
         const wy = Math.cos(nowSec * 1.9 + c.botWobbleSeed) * prof.wobbleAmp * 0.4;
@@ -2426,7 +2475,7 @@ const EMBEDDED_VOICES = {
           }
           return;
         }
-        const chosenId = hasHeldItem ? att.heldSabotageItem : SABOTAGE_ITEMS[Math.floor(Math.random() * SABOTAGE_ITEMS.length)].id;
+        const chosenId = hasHeldItem ? att.heldSabotageItem : SABOTAGE_ITEMS[Math.floor(this.nextMatchRand() * SABOTAGE_ITEMS.length)].id;
         const meta = getSabotageMeta(chosenId);
         if (hasHeldItem) att.heldSabotageItem = null;
         else att.jammerCharge = 0;
@@ -2435,10 +2484,12 @@ const EMBEDDED_VOICES = {
         targets.forEach(t => {
           t.debuffType = meta.id;
           t.debuffTimer = meta.duration;
-          t.debuffWindDir = Math.random() < 0.5 ? -1 : 1;
+          t.debuffWindDir = this.nextMatchRand() < 0.5 ? -1 : 1;
         });
         audio.playJammerLaunch();
-        this.showPopup(`${att.name} が【${meta.name}】発射！`, meta.colorHex);
+        att.itemUseAnimTimer = 0.65;
+        this.spawnSabotageProjectileAnim(meta.colorNum);
+        this.showPopup(`【${meta.name}】発射！`, meta.colorHex);
       },
       getStoryQuestProgress(chapterIdx) {
         const sq = STORY_QUESTS[chapterIdx] || STORY_QUESTS[0];
@@ -2447,6 +2498,45 @@ const EMBEDDED_VOICES = {
         const taskDone = taskCur >= sq.reqTaskVal;
         return { sq, taskCur, itemDone, taskDone, allDone: itemDone && taskDone };
       },
+      matchSeed: 123456,
+      rngSeed: 123456,
+      stageRollAngle: 0,
+      setMatchSeed(seed) {
+        const s = (typeof seed === 'number' && !isNaN(seed)) ? (seed >>> 0) : ((Math.floor(this.nextMatchRand() * 900000) + 100000) >>> 0);
+        this.matchSeed = s;
+        this.rngSeed = s;
+      },
+      nextMatchRand() {
+        if (this.runMode !== 'ONLINE') return this.nextMatchRand();
+        this.rngSeed = (this.rngSeed * 1664525 + 1013904223) >>> 0;
+        return this.rngSeed / 4294967296;
+      },
+      spawnSabotageProjectileAnim(colorNum = 0xF97316) {
+        if (!this.scene) return;
+        const projGroup = new THREE.Group();
+        const ring = new THREE.Mesh(
+          new THREE.TorusGeometry(1.15, 0.14, 8, 22),
+          new THREE.MeshBasicMaterial({ color: colorNum })
+        );
+        const core = new THREE.Mesh(
+          new THREE.OctahedronGeometry(0.55, 0),
+          new THREE.MeshLambertMaterial({ color: 0xFFFDF9, flatShading: true })
+        );
+        projGroup.add(ring, core);
+        const startC = this.crafts[0];
+        projGroup.position.set(startC ? startC.x : 0, startC ? startC.y : 0, this.PLAYER_Z - 1.5);
+        this.scene.add(projGroup);
+        this.obstacles.push({
+          kind: 'ITEM_FX',
+          mesh: projGroup,
+          x: projGroup.position.x,
+          y: projGroup.position.y,
+          z: projGroup.position.z,
+          fxSpeedZ: 68,
+          fxTimer: 0.9
+        });
+      },
+
       getStageZoneInfo(dist) {
         const cycle = Math.floor(dist / 100) % 4;
         if (cycle === 0) return { id: 'GLIDE', name: '滑空ゾーン', ringBoost: 0.08, allowVerticalMove: false, chainChance: 0.25 };
@@ -2460,10 +2550,10 @@ const EMBEDDED_VOICES = {
         const curDiff = DIFFICULTIES[app.currentDiffIndex];
         const mMode = this.runMode;
         const zone = this.getStageZoneInfo(this.teamDistance);
-        const roll = Math.random();
+        const roll = this.nextMatchRand();
 
         if (mMode === 'HOST' && hostNet.ruleMode === 'COOP' && this.crafts.some(c => !c.alive) && roll < 0.25) {
-          const gx = (Math.random()-0.5)*7.5, gy = (Math.random()-0.5)*4.2;
+          const gx = (this.nextMatchRand()-0.5)*7.5, gy = (this.nextMatchRand()-0.5)*4.2;
           const m = new THREE.Mesh(new THREE.TorusGeometry(1.55,0.22,8,16), new THREE.MeshLambertMaterial({color:0x38BDF8,flatShading:true}));
           m.position.set(gx, gy, this.SPAWN_Z); this.scene.add(m);
           this.obstacles.push({ kind:'RESCUE', mesh:m, x:gx, y:gy, z:this.SPAWN_Z, radius:1.75, collectedBy:new Set() }); return;
@@ -2473,17 +2563,17 @@ const EMBEDDED_VOICES = {
         if ((curMap.hasSpinner || zone.id === 'SPINNER' || curDiff.id === 'EXTREME' || (mMode === 'SOLO' && this.speedLevel >= 5)) && roll > 0.70) {
           const g = new THREE.Group();
           g.add(new THREE.Mesh(new THREE.BoxGeometry(11.2,1.2,1.5), new THREE.MeshLambertMaterial({color:curMap.blockHex,flatShading:true})));
-          const ang = Math.random()*Math.PI;
+          const ang = this.nextMatchRand()*Math.PI;
           g.position.set(0,0,this.SPAWN_Z); g.rotation.z = ang; this.scene.add(g);
-          this.obstacles.push({ kind:'SPINNER', mesh:g, x:0, y:0, z:this.SPAWN_Z, angle:ang, rotSpeed:(Math.random()<0.5?1:-1)*1.45*curDiff.moveSpeedMult, halfLen:5.6, halfThick:0.6, hitBy:new Set(), nearMissedBy:new Set() });
+          this.obstacles.push({ kind:'SPINNER', mesh:g, x:0, y:0, z:this.SPAWN_Z, angle:ang, rotSpeed:(this.nextMatchRand()<0.5?1:-1)*1.45*curDiff.moveSpeedMult, halfLen:5.6, halfThick:0.6, hitBy:new Set(), nearMissedBy:new Set() });
           return;
         }
 
                 const allowSabotageBox = (mMode === 'ONLINE') || (mMode === 'SOLO' && (app.currentSoloMode === 'VS_BOT' || app.botLevelSetting !== 'NONE')) || (mMode === 'HOST' && hostNet.ruleMode === 'BATTLE');
         if (allowSabotageBox && roll > 0.76) {
-          const itemMeta = SABOTAGE_ITEMS[Math.floor(Math.random() * SABOTAGE_ITEMS.length)];
-          const gx = (Math.random() - 0.5) * 7.6;
-          const gy = (Math.random() - 0.5) * 3.8;
+          const itemMeta = SABOTAGE_ITEMS[Math.floor(this.nextMatchRand() * SABOTAGE_ITEMS.length)];
+          const gx = (this.nextMatchRand() - 0.5) * 7.6;
+          const gy = (this.nextMatchRand() - 0.5) * 3.8;
           const g = new THREE.Group();
           const core = new THREE.Mesh(
             new THREE.DodecahedronGeometry(0.85, 0),
@@ -2510,8 +2600,8 @@ const EMBEDDED_VOICES = {
         if (mMode === 'STORY') {
           const sq = STORY_QUESTS[app.currentMapIndex] || STORY_QUESTS[0];
           if (this.storyItemsCollected < sq.reqItemCount && roll < 0.34) {
-            const gx = (Math.random() - 0.5) * 7.2;
-            const gy = (Math.random() - 0.5) * 3.8;
+            const gx = (this.nextMatchRand() - 0.5) * 7.2;
+            const gy = (this.nextMatchRand() - 0.5) * 3.8;
             const g = new THREE.Group();
             const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.95, 0), new THREE.MeshLambertMaterial({ color: 0xFBBF24, flatShading: true }));
             const halo = new THREE.Mesh(new THREE.TorusGeometry(1.35, 0.12, 8, 18), new THREE.MeshBasicMaterial({ color: 0x93AB8A }));
@@ -2527,12 +2617,12 @@ const EMBEDDED_VOICES = {
 
         if (roll < ringProb) {
           // 連続リング（3連ウェーブまたは一直線）で鳥・トンボの滑空ルートを作る
-          const isChain = Math.random() < zone.chainChance;
+          const isChain = this.nextMatchRand() < zone.chainChance;
           const count = isChain ? 3 : 1;
-          const startX = (Math.random() - 0.5) * 6.5;
-          const startY = (Math.random() - 0.5) * 3.4;
-          const dirX = (Math.random() < 0.5 ? 1 : -1) * 1.4;
-          const dirY = (Math.random() < 0.5 ? 1 : -1) * 0.9;
+          const startX = (this.nextMatchRand() - 0.5) * 6.5;
+          const startY = (this.nextMatchRand() - 0.5) * 3.4;
+          const dirX = (this.nextMatchRand() < 0.5 ? 1 : -1) * 1.4;
+          const dirY = (this.nextMatchRand() < 0.5 ? 1 : -1) * 0.9;
           for (let k = 0; k < count; k++) {
             const gx = Math.max(-5.2, Math.min(5.2, startX + k * dirX));
             const gy = Math.max(-3.1, Math.min(3.1, startY + Math.sin(k * 1.1) * dirY));
@@ -2544,19 +2634,19 @@ const EMBEDDED_VOICES = {
         } else {
           const cnt = (curMap.spawnPattern === 'DENSE_WALLS' || curDiff.id === 'HARD' || curDiff.id === 'EXTREME' || (mMode === 'SOLO' && this.speedLevel >= 4)) ? 2 : 1;
           for (let i = 0; i < cnt; i++) {
-            const w = 2.1 + Math.random()*1.7, h = 2.3 + Math.random()*2.2, d = 2.0;
-            const ox = (Math.random()-0.5)*9.0, oy = (Math.random()-0.5)*4.2;
+            const w = 2.1 + this.nextMatchRand()*1.7, h = 2.3 + this.nextMatchRand()*2.2, d = 2.0;
+            const ox = (this.nextMatchRand()-0.5)*9.0, oy = (this.nextMatchRand()-0.5)*4.2;
             const g = this.createStyledObstacleGroup(w, h, d, curMap);
             const sz = this.SPAWN_Z - i*6.5; g.position.set(ox, oy, sz); this.scene.add(g);
-            const movingX = curMap.hasMoving || zone.id === 'WAVE' || curDiff.id === 'EXTREME' || (mMode === 'SOLO' && this.speedLevel >= 3 && Math.random() < 0.5);
-            const movingY = zone.allowVerticalMove && Math.random() < 0.42;
+            const movingX = curMap.hasMoving || zone.id === 'WAVE' || curDiff.id === 'EXTREME' || (mMode === 'SOLO' && this.speedLevel >= 3 && this.nextMatchRand() < 0.5);
+            const movingY = zone.allowVerticalMove && this.nextMatchRand() < 0.42;
             this.obstacles.push({
               kind:'BLOCK', mesh:g, baseX:ox, baseY:oy, x:ox, y:oy, z:sz,
               halfW:w/2, halfH:h/2,
               moveAmpX: movingX ? 2.5 : 0,
               moveAmpY: movingY ? 1.35 : 0,
               moveSpeed: 2.05 * curDiff.moveSpeedMult,
-              movePhase: Math.random() * 6.28,
+              movePhase: this.nextMatchRand() * 6.28,
               hitBy: new Set(), nearMissedBy: new Set()
             });
           }
@@ -2567,7 +2657,7 @@ const EMBEDDED_VOICES = {
         const geo = new THREE.OctahedronGeometry(0.28, 0), mat = new THREE.MeshBasicMaterial({ color: colorNum });
         for (let i = 0; i < 14; i++) {
           const m = new THREE.Mesh(geo, mat); m.position.set(x,y,z); this.scene.add(m);
-          this.particles.push({ mesh:m, vx:(Math.random()-0.5)*16, vy:(Math.random()-0.5)*16, vz:(Math.random()-0.5)*12, life:1 });
+          this.particles.push({ mesh:m, vx:(this.nextMatchRand()-0.5)*16, vy:(this.nextMatchRand()-0.5)*16, vz:(this.nextMatchRand()-0.5)*12, life:1 });
         }
       },
       update(dt) {
@@ -2643,7 +2733,7 @@ const EMBEDDED_VOICES = {
           }
           if (mMode === 'SOLO' && app.currentSoloMode === 'RANDOM') {
             const ws = Math.floor(this.teamDistance / 150);
-            if (ws > this.lastRandomWarp) { this.lastRandomWarp = ws; const ni = (app.currentMapIndex + 1 + Math.floor(Math.random()*(MAPS.length-1))) % MAPS.length; app.setMapIndex(ni); audio.playSpeedUp(); this.showPopup(`ワープ！${MAPS[ni].name}`, '#F97316'); }
+            if (ws > this.lastRandomWarp) { this.lastRandomWarp = ws; const ni = (app.currentMapIndex + 1 + Math.floor(this.nextMatchRand()*(MAPS.length-1))) % MAPS.length; app.setMapIndex(ni); audio.playSpeedUp(); this.showPopup(`ワープ！${MAPS[ni].name}`, '#F97316'); }
           }
           const nl = Math.min(10, 1 + Math.floor(this.teamDistance / 110));
           if (nl > this.speedLevel) { this.speedLevel = nl; audio.playSpeedUp(); this.showPopup(`LV.${this.speedLevel} SPEED UP!`, '#EA580C'); }
@@ -2658,7 +2748,7 @@ const EMBEDDED_VOICES = {
           const wb = document.getElementById('hudWindBanner');
           if (curMap.hasWind) {
             this.windTimer -= dt;
-            if (this.windTimer <= 0) { this.windTimer = 4.5; this.windForce = [-2.2, 0, 2.2][Math.floor(Math.random()*3)] * curDiff.moveSpeedMult; }
+            if (this.windTimer <= 0) { this.windTimer = 4.5; this.windForce = [-2.2, 0, 2.2][Math.floor(this.nextMatchRand()*3)] * curDiff.moveSpeedMult; }
             if (wb) { wb.classList.toggle('hidden', Math.abs(this.windForce) < 0.1); wb.textContent = this.windForce > 0 ? '横風 →→' : '横風 ←←'; }
           } else { this.windForce = 0; wb?.classList.add('hidden'); }
 
@@ -2687,7 +2777,12 @@ const EMBEDDED_VOICES = {
             else if (c.debuffType === 'GUST') extraGustX = (c.debuffWindDir || 1) * 4.6;
             else if (c.debuffType === 'SHRINK') { lerp *= 0.72; c.mesh.scale.setScalar(0.62); }
           }
-          if (c.debuffTimer <= 0 || c.debuffType !== 'SHRINK') {
+          if (c.itemUseAnimTimer && c.itemUseAnimTimer > 0) {
+            c.itemUseAnimTimer -= dt;
+            const pulse = 1 + Math.sin(c.itemUseAnimTimer * Math.PI * 6) * 0.18;
+            c.mesh.scale.setScalar(pulse);
+            c.mesh.rotation.y += dt * 12;
+          } else if (c.debuffTimer <= 0 || c.debuffType !== 'SHRINK') {
             c.mesh.scale.setScalar(1.0);
           }
 
@@ -2793,8 +2888,27 @@ const EMBEDDED_VOICES = {
           this.spawnTimer = Math.max(0.25, (0.88 - this.speedLevel * 0.055) * spM);
         }
 
+        // ステージ自体の回転演出（ゾーンやスピナー・お邪魔効果に合わせて滑らかに回転）
+        const zoneInfo = this.getStageZoneInfo(this.teamDistance);
+        const rollTargetSpeed = (curMap.hasSpinner || zoneInfo.id === 'SPINNER' ? 0.42 : 0.16) * (this.currentSpeed >= 50 ? 1.35 : 1.0);
+        this.stageRollAngle += rollTargetSpeed * dt;
+        if (this.tunnelGroup) {
+          this.tunnelGroup.rotation.z = Math.sin(this.stageRollAngle) * 0.24 + this.stageRollAngle * 0.12;
+        }
+
         for (let i = this.obstacles.length - 1; i >= 0; i--) {
-          const o = this.obstacles[i]; o.z += this.currentSpeed * dt; o.mesh.position.z = o.z;
+          const o = this.obstacles[i];
+          if (o.kind === 'ITEM_FX') {
+            o.z -= (o.fxSpeedZ || 65) * dt;
+            o.fxTimer -= dt;
+            o.mesh.position.z = o.z;
+            o.mesh.rotation.z += dt * 10;
+            const sc = 1 + Math.max(0, (0.9 - o.fxTimer) * 1.4);
+            o.mesh.scale.setScalar(sc);
+            if (o.fxTimer <= 0 || o.z < -85) { this.scene.remove(o.mesh); this.obstacles.splice(i, 1); }
+            continue;
+          }
+          o.z += this.currentSpeed * dt; o.mesh.position.z = o.z;
           if (o.kind === 'RING' || o.kind === 'RESCUE') o.mesh.rotation.z += dt * 2.5;
           else if (o.kind === 'STORY_ITEM') { o.mesh.rotation.y += dt * 3.2; o.mesh.rotation.z += dt * 1.6; }
           else if (o.kind === 'SABOTAGE_ITEM') { o.mesh.rotation.y -= dt * 3.6; o.mesh.rotation.x += dt * 1.8; }
@@ -3075,7 +3189,7 @@ const EMBEDDED_VOICES = {
         if (!this.lastTime) this.lastTime = ts;
         const dt = Math.min(0.05, (ts - this.lastTime) / 1000); this.lastTime = ts;
         this.update(dt);
-        if (this.shakeTime > 0 && this.camera) this.camera.position.x += (Math.random()-0.5)*this.shakeTime*0.6;
+        if (this.shakeTime > 0 && this.camera) this.camera.position.x += (this.nextMatchRand()-0.5)*this.shakeTime*0.6;
         if (this.renderer && this.scene && this.camera) this.renderer.render(this.scene, this.camera);
         requestAnimationFrame(t => this.loop(t));
       }
@@ -3438,7 +3552,7 @@ const EMBEDDED_VOICES = {
       },
       startSoloSetup() { audio.init(); audio.playHello(); this.mode = 'SOLO'; gyro.calibrate(); this.renderQuickSelectors(); this.showScreen('screenSoloSetup'); },
       launchSoloGame() { this.mode = 'SOLO'; gyro.calibrate(); this.showScreen('screenGame'); game3d.onResize(); game3d.start('SOLO'); },
-      launchQuickRandom() { audio.init(); audio.playHello(); this.currentSoloMode = 'RANDOM'; this.setMapIndex(Math.floor(Math.random()*MAPS.length)); this.mode = 'SOLO'; gyro.calibrate(); this.showScreen('screenGame'); game3d.onResize(); game3d.start('SOLO'); },
+      launchQuickRandom() { audio.init(); audio.playHello(); this.currentSoloMode = 'RANDOM'; this.setMapIndex(Math.floor(this.nextMatchRand()*MAPS.length)); this.mode = 'SOLO'; gyro.calibrate(); this.showScreen('screenGame'); game3d.onResize(); game3d.start('SOLO'); },
       startOnlineLobby(prefill = '') { audio.init(); audio.playHello(); this.mode = 'ONLINE'; this.showScreen('screenOnlineLobby'); if (prefill) { document.getElementById('onlineJoinCodeInput').value = prefill; onlineNet.joinRoom(prefill); } },
       launchOnlineGame() { this.mode = 'ONLINE'; gyro.calibrate(); this.showScreen('screenGame'); game3d.onResize(); game3d.start('ONLINE'); },
       startHostSetup() { audio.init(); audio.playHello(); this.mode = 'HOST'; this.showScreen('screenHostLobby'); hostNet.initHost(); },
@@ -3487,7 +3601,7 @@ const EMBEDDED_VOICES = {
         const carry = document.getElementById('acctCarryGuestData')?.checked ?? true;
         const fb = document.getElementById('acctFeedbackMsg');
         if (name.length < 2) { fb.textContent = '2文字以上で入力してください'; return; }
-        const tag = 'GR-' + String(Math.floor(1000 + Math.random()*9000));
+        const tag = 'GR-' + String(Math.floor(1000 + this.nextMatchRand()*9000));
         const id = 'acct_' + Date.now();
         this.accounts.unshift({ id, name, tag, pin, data: carry ? this.snapshot() : { coins: 500, ownedIds: ['OUTFIT_001','ITEM_001','COLL_001'], custom: { colorIndex: 0, shapeId: 'EGGPOD', partId: 'NONE' }, storyClearedMax: 0 } });
         this.activeId = id; localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.accounts)); localStorage.setItem(this.ACTIVE_KEY, id);
@@ -3689,6 +3803,14 @@ const EMBEDDED_VOICES = {
       const botHost = document.getElementById('selectBotLevelHost');
       if (botHost) botHost.onchange = e => app.setBotLevelSetting(e.target.value);
 
+      const jamBtnEl = document.getElementById('btnDirectJammer');
+      if (jamBtnEl) {
+        jamBtnEl.onpointerdown = e => {
+          e.stopPropagation();
+          e.preventDefault();
+          game3d.triggerDirectJammer();
+        };
+      }
       const cb = document.getElementById('btnCtrlBoost');
       if (cb) {
         cb.onpointerdown = () => ctrlNet.setBoost(true);
