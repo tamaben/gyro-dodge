@@ -37,7 +37,7 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
       margin: 0; padding: 0; width: 100%; height: 100dvh;
-      background: #FBF7F2; color: #3E2723; overflow: hidden;
+      background: #FFF7ED; color: #3E2723; overflow: hidden;
       font-family: 'Zen Maru Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     button, a, label, select, input {
@@ -60,31 +60,35 @@
     .screen.active { display: flex; }
     #screenGame { padding-bottom: 0; }
 
-    /* アイコンに調和するミニマル＆フラット角丸パネル */
+    /* 初代ウォームクリーム＆ふんわり角丸パネル */
     .soft-card {
-      background: rgba(255, 253, 249, 0.94);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 28px;
+      background: rgba(255, 253, 249, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 26px;
+      box-shadow: 0 6px 22px rgba(249, 115, 22, 0.07);
+      transition: transform 0.22s ease, background-color 0.2s ease;
     }
     .soft-pill {
-      background: rgba(255, 253, 249, 0.96);
+      background: rgba(255, 253, 249, 0.94);
       border-radius: 999px;
+      box-shadow: 0 4px 14px rgba(62, 39, 35, 0.06);
     }
     .btn-peach {
       background: #F7EAE0;
       color: #3E2723;
       border-radius: 20px;
-      transition: transform 0.1s ease, background-color 0.15s ease;
+      transition: transform 0.14s ease, background-color 0.16s ease;
     }
-    .btn-peach:hover { background: #EED8C8; }
-    .btn-peach:active { transform: scale(0.95); }
+    .btn-peach:hover { background: #F1DEC9; }
+    .btn-peach:active { transform: scale(0.96); }
 
     .btn-orange {
       background: #F97316;
       color: #FFFFFF;
       border-radius: 22px;
-      transition: transform 0.1s ease, background-color 0.15s ease;
+      box-shadow: 0 6px 16px rgba(249, 115, 22, 0.24);
+      transition: transform 0.14s ease, background-color 0.16s ease;
     }
     .btn-orange:hover { background: #EA580C; }
     .btn-orange:active { transform: scale(0.96); }
@@ -93,28 +97,30 @@
       background: #93AB8A;
       color: #FFFFFF;
       border-radius: 22px;
-      transition: transform 0.1s ease, background-color 0.15s ease;
+      box-shadow: 0 6px 16px rgba(147, 171, 138, 0.24);
+      transition: transform 0.14s ease, background-color 0.16s ease;
     }
-    .btn-sage:hover { background: #738E69; }
+    .btn-sage:hover { background: #7D9773; }
     .btn-sage:active { transform: scale(0.96); }
 
     .btn-cocoa {
-      background: #3E2723;
+      background: #6D4C41;
       color: #FFFDF9;
       border-radius: 20px;
-      transition: transform 0.1s ease;
+      transition: transform 0.14s ease, background-color 0.16s ease;
     }
+    .btn-cocoa:hover { background: #5D4037; }
     .btn-cocoa:active { transform: scale(0.96); }
 
     .story-dot {
       width: 68px; height: 68px; border-radius: 50%;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      font-weight: 900; transition: transform 0.1s ease;
+      font-weight: 900; transition: transform 0.14s ease;
     }
-    .story-dot:active:not(:disabled) { transform: scale(0.92); }
-    .story-dot-now    { background: #F97316; color: #FFFFFF; }
+    .story-dot:active:not(:disabled) { transform: scale(0.93); }
+    .story-dot-now    { background: #F97316; color: #FFFFFF; box-shadow: 0 6px 16px rgba(249, 115, 22, 0.28); }
     .story-dot-done   { background: #93AB8A; color: #FFFFFF; }
-    .story-dot-locked { background: #EFEBE9; color: #BCAAA4; }
+    .story-dot-locked { background: #F7EAE0; color: #A1887F; }
 
     select.clean-select {
       appearance: none;
@@ -130,28 +136,11 @@
       50% { transform: translateY(-4px); }
     }
     @keyframes popInSoft {
-      0% { opacity: 0; transform: scale(0.95) translateY(8px); }
+      0% { opacity: 0; transform: scale(0.96) translateY(6px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
     }
-    @keyframes breatheSoft {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.02); }
-    }
-    .anim-float-soft {
-      animation: floatSoft 3.6s ease-in-out infinite;
-    }
-    .anim-pop-in {
-      animation: popInSoft 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-    .anim-breathe-soft {
-      animation: breatheSoft 3.2s ease-in-out infinite;
-    }
-    .soft-card {
-      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease;
-    }
-    .btn-peach, .btn-orange, .btn-sage, .btn-cocoa, .soft-pill, .story-dot {
-      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease, opacity 0.2s ease;
-    }
+    .anim-float-soft { animation: floatSoft 3.6s ease-in-out infinite; }
+    .anim-pop-in { animation: popInSoft 0.25s ease-out both; }
   </style>
 <script>
 (function () {
@@ -501,7 +490,7 @@
 })();
 </script>
 </head>
-<body class="bg-[#FBF7F2] text-cocoa-800">
+<body class="bg-[#FFF7ED] text-cocoa-800">
 
 
   <!-- SPオーバーレイ広告（320x100・邪魔にならない控えめ表示＋閉じる対応） -->
@@ -664,7 +653,7 @@
   <!-- =====================================================================
        2. イラスト＆3D回転付き図鑑・コイン交換所（全126種類）
        ===================================================================== -->
-  <section id="screenEncyclopedia" class="screen items-center justify-start px-4 pt-14 bg-[#FBF7F2]/90 backdrop-blur-md">
+  <section id="screenEncyclopedia" class="screen items-center justify-start px-4 pt-14 bg-[#FFF7ED]/85 backdrop-blur-md">
     <div class="w-full max-w-2xl flex flex-col gap-3 my-auto">
       <div class="soft-card p-4 flex items-center justify-between gap-2">
         <div class="text-left">
@@ -737,7 +726,7 @@
   <!-- =====================================================================
        3. 冒険モード（全12章・かわいい蛇行ステージマップ）
        ===================================================================== -->
-  <section id="screenStoryMap" class="screen items-center justify-start px-4 pt-14 bg-[#FBF7F2]/90 backdrop-blur-md">
+  <section id="screenStoryMap" class="screen items-center justify-start px-4 pt-14 bg-[#FFF7ED]/85 backdrop-blur-md">
     <div class="w-full max-w-md flex flex-col items-center">
       <div class="soft-card w-full px-4 py-3 mb-2.5 flex flex-col gap-2">
         <div class="flex items-center justify-between">
@@ -821,7 +810,7 @@
   <!-- =====================================================================
        4. きせかえ＆機体改造（全20色 × 6種のかわいい3D機体 × 6機能パーツ）
        ===================================================================== -->
-  <section id="screenCustom" class="screen items-center justify-start px-4 pt-14 bg-[#FBF7F2]/90 backdrop-blur-md">
+  <section id="screenCustom" class="screen items-center justify-start px-4 pt-14 bg-[#FFF7ED]/85 backdrop-blur-md">
     <div class="soft-card w-full max-w-lg p-5 flex flex-col gap-3 my-auto">
       <div class="flex items-center justify-between pb-1">
         <h2 class="text-lg font-black">きせかえ＆機体改造</h2>
@@ -857,7 +846,7 @@
   </section>
 
   <!-- ボイス設定 -->
-  <section id="screenVoiceStudio" class="screen items-center justify-center px-4 pt-14 bg-[#FBF7F2]/90 backdrop-blur-md">
+  <section id="screenVoiceStudio" class="screen items-center justify-center px-4 pt-14 bg-[#FFF7ED]/85 backdrop-blur-md">
     <div class="soft-card w-full max-w-xl p-5 flex flex-col gap-3 my-auto">
       <div class="flex items-center justify-between pb-1">
         <h2 class="text-lg font-black">ボイス設定（全7種）</h2>
@@ -962,7 +951,7 @@
   </section>
 
   <!-- オンライン＆モニターマルチ -->
-  <section id="screenOnlineLobby" class="screen items-center justify-center px-4 pt-14 bg-[#FBF7F2]/90 backdrop-blur-md">
+  <section id="screenOnlineLobby" class="screen items-center justify-center px-4 pt-14 bg-[#FFF7ED]/85 backdrop-blur-md">
     <div class="soft-card w-full max-w-lg p-5 flex flex-col gap-3 my-auto">
       <h2 class="text-lg font-black">オンライン対戦</h2>
       <input id="onlineMyName" type="text" maxlength="10" placeholder="なまえ（任意）" class="w-full px-3 py-2 rounded-xl bg-[#FBF7F2] text-xs font-extrabold">
@@ -1003,7 +992,7 @@
     </div>
   </section>
 
-  <section id="screenHostLobby" class="screen items-center justify-center px-4 pt-14 bg-[#FBF7F2]/90 backdrop-blur-md">
+  <section id="screenHostLobby" class="screen items-center justify-center px-4 pt-14 bg-[#FFF7ED]/85 backdrop-blur-md">
     <div class="soft-card w-full max-w-2xl p-5 flex flex-col gap-3 my-auto">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-black">モニター・ロビー（最大10人）</h2>
