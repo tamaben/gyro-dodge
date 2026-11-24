@@ -1848,7 +1848,13 @@ const EMBEDDED_VOICES = {
           conn.on('data', data => {
             const m = this.roster.find(r => r.id === conn.peer); if (!m) return;
             if (data.type === 'HELLO') { m.name = (data.name || m.name).slice(0, 10); this.broadcastRoster(); this.renderRoster(); }
-            else if (data.type === 'STATE') { m.score = data.score; m.distance = data.distance; m.alive = data.alive; m.x = data.x; m.y = data.y; m.roll = data.roll || 0; this.recalcRanks(); const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime }; Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); }); game3d.syncOnlineRivals(this.roster, this.myId); }
+            else if (data.type === 'STATE') { m.score = data.score; m.distance = data.distance; m.alive = data.alive; m.x = data.x; m.y = data.y; m.roll = data.roll || 0; this.recalcRanks(); const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length }; Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); }); game3d.syncOnlineRivals(this.roster, this.myId); }
+            else if (data.type === 'REQ_CHUNKS') {
+              const startIdx = Math.max(0, parseInt(data.haveCount, 10) || 0);
+              for (let ci = startIdx; ci < game3d.onlineStageChunks.length; ci++) {
+                if (conn.open) conn.send({ type: 'STAGE_CHUNK', chunkIdx: ci, items: game3d.onlineStageChunks[ci] });
+              }
+            }
             else if (data.type === 'ITEM_TAKEN') {
               game3d.consumeRemoteItem(data.itemId);
               Object.entries(this.guestConns).forEach(([pid, gc]) => { if (pid !== conn.peer && gc.open) gc.send(data); });
@@ -1923,6 +1929,12 @@ const EMBEDDED_VOICES = {
               if (typeof data.matchTime === 'number' && game3d.runMode === 'ONLINE') {
                 game3d.sharedMatchTime += (data.matchTime - game3d.sharedMatchTime) * 0.35;
               }
+              if (typeof data.chunkCount === 'number' && game3d.runMode === 'ONLINE' && data.chunkCount > game3d.onlineStageChunks.length) {
+                if (!this._lastChunkReqAt || Date.now() - this._lastChunkReqAt > 400) {
+                  this._lastChunkReqAt = Date.now();
+                  if (this.hostConn?.open) this.hostConn.send({ type: 'REQ_CHUNKS', haveCount: game3d.onlineStageChunks.length });
+                }
+              }
               this.renderRoster();
               game3d.syncOnlineRivals(this.roster, this.myId);
             } else if (data.type === 'START_MATCH') {
@@ -1933,7 +1945,8 @@ const EMBEDDED_VOICES = {
               app.launchOnlineGame();
             } else if (data.type === 'STAGE_CHUNK') {
               if (Array.isArray(data.items)) {
-                game3d.onlineStageChunks.push(data.items);
+                if (typeof data.chunkIdx === 'number') game3d.onlineStageChunks[data.chunkIdx] = data.items;
+                else game3d.onlineStageChunks.push(data.items);
                 game3d.applyOnlineStageItems(data.items);
               }
             } else if (data.type === 'ITEM_TAKEN') {
@@ -1997,7 +2010,7 @@ const EMBEDDED_VOICES = {
       recalcRanks() { const s = [...this.roster].sort((a,b) => (a.alive !== b.alive ? (a.alive ? -1 : 1) : b.score - a.score)); s.forEach((r,i) => r.rank = i+1); },
       broadcastRoster() {
         if (!this.isHost) return; this.recalcRanks();
-        const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime };
+        const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length };
         Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); });
         game3d.syncOnlineRivals(this.roster, this.myId);
       },
@@ -2023,19 +2036,19 @@ const EMBEDDED_VOICES = {
         if (!list) return;
         list.innerHTML = this.roster.map((r, i) => `<div class="bg-cream-200 rounded-xl px-2.5 py-1 text-xs font-extrabold truncate">#${i+1} ${r.name}</div>`).join('');
       },
-      broadcastStageChunk(items) {
+      broadcastStageChunk(items, chunkIdx = 0) {
         if (!this.isHost || !items || !items.length) return;
-        const msg = { type: 'STAGE_CHUNK', items };
+        const msg = { type: 'STAGE_CHUNK', chunkIdx, items };
         Object.values(this.guestConns).forEach(c => { if (c.open) c.send(msg); });
       },
       hostStartMatch() {
         if (!this.isHost) return;
-        this.roster.forEach(r => { r.score = 0; r.distance = 0; r.alive = true; });
+        this.roster.forEach(r => { r.score = 0; r.distance = 0; r.alive = true; r.x = 0; r.y = 0; });
         const seed = Math.floor(Math.random() * 900000) + 100000;
         game3d.setMatchSeed(seed);
-        game3d.hostGeneratedUntilZ = -28;
+        game3d.hostGeneratedUntilZ = -26;
         game3d.onlineStageChunks = [];
-        const initItems = game3d.generateOnlineStageChunk(-28, -360);
+        const initItems = game3d.generateOnlineStageChunk(-26, -420);
         const msg = {
           type: 'START_MATCH',
           mapIndex: app.currentMapIndex,
@@ -2056,7 +2069,7 @@ const EMBEDDED_VOICES = {
             const me = this.roster.find(r => r.id === this.myId);
             if (me) { me.score = game3d.teamScore; me.distance = Math.floor(game3d.teamDistance); me.alive = mc.alive; me.x = mc.x; me.y = mc.y; me.roll = rollVal; }
             this.recalcRanks();
-            const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime };
+            const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length };
             Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); });
             game3d.syncOnlineRivals(this.roster, this.myId);
           } else if (this.hostConn?.open) {
@@ -2572,14 +2585,19 @@ const EMBEDDED_VOICES = {
         this.seenStageItemIds = new Set();
         if (mMode === 'ONLINE') {
           if (onlineNet.isHost) {
-            this.hostGeneratedUntilZ = -28;
-            this.onlineStageChunks = [];
-            const initItems = this.generateOnlineStageChunk(-28, -360);
-            this.applyOnlineStageItems(initItems);
-            onlineNet.broadcastStageChunk(initItems);
-          } else {
+            if (!this.onlineStageChunks || this.onlineStageChunks.length === 0) {
+              this.hostGeneratedUntilZ = -26;
+              this.onlineStageChunks = [];
+              this.generateOnlineStageChunk(-26, -420);
+            }
             this.onlineStageChunks.forEach(chunk => this.applyOnlineStageItems(chunk));
+          } else {
+            (this.onlineStageChunks || []).forEach(chunk => this.applyOnlineStageItems(chunk));
+            if (onlineNet.hostConn?.open) {
+              onlineNet.hostConn.send({ type: 'REQ_CHUNKS', haveCount: (this.onlineStageChunks || []).length });
+            }
           }
+          this.syncOnlineRivals(onlineNet.roster, onlineNet.myId);
           this.runCountdown();
           return;
         }
@@ -2962,11 +2980,12 @@ const EMBEDDED_VOICES = {
 
       extendOnlineStageIfNeeded() {
         if (this.runMode !== 'ONLINE' || !onlineNet.isHost) return;
-        const frontierNeeded = -(this.sharedTrackZ + 280);
+        const frontierNeeded = -(this.sharedTrackZ + 320);
         if (this.hostGeneratedUntilZ > frontierNeeded) {
-          const newItems = this.generateOnlineStageChunk(this.hostGeneratedUntilZ, frontierNeeded - 220);
+          const chunkIdx = this.onlineStageChunks.length;
+          const newItems = this.generateOnlineStageChunk(this.hostGeneratedUntilZ, frontierNeeded - 260);
           this.applyOnlineStageItems(newItems);
-          onlineNet.broadcastStageChunk(newItems);
+          onlineNet.broadcastStageChunk(newItems, chunkIdx);
         }
       },
 
