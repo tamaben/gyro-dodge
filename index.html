@@ -632,6 +632,10 @@
           <div id="onlineDisplayCode" class="text-2xl font-black text-brand-500 tracking-widest">----</div>
           <button id="btnOnlineCopy" type="button" class="btn-peach px-3 py-1.5 text-xs font-extrabold"><span id="onlineCopyBtnText">URLコピー</span></button>
         </div>
+        <div class="bg-[#FBF7F2] rounded-2xl p-2 grid grid-cols-2 gap-1.5 text-xs font-extrabold">
+          <button id="btnOnlineRuleScore" type="button" class="py-2 rounded-xl bg-brand-500 text-white font-black">スコア対戦</button>
+          <button id="btnOnlineRuleRace" type="button" class="py-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold">ゴールレース</button>
+        </div>
         <div id="onlineMapPreviewCard" class="bg-[#FBF7F2] rounded-2xl p-3 flex flex-col gap-2 text-left">
           <div class="flex items-center justify-between gap-2">
             <div class="min-w-0">
@@ -752,6 +756,18 @@
           <div class="text-xl font-black text-brand-600"><span id="hudSpeed">120</span><span class="text-[10px]">km/h</span></div>
         </div>
       </div>
+      <!-- レース進行バー（順位・残り距離・ミニレーサー位置） -->
+      <div id="hudRaceBar" class="hidden mx-auto w-full max-w-md soft-card px-3.5 py-2 flex flex-col gap-1">
+        <div class="flex items-center justify-between text-xs font-black">
+          <span class="text-brand-600">現在 <span id="hudRaceRank" class="text-base">1</span>位 / <span id="hudRaceTotal">6</span>人</span>
+          <span class="text-cocoa-800">ゴールまであと <span id="hudRaceRemain" class="text-brand-600">600</span>m</span>
+        </div>
+        <div class="relative w-full h-3 rounded-full bg-cream-200 overflow-hidden">
+          <div id="hudRaceFill" class="h-full bg-brand-500 rounded-full transition-all duration-100" style="width: 0%"></div>
+          <div id="hudRaceRivalDots" class="absolute inset-0 pointer-events-none"></div>
+        </div>
+      </div>
+
       <div id="hudModeTimerBar" class="hidden mx-auto bg-cocoa-800 text-cream-50 rounded-full px-4 py-1 text-xs font-extrabold gap-3">
         <span id="hudModeTimerLabel">TIME</span><span id="hudModeTimerValue" class="text-brand-400">60.0s</span>
       </div>
@@ -874,11 +890,16 @@ const EMBEDDED_VOICES = {
 
 
     const SABOTAGE_ITEMS = [
-      { id: 'REVERSE', name: 'あべこべミラー', short: '左右あべこべ', duration: 3.8, colorHex: '#F97316', colorNum: 0xF97316 },
-      { id: 'BLIND',   name: 'もくもくスモーク', short: '視界スモーク', duration: 3.8, colorHex: '#6D4C41', colorNum: 0x6D4C41 },
-      { id: 'HEAVY',   name: 'ずっしりおもり',   short: '機体ヘビー化', duration: 3.8, colorHex: '#3E2723', colorNum: 0x3E2723 },
-      { id: 'GUST',    name: 'とつぜん突風',     short: '横風アタック', duration: 3.5, colorHex: '#93AB8A', colorNum: 0x93AB8A },
-      { id: 'SHRINK',  name: 'ちびっこミニ化',   short: '翼ミニ化',     duration: 3.8, colorHex: '#EA580C', colorNum: 0xEA580C }
+      { id: 'REVERSE',     category: 'ATTACK',  name: 'あべこべミラー',   short: '左右あべこべ',     duration: 3.8, colorHex: '#F97316', colorNum: 0xF97316 },
+      { id: 'BLIND',       category: 'ATTACK',  name: 'もくもくスモーク', short: '視界スモーク',     duration: 3.8, colorHex: '#6D4C41', colorNum: 0x6D4C41 },
+      { id: 'HEAVY',       category: 'ATTACK',  name: 'ずっしりおもり',   short: '機体ヘビー化',     duration: 3.8, colorHex: '#3E2723', colorNum: 0x3E2723 },
+      { id: 'GUST',        category: 'ATTACK',  name: 'とつぜん突風',     short: '横風アタック',     duration: 3.5, colorHex: '#93AB8A', colorNum: 0x93AB8A },
+      { id: 'SHRINK',      category: 'ATTACK',  name: 'ちびっこミニ化',   short: '翼ミニ化',         duration: 3.8, colorHex: '#EA580C', colorNum: 0xEA580C },
+      { id: 'TURBO_WING',  category: 'SUPPORT', name: 'はやぶさターボ',   short: '超加速＆無敵',     duration: 4.0, colorHex: '#F97316', colorNum: 0xFBBF24 },
+      { id: 'SHIELD_ORB',  category: 'SUPPORT', name: 'バリアシールド',   short: '衝突1回ガード',    duration: 8.0, colorHex: '#38BDF8', colorNum: 0x38BDF8 },
+      { id: 'MAGNET_STAR', category: 'SUPPORT', name: 'スターマグネット', short: '周囲アイテム吸引', duration: 5.0, colorHex: '#93AB8A', colorNum: 0x34D399 },
+      { id: 'SCORE_FEVER', category: 'SUPPORT', name: 'フィーバーコイン', short: '+600pts＆コンボ',  duration: 0.5, colorHex: '#F59E0B', colorNum: 0xF59E0B },
+      { id: 'SLOW_TIME',   category: 'SUPPORT', name: 'スロータイム',     short: '障害物スロー化',   duration: 4.0, colorHex: '#8B5CF6', colorNum: 0x8B5CF6 }
     ];
     function getSabotageMeta(id) {
       return SABOTAGE_ITEMS.find(x => x.id === id) || SABOTAGE_ITEMS[0];
@@ -954,6 +975,7 @@ const EMBEDDED_VOICES = {
     ];
 
     const SOLO_MODES = [
+      { id: 'RACE',          label: 'レース' },
       { id: 'SURVIVAL',      label: 'サバイバル' },
       { id: 'VS_BOT',        label: 'VS BOT' },
       { id: 'TIME_ATTACK',   label: '60秒' },
@@ -1764,7 +1786,8 @@ const EMBEDDED_VOICES = {
     };
 
     const onlineNet = {
-      peer: null, isHost: false, roomCode: '', myId: '', myName: 'PLAYER', hostConn: null, guestConns: {}, roster: [], syncTimer: null,
+      peer: null, isHost: false, ruleMode: 'SCORE', roomCode: '', myId: '', myName: 'PLAYER', hostConn: null, guestConns: {}, roster: [], syncTimer: null,
+      setRuleMode(rm) { this.ruleMode = rm === 'RACE' ? 'RACE' : 'SCORE'; const bS = document.getElementById('btnOnlineRuleScore'); const bR = document.getElementById('btnOnlineRuleRace'); if (bS) bS.className = this.ruleMode === 'SCORE' ? 'py-2 rounded-xl bg-brand-500 text-white font-black' : 'py-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold'; if (bR) bR.className = this.ruleMode === 'RACE' ? 'py-2 rounded-xl bg-brand-500 text-white font-black' : 'py-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold'; if (this.isHost) this.broadcastRoster(); },
       getMyName() { return (document.getElementById('onlineMyName')?.value.trim() || 'PLAYER').slice(0, 10); },
       openRoomUi(id) {
         this.myId = id || ('local-' + this.roomCode);
@@ -1848,7 +1871,7 @@ const EMBEDDED_VOICES = {
           conn.on('data', data => {
             const m = this.roster.find(r => r.id === conn.peer); if (!m) return;
             if (data.type === 'HELLO') { m.name = (data.name || m.name).slice(0, 10); this.broadcastRoster(); this.renderRoster(); }
-            else if (data.type === 'STATE') { m.score = data.score; m.distance = data.distance; m.alive = data.alive; m.x = data.x; m.y = data.y; m.roll = data.roll || 0; this.recalcRanks(); const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length }; Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); }); game3d.syncOnlineRivals(this.roster, this.myId); }
+            else if (data.type === 'STATE') { m.score = data.score; m.distance = data.distance; m.alive = data.alive; m.x = data.x; m.y = data.y; m.roll = data.roll || 0; this.recalcRanks(); const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, ruleMode: this.ruleMode, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length }; Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); }); game3d.syncOnlineRivals(this.roster, this.myId); }
             else if (data.type === 'REQ_CHUNKS') {
               const startIdx = Math.max(0, parseInt(data.haveCount, 10) || 0);
               for (let ci = startIdx; ci < game3d.onlineStageChunks.length; ci++) {
@@ -1922,6 +1945,7 @@ const EMBEDDED_VOICES = {
               this.roster = data.roster || [];
               if (typeof data.mapIndex === 'number') app.setMapIndex(data.mapIndex);
               if (typeof data.diffIndex === 'number') app.setDifficultyIndex(data.diffIndex);
+              if (data.ruleMode) this.setRuleMode(data.ruleMode);
               if (typeof data.trackZ === 'number' && game3d.runMode === 'ONLINE') {
                 const diffZ = data.trackZ - game3d.sharedTrackZ;
                 if (Math.abs(diffZ) > 0.4) game3d.sharedTrackZ += diffZ * 0.35;
@@ -1940,6 +1964,7 @@ const EMBEDDED_VOICES = {
             } else if (data.type === 'START_MATCH') {
               if (typeof data.mapIndex === 'number') app.setMapIndex(data.mapIndex);
               if (typeof data.diffIndex === 'number') app.setDifficultyIndex(data.diffIndex);
+              if (data.ruleMode) this.setRuleMode(data.ruleMode);
               game3d.setMatchSeed(data.matchSeed);
               game3d.onlineStageChunks = Array.isArray(data.initialItems) ? [data.initialItems] : [];
               app.launchOnlineGame();
@@ -2010,7 +2035,7 @@ const EMBEDDED_VOICES = {
       recalcRanks() { const s = [...this.roster].sort((a,b) => (a.alive !== b.alive ? (a.alive ? -1 : 1) : b.score - a.score)); s.forEach((r,i) => r.rank = i+1); },
       broadcastRoster() {
         if (!this.isHost) return; this.recalcRanks();
-        const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length };
+        const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, ruleMode: this.ruleMode, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length };
         Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); });
         game3d.syncOnlineRivals(this.roster, this.myId);
       },
@@ -2053,6 +2078,7 @@ const EMBEDDED_VOICES = {
           type: 'START_MATCH',
           mapIndex: app.currentMapIndex,
           diffIndex: app.currentDiffIndex,
+          ruleMode: this.ruleMode,
           matchSeed: seed,
           initialItems: initItems
         };
@@ -2069,7 +2095,7 @@ const EMBEDDED_VOICES = {
             const me = this.roster.find(r => r.id === this.myId);
             if (me) { me.score = game3d.teamScore; me.distance = Math.floor(game3d.teamDistance); me.alive = mc.alive; me.x = mc.x; me.y = mc.y; me.roll = rollVal; }
             this.recalcRanks();
-            const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length };
+            const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, ruleMode: this.ruleMode, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length };
             Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); });
             game3d.syncOnlineRivals(this.roster, this.myId);
           } else if (this.hostConn?.open) {
@@ -2086,6 +2112,15 @@ const EMBEDDED_VOICES = {
         const meta = getSabotageMeta(chosenId);
         if (hasHeld) mc.heldSabotageItem = null;
         else mc.jammerCharge = 0;
+        if (meta.category === 'SUPPORT') {
+          game3d.applySupportItemToCraft(mc, meta);
+          mc.score += 200;
+          game3d.teamScore += 200;
+          audio.playRingCollect();
+          game3d.spawnSabotageProjectileAnim(meta.colorNum);
+          game3d.showPopup(`【${meta.name}】発動！（${meta.short}）`, meta.colorHex);
+          return;
+        }
         mc.score += 250;
         game3d.teamScore += 250;
         audio.playJammerLaunch();
@@ -2491,7 +2526,10 @@ const EMBEDDED_VOICES = {
         this.runMode = forcedMode || app.mode || 'SOLO';
         const mMode = this.runMode, curMap = MAPS[app.currentMapIndex], curDiff = DIFFICULTIES[app.currentDiffIndex], isStory = (mMode === 'STORY'), soloMode = app.currentSoloMode;
 
-        audio.init(); this.clearEntities(); this.applyMapTheme(curMap);
+        audio.init();
+        if (!this.scene) this.init();
+        this.clearEntities();
+        this.applyMapTheme(curMap);
         this.state = 'COUNTDOWN'; this.teamScore = 0; this.teamDistance = 0; this.teamEnergy = 100;
         this.nearMissCount = 0; this.comboCount = 0; this.maxComboMult = 1.0; this.comboDecayTimer = 0;
         this.windForce = 0; this.windTimer = 3.0; this.speedLevel = 1; this.lastRandomWarp = 0;
@@ -2508,6 +2546,9 @@ const EMBEDDED_VOICES = {
         const sudden = (mMode === 'SOLO' && soloMode === 'SUDDEN_DEATH') ? 1.25 : 1;
         const speedScale = isStory ? curMap.storySpeedMult : (curMap.speedBonus * curDiff.speedMult * sudden);
         this.stageRollAngle = 0;
+        this.slowMotionTimer = 0;
+        this.raceFinishOrder = [];
+        this.raceGoalDist = curDiff.id === 'EASY' ? 500 : (curDiff.id === 'NORMAL' ? 650 : (curDiff.id === 'HARD' ? 850 : 1050));
         if (this.tunnelGroup) this.tunnelGroup.rotation.z = 0;
         if (mMode === 'ONLINE') this.rngSeed = this.matchSeed;
         this.baseSpeed = 40 * speedScale; this.currentSpeed = this.baseSpeed;
@@ -2566,7 +2607,8 @@ const EMBEDDED_VOICES = {
         const isVsBot = (mMode === 'SOLO' && soloMode === 'VS_BOT');
         const isTimed = (mMode === 'SOLO' && (soloMode === 'TIME_ATTACK' || soloMode === 'RING_RUSH')) || (mMode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE');
         document.getElementById('directPlayControls').classList.toggle('hidden', !isDirect);
-        document.getElementById('btnDirectJammer').classList.toggle('hidden', !(mMode === 'ONLINE' || isVsBot));
+        document.getElementById('btnDirectJammer').classList.toggle('hidden', !isDirect);
+        const rb = document.getElementById('hudRaceBar'); if (rb) { rb.classList.toggle('hidden', !this.isRaceMode()); rb.classList.toggle('flex', this.isRaceMode()); }
         document.getElementById('hudModeTimerBar').classList.toggle('hidden', !isTimed);
         document.getElementById('hudModeTimerBar').classList.toggle('flex', isTimed);
 
@@ -2601,31 +2643,39 @@ const EMBEDDED_VOICES = {
           this.runCountdown();
           return;
         }
-        // スタート直後から障害物・リングが画面内にハッキリ見えるよう前方に配置
-        const presetZs = [-28, -54, -82];
-        for (let w = 0; w < presetZs.length; w++) {
-          const prevLen = this.obstacles.length;
-          this.spawnWave();
-          // 確実に障害物（BLOCK）も混ぜて見やすくする
-          if (w === 1) {
-            const bw = 2.6, bh = 2.8, bd = 2.2;
-            const bx = -2.2, by = 0.2;
-            const bg = this.createStyledObstacleGroup(bw, bh, bd, curMap);
-            bg.position.set(bx, by, presetZs[w]);
-            this.scene.add(bg);
-            this.obstacles.push({
-              kind: 'BLOCK', mesh: bg, baseX: bx, baseY: by, x: bx, y: by, z: presetZs[w],
-              halfW: bw / 2, halfH: bh / 2, moveAmpX: 0, moveAmpY: 0, moveSpeed: 0, movePhase: 0,
-              hitBy: new Set(), nearMissedBy: new Set()
-            });
-          } else {
-            for (let k = prevLen; k < this.obstacles.length; k++) {
-              const ob = this.obstacles[k];
-              const rel = ob.z - this.SPAWN_Z;
-              ob.z = presetZs[w] + rel;
-              ob.mesh.position.z = ob.z;
+        // ソロ・冒険・モニター各モードでスタート直後から障害物とリングがはっきり見えるよう初期配置
+        if (this.scene) {
+          const initialSpecs = [
+            { kind: 'RING', x: -1.8, y: 0.4, z: -22 },
+            { kind: 'BLOCK', x: 2.3, y: -0.3, z: -42, w: 2.7, h: 2.8, d: 2.2 },
+            { kind: 'RING', x: 0.0, y: 0.8, z: -62 },
+            { kind: 'BLOCK', x: -2.4, y: 0.2, z: -84, w: 2.8, h: 3.0, d: 2.2 }
+          ];
+          initialSpecs.forEach((sp, idx) => {
+            if (sp.kind === 'RING') {
+              const m = new THREE.Mesh(
+                new THREE.TorusGeometry(1.42, 0.19, 8, 16),
+                new THREE.MeshLambertMaterial({ color: curMap.stripeHex, emissive: curMap.stripeHex, emissiveIntensity: 0.25, flatShading: true })
+              );
+              m.position.set(sp.x, sp.y, sp.z);
+              this.scene.add(m);
+              this.obstacles.push({ itemId: `INIT_RNG_${idx}`, kind: 'RING', mesh: m, x: sp.x, y: sp.y, z: sp.z, radius: 1.6, collectedBy: new Set() });
+            } else {
+              const g = this.createStyledObstacleGroup(sp.w, sp.h, sp.d, curMap);
+              g.position.set(sp.x, sp.y, sp.z);
+              this.scene.add(g);
+              this.obstacles.push({
+                itemId: `INIT_BLK_${idx}`, kind: 'BLOCK', mesh: g,
+                baseX: sp.x, baseY: sp.y, x: sp.x, y: sp.y, z: sp.z,
+                halfW: sp.w / 2, halfH: sp.h / 2,
+                moveAmpX: curMap.hasMoving ? 1.8 : 0,
+                moveAmpY: 0,
+                moveSpeed: 1.8 * curDiff.moveSpeedMult,
+                movePhase: idx * 1.2,
+                hitBy: new Set(), nearMissedBy: new Set()
+              });
             }
-          }
+          });
         }
         this.runCountdown();
       },
@@ -2731,27 +2781,52 @@ const EMBEDDED_VOICES = {
         const wy = Math.cos(nowSec * 1.9 + c.botWobbleSeed) * prof.wobbleAmp * 0.4;
         return { inX: Math.max(-1, Math.min(1, (c.botTargetX + wx) / this.BOUNDS_X)), inY: Math.max(-1, Math.min(1, (c.botTargetY + wy) / this.BOUNDS_Y)), steerAgility: prof.steerAgility };
       },
+      applySupportItemToCraft(craft, meta) {
+        if (!craft || !meta) return;
+        craft.itemUseAnimTimer = 0.75;
+        if (meta.id === 'TURBO_WING') {
+          craft.turboTimer = meta.duration;
+          craft.invuln = Math.max(craft.invuln || 0, meta.duration);
+          if (this.isRaceMode()) craft.distance += 18;
+        } else if (meta.id === 'SHIELD_ORB') {
+          craft.shieldCharges = Math.min(2, (craft.shieldCharges || 0) + 1);
+          if (craft.shieldMesh) craft.shieldMesh.visible = true;
+        } else if (meta.id === 'MAGNET_STAR') {
+          craft.magnetTimer = meta.duration;
+        } else if (meta.id === 'SCORE_FEVER') {
+          craft.score += 600;
+          if (!craft.isBot) {
+            this.teamScore += 600;
+            this.comboCount += 2;
+            this.comboDecayTimer = 5.0;
+          }
+        } else if (meta.id === 'SLOW_TIME') {
+          this.slowMotionTimer = meta.duration;
+        }
+      },
       activateJammer(attackerSlot) {
         const att = this.crafts.find(c => c.slotIndex === attackerSlot && c.alive);
         if (!att) return;
         const hasHeldItem = Boolean(att.heldSabotageItem);
         if (!hasHeldItem && att.jammerCharge < 100) return;
-        const targets = this.crafts.filter(c => c.alive && c.slotIndex !== attackerSlot);
-        if (!targets.length) {
-          if (hasHeldItem) {
-            const meta = getSabotageMeta(att.heldSabotageItem);
-            att.heldSabotageItem = null;
-            att.score += 300;
-            if (!att.isBot) this.teamScore += 300;
-            audio.playJammerLaunch();
-            this.showPopup(`【${meta.name}】発動！ +300 pts`, meta.colorHex);
-          }
-          return;
-        }
         const chosenId = hasHeldItem ? att.heldSabotageItem : SABOTAGE_ITEMS[Math.floor(this.nextMatchRand() * SABOTAGE_ITEMS.length)].id;
         const meta = getSabotageMeta(chosenId);
         if (hasHeldItem) att.heldSabotageItem = null;
         else att.jammerCharge = 0;
+
+        if (meta.category === 'SUPPORT') {
+          this.applySupportItemToCraft(att, meta);
+          att.score += 200;
+          if (!att.isBot) {
+            this.teamScore += 200;
+            audio.playRingCollect();
+            this.spawnSabotageProjectileAnim(meta.colorNum);
+            this.showPopup(`【${meta.name}】発動！（${meta.short}）`, meta.colorHex);
+          }
+          return;
+        }
+
+        const targets = this.crafts.filter(c => c.alive && c.slotIndex !== attackerSlot);
         att.score += 250;
         if (!att.isBot) this.teamScore += 250;
         targets.forEach(t => {
@@ -2762,7 +2837,7 @@ const EMBEDDED_VOICES = {
         audio.playJammerLaunch();
         att.itemUseAnimTimer = 0.65;
         this.spawnSabotageProjectileAnim(meta.colorNum);
-        this.showPopup(`【${meta.name}】発射！`, meta.colorHex);
+        if (!att.isBot) this.showPopup(`【${meta.name}】発射！`, meta.colorHex);
       },
       consumeRemoteItem(itemId) {
         if (!itemId || !this.scene) return;
@@ -2786,6 +2861,14 @@ const EMBEDDED_VOICES = {
       matchSeed: 123456,
       rngSeed: 123456,
       stageRollAngle: 0,
+      slowMotionTimer: 0,
+      raceGoalDist: 650,
+      raceFinishOrder: [],
+
+      isRaceMode() {
+        return (this.runMode === 'SOLO' && app.currentSoloMode === 'RACE') || (this.runMode === 'ONLINE' && onlineNet.ruleMode === 'RACE');
+      },
+
       sharedTrackZ: 0,
       sharedMatchTime: 0,
       hostGeneratedUntilZ: 0,
@@ -3057,7 +3140,7 @@ const EMBEDDED_VOICES = {
           return;
         }
 
-                const allowSabotageBox = (mMode === 'ONLINE') || (mMode === 'SOLO' && (app.currentSoloMode === 'VS_BOT' || app.botLevelSetting !== 'NONE')) || (mMode === 'HOST' && hostNet.ruleMode === 'BATTLE');
+                const allowSabotageBox = (mMode !== 'STORY');
         if (allowSabotageBox && roll > 0.76) {
           const itemMeta = SABOTAGE_ITEMS[Math.floor(this.nextMatchRand() * SABOTAGE_ITEMS.length)];
           const gx = (this.nextMatchRand() - 0.5) * 7.6;
@@ -3230,7 +3313,10 @@ const EMBEDDED_VOICES = {
           const sudden = (mMode === 'SOLO' && app.currentSoloMode === 'SUDDEN_DEATH') ? 1.25 : 1;
           const scale = isStory ? curMap.storySpeedMult : (curMap.speedBonus * curDiff.speedMult);
           this.baseSpeed = Math.min(120, 40 * scale * sudden + (this.speedLevel - 1) * 6.5 * scale);
-          this.currentSpeed = anyBoost ? this.baseSpeed * 1.42 : this.baseSpeed;
+          if (this.slowMotionTimer > 0) this.slowMotionTimer -= dt;
+          const turboMult = (this.crafts[0]?.turboTimer > 0) ? 1.55 : 1.0;
+          const slowMult = (this.slowMotionTimer > 0) ? 0.65 : 1.0;
+          this.currentSpeed = (anyBoost ? this.baseSpeed * 1.42 : this.baseSpeed) * turboMult * slowMult;
 
           const isTimed = (mMode === 'SOLO' && (app.currentSoloMode === 'TIME_ATTACK' || app.currentSoloMode === 'RING_RUSH')) || (mMode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE');
           if (isTimed) { this.modeTimer -= dt; if (this.modeTimer <= 0) { this.modeTimer = 0; this.triggerGameOver(true); return; } }
@@ -3305,7 +3391,21 @@ const EMBEDDED_VOICES = {
 
           if (this.state === 'PLAYING') {
             const pb = c.isBot ? c.botBoostActive : ((mMode === 'SOLO' || mMode === 'ONLINE' || isStory) ? (this.directBoost || this.autoBoost) : hostNet.slots[c.slotIndex]?.boost);
-            c.distance += this.currentSpeed * dt * 0.45;
+            const craftSpeedMult = c.isBot ? (0.94 + ((c.botProfile?.level || 5) * 0.018) + (c.botBoostActive ? 0.28 : 0)) : ((c.turboTimer > 0) ? 1.38 : 1.0);
+            c.distance += this.currentSpeed * craftSpeedMult * dt * 0.45;
+            if (!c.isBot && this.isRaceMode()) this.teamDistance = c.distance;
+            if (this.isRaceMode() && !c.finishedRace && c.distance >= this.raceGoalDist) {
+              c.finishedRace = true;
+              this.raceFinishOrder.push(c);
+              c.score += Math.max(200, 1500 - (this.raceFinishOrder.length - 1) * 300);
+              if (!c.isBot) {
+                const place = this.raceFinishOrder.length;
+                audio.playClearVoice();
+                this.showPopup(`ゴール！第${place}位フィニッシュ！`, '#F97316');
+                this.triggerGameOver(place === 1);
+                return;
+              }
+            }
             const speedFactor = 1.0 + Math.max(0, (this.currentSpeed - 40) / 80);
             const zoneMult = this.getZonePointMultiplier(c.distance);
             const rawDistPts = dt * 20 * speedFactor * zoneMult * (pb ? 1.35 : 1.0) * curDiff.scoreMult * (1 + app.getEquippedBonus());
@@ -3436,20 +3536,29 @@ const EMBEDDED_VOICES = {
           if (o.z > -1.4 && o.z < 1.4) {
             for (const c of this.crafts) {
               if (!c.alive) continue;
-              const magAdd = c.partId === 'MAGNET' ? 2.1 : 0.5;
-              if (o.kind === 'RING' && !o.collectedBy.has(c.slotIndex) && Math.hypot(c.x - o.x, c.y - o.y) <= o.radius + magAdd) {
+              if (c.magnetTimer > 0) c.magnetTimer -= dt; if (c.turboTimer > 0) c.turboTimer -= dt;
+              const magAdd = (c.partId === 'MAGNET' || c.magnetTimer > 0) ? 2.6 : 0.5;
+              if (o.kind === 'RING' && !o.taken && !o.collectedBy.has(c.slotIndex) && Math.hypot(c.x - o.x, c.y - o.y) <= o.radius + magAdd) {
+                o.taken = true;
                 o.collectedBy.add(c.slotIndex);
-                const pts = Math.round((150 + this.comboCount * 35) * this.getComboMultiplier() * this.getZonePointMultiplier(c.distance));
-                c.score += pts; if (!c.isBot || mMode === 'HOST') this.teamScore += pts;
-                this.ringsCollected++;
+                o.mesh.visible = false;
                 if (mMode === 'ONLINE' && !c.isBot && o.itemId) {
-                  o.mesh.visible = false;
                   onlineNet.notifyItemTaken(o.itemId, o.kind);
                 }
-                if (mMode === 'SOLO' && app.currentSoloMode === 'RING_RUSH') { this.modeTimer = Math.min(60, this.modeTimer + 1.5); this.showPopup(`+1.5s! (+${pts})`); }
-                else this.showPopup(`RING +${pts}`);
-                if ((mMode === 'HOST' && hostNet.ruleMode === 'BATTLE') || mMode === 'ONLINE' || (mMode === 'SOLO' && app.currentSoloMode === 'VS_BOT')) c.jammerCharge = Math.min(100, c.jammerCharge + 35);
-                audio.playRingCollect();
+                const pts = Math.round((150 + this.comboCount * 35) * this.getComboMultiplier() * this.getZonePointMultiplier(c.distance));
+                c.score += pts;
+                if (this.isRaceMode()) {
+                  c.distance += 12;
+                  if (!c.isBot) this.teamDistance = Math.max(this.teamDistance, c.distance);
+                }
+                if (!c.isBot || mMode === 'HOST') {
+                  this.teamScore += pts;
+                  this.ringsCollected++;
+                  if (mMode === 'SOLO' && app.currentSoloMode === 'RING_RUSH') { this.modeTimer = Math.min(60, this.modeTimer + 1.5); this.showPopup(`+1.5s! (+${pts})`); }
+                  else this.showPopup(this.isRaceMode() ? `RINGダッシュ！ +12m (+${pts})` : `RING +${pts}`);
+                  audio.playRingCollect();
+                }
+                c.jammerCharge = Math.min(100, c.jammerCharge + 35);
               } else if (o.kind === 'MATH_GATE' && !o.resolvedBy.has(c.slotIndex) && Math.abs(c.x - o.x) <= 1.55 && Math.abs(c.y - o.y) <= 2.3) {
                 // 同じ問題グループ（gateId）の他ゲートも含めて解決済みにする
                 this.obstacles.forEach(other => { if (other.kind === 'MATH_GATE' && other.gateId === o.gateId) other.resolvedBy.add(c.slotIndex); });
@@ -3476,7 +3585,8 @@ const EMBEDDED_VOICES = {
                     this.showPopup(`おしい！次は【${o.choiceLabel || '正解'}】を狙おう`, '#6D4C41');
                   }
                 }
-              } else if (o.kind === 'SABOTAGE_ITEM' && !o.collectedBy.has(c.slotIndex) && Math.hypot(c.x - o.x, c.y - o.y) <= o.radius + magAdd) {
+              } else if (o.kind === 'SABOTAGE_ITEM' && !o.taken && !o.collectedBy.has(c.slotIndex) && Math.hypot(c.x - o.x, c.y - o.y) <= o.radius + magAdd) {
+                o.taken = true;
                 o.collectedBy.add(c.slotIndex);
                 o.mesh.visible = false;
                 if (mMode === 'ONLINE' && !c.isBot && o.itemId) onlineNet.notifyItemTaken(o.itemId, o.kind);
@@ -3486,7 +3596,9 @@ const EMBEDDED_VOICES = {
                 if (!c.isBot) {
                   this.teamScore += 150;
                   audio.playRingCollect();
-                  this.showPopup(`お邪魔GET【${o.sabotageName}】！`, '#F97316');
+                  const meta = getSabotageMeta(o.sabotageId);
+                  const prefix = meta.category === 'SUPPORT' ? 'アイテムGET' : 'お邪魔GET';
+                  this.showPopup(`${prefix}【${o.sabotageName}】！`, meta.colorHex);
                 } else {
                   c.botJamWait = Math.min(c.botJamWait, 0.45);
                 }
@@ -3518,7 +3630,7 @@ const EMBEDDED_VOICES = {
               }
             }
           }
-          if (o.z > 14) { this.scene.remove(o.mesh); this.obstacles.splice(i, 1); }
+          if (o.taken || o.z > 14) { this.scene.remove(o.mesh); this.obstacles.splice(i, 1); }
         }
 
         const s = [...this.crafts].sort((a,b) => (a.alive !== b.alive ? (a.alive ? -1 : 1) : b.score - a.score));
@@ -3527,6 +3639,17 @@ const EMBEDDED_VOICES = {
         if (mMode === 'HOST') { this.snapshotTimer -= dt; if (this.snapshotTimer <= 0) { this.snapshotTimer = 0.1; hostNet.broadcastSnapshots(this.crafts); } }
       },
       handlePlayerHit(c) {
+        if (this.isRaceMode()) {
+          c.invuln = 1.6;
+          c.distance = Math.max(0, c.distance - 10);
+          if (!c.isBot) {
+            this.teamDistance = c.distance;
+            this.shakeTime = 0.25;
+            audio.playHit();
+            this.showPopup('クラッシュ減速！ -10m', '#6D4C41');
+          }
+          return;
+        }
         if (c.shieldCharges > 0) { c.shieldCharges--; c.invuln = 2.4; if (c.shieldMesh) c.shieldMesh.visible = false; audio.playRescue(); this.showPopup('バリア防御！', '#93AB8A'); return; }
         this.shakeTime = 0.35; this.comboCount = 0; this.spawnExplosion(c.x, c.y, this.PLAYER_Z, PLAYER_PALETTE[c.slotIndex].num);
         const mMode = this.runMode;
@@ -3689,7 +3812,27 @@ const EMBEDDED_VOICES = {
             }
           }
         }
-        if ((isVsBot || this.runMode === 'ONLINE') && this.crafts[0]) {
+        if (this.isRaceMode() && this.crafts[0]) {
+          const allRacers = this.runMode === 'ONLINE'
+            ? [...(onlineNet.roster || [])].sort((a, b) => (b.distance || 0) - (a.distance || 0))
+            : [...this.crafts].sort((a, b) => (b.distance || 0) - (a.distance || 0));
+          const myRank = Math.max(1, allRacers.findIndex(r => this.runMode === 'ONLINE' ? r.id === onlineNet.myId : r.slotIndex === 0) + 1);
+          const myDist = this.crafts[0].distance || 0;
+          const pctRace = Math.max(0, Math.min(100, (myDist / Math.max(1, this.raceGoalDist)) * 100));
+          const rkEl = document.getElementById('hudRaceRank'); if (rkEl) rkEl.textContent = String(myRank);
+          const ttEl = document.getElementById('hudRaceTotal'); if (ttEl) ttEl.textContent = String(Math.max(1, allRacers.length));
+          const rmEl = document.getElementById('hudRaceRemain'); if (rmEl) rmEl.textContent = String(Math.max(0, Math.ceil(this.raceGoalDist - myDist)));
+          const flEl = document.getElementById('hudRaceFill'); if (flEl) flEl.style.width = `${pctRace.toFixed(1)}%`;
+          const dotsEl = document.getElementById('hudRaceRivalDots');
+          if (dotsEl) {
+            dotsEl.innerHTML = allRacers.map((r) => {
+              const p = Math.max(0, Math.min(98, ((r.distance || 0) / Math.max(1, this.raceGoalDist)) * 100));
+              const isMe = this.runMode === 'ONLINE' ? r.id === onlineNet.myId : r.slotIndex === 0;
+              return `<span style="left:${p}%" class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full ${isMe ? 'bg-cocoa-800 scale-125' : 'bg-sage-500'}"></span>`;
+            }).join('');
+          }
+        }
+        if (['SOLO', 'ONLINE', 'STORY'].includes(this.runMode) && this.crafts[0]) {
           const mc = this.crafts[0], pct = Math.floor(mc.jammerCharge), jb = document.getElementById('btnDirectJammer');
           if (mc.heldSabotageItem) {
             const meta = getSabotageMeta(mc.heldSabotageItem);
@@ -4238,6 +4381,8 @@ const EMBEDDED_VOICES = {
       btnOpenEncyclopediaQuick: () => app.openEncyclopedia('ALL'),
       btnOpenTasks: () => app.openTasksModal(),
       btnModeOnline: () => app.startOnlineLobby(),
+      btnOnlineRuleScore: () => onlineNet.setRuleMode('SCORE'),
+      btnOnlineRuleRace: () => onlineNet.setRuleMode('RACE'),
       btnModeHost: () => app.startHostSetup(),
       btnModeRemote: () => app.startControllerSetup(),
 
