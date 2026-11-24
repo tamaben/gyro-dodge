@@ -1,4 +1,4 @@
-const CACHE_NAME = "gyro-dodge-v75";
+const CACHE_NAME = "gyro-dodge-v76";
 const CORE_ASSETS = [
   "./",
   "./index.html",
