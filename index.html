@@ -266,10 +266,16 @@
         <!-- メインアクション1：しゅつげき！ -->
         <button id="btnStartFree" type="button" class="btn-orange anim-breathe-soft w-full py-4 px-4 text-center flex flex-col items-center justify-center">
           <span class="text-base sm:text-lg font-black">しゅつげき！</span>
-          <span id="homeSoloBtnDesc" class="text-[11px] font-extrabold opacity-90 truncate max-w-full mt-0.5">空間パズル · サンセット · ふつう</span>
+          <span id="homeSoloBtnDesc" class="text-[11px] font-extrabold opacity-90 truncate max-w-full mt-0.5">サバイバル · サンセット · ふつう</span>
         </button>
 
-        <!-- サブアクション3つ（計4ボタン構成：冒険12章 / イラスト図鑑 / きせかえ・設定） -->
+        <!-- モニター・リモコン・オンライン対戦バー -->
+        <div class="grid grid-cols-3 gap-1.5 text-center">
+          <button id="btnModeOnline" type="button" class="btn-peach py-2 px-2 text-xs font-extrabold truncate">オンライン対戦</button>
+          <button id="btnModeHost" type="button" class="btn-peach py-2 px-2 text-xs font-extrabold truncate">モニター画面</button>
+          <button id="btnModeRemote" type="button" class="btn-peach py-2 px-2 text-xs font-extrabold truncate">スマホリモコン</button>
+        </div>
+                <!-- サブアクション3つ（計4ボタン構成：冒険12章 / イラスト図鑑 / きせかえ・設定） -->
         <div class="grid grid-cols-3 gap-2 text-center">
           <button id="btnStartStory" type="button" class="btn-sage py-3 px-2 flex flex-col items-center justify-center">
             <span class="text-xs font-black">冒険12章</span>
@@ -709,18 +715,6 @@
       <div id="hudModeTimerBar" class="hidden mx-auto bg-cocoa-800 text-cream-50 rounded-full px-4 py-1 text-xs font-extrabold gap-3">
         <span id="hudModeTimerLabel">TIME</span><span id="hudModeTimerValue" class="text-brand-400">60.0s</span>
       </div>
-      <!-- 頭を使う空間・記憶・推理HUD（そろばん計算なし） -->
-      <div id="hudMathPromptBar" class="hidden mx-auto soft-card px-4 py-2.5 flex flex-col items-center gap-1 text-center" style="min-width: 240px;">
-        <div class="flex items-center gap-2 text-[10px] font-black text-sage-600">
-          <span id="hudMathModeTag" class="px-2 py-0.5 rounded-full bg-sage-100">空間パズル</span>
-          <span>クリア数: <strong id="hudMathSolvedCount" class="text-brand-600">0</strong></span>
-        </div>
-        <div id="hudMathQuestionText" class="text-lg sm:text-xl font-black text-cocoa-800 tracking-wide leading-snug">
-          「○」のゲートへ飛ぼう！
-        </div>
-        <div id="hudLogicSubHint" class="text-[10px] font-extrabold text-brand-600">形・色・順番を見極めて傾けて進もう！</div>
-      </div>
-
       <div id="hudStoryQuestBar" class="hidden mx-auto soft-pill px-3.5 py-1 text-[11px] font-black text-cocoa-800 gap-2 items-center">
         <span id="hudStoryKeyItemStatus" class="text-brand-600">光の羽根: 0/1</span>
         <span>·</span>
@@ -895,8 +889,6 @@ const EMBEDDED_VOICES = {
     ];
 
     const SOLO_MODES = [
-      { id: 'SPATIAL_LOGIC', label: '空間パズル' },
-      { id: 'MEMORY_ROUTE',  label: '記憶ルート' },
       { id: 'SURVIVAL',      label: 'サバイバル' },
       { id: 'VS_BOT',        label: 'VS BOT' },
       { id: 'TIME_ATTACK',   label: '60秒' },
@@ -2079,7 +2071,7 @@ const EMBEDDED_VOICES = {
         this.state = 'COUNTDOWN'; this.teamScore = 0; this.teamDistance = 0; this.teamEnergy = 100;
         this.nearMissCount = 0; this.comboCount = 0; this.maxComboMult = 1.0; this.comboDecayTimer = 0;
         this.windForce = 0; this.windTimer = 3.0; this.speedLevel = 1; this.lastRandomWarp = 0;
-        this.directBoost = false; this.autoBoost = !!gyro.defaultAutoBoost; this.shakeTime = 0; this.spawnTimer = 0.25; this.ringsCollected = 0; this.modeTimer = 0; this.storyItemsCollected = 0; this.mathSolvedCount = 0; this.mathStreak = 0; this.activeMathChallenge = null; this.memorySequence = []; this.memoryStepIdx = 0; if (this.flashTimer) clearInterval(this.flashTimer); document.getElementById('hudMathPromptBar')?.classList.add('hidden'); const scEl = document.getElementById('hudMathSolvedCount'); if (scEl) scEl.textContent = '0';
+        this.directBoost = false; this.autoBoost = !!gyro.defaultAutoBoost; this.shakeTime = 0; this.spawnTimer = 0.25; this.ringsCollected = 0; this.modeTimer = 0; this.storyItemsCollected = 0; this.mathSolvedCount = 0; this.mathStreak = 0;  if (this.flashTimer) clearInterval(this.flashTimer); document.getElementById('hudMathPromptBar')?.classList.add('hidden'); const scEl = document.getElementById('hudMathSolvedCount'); if (scEl) scEl.textContent = '0';
 
         if (mMode === 'SOLO') {
           if (soloMode === 'TIME_ATTACK') this.modeTimer = 60.0;
@@ -2240,181 +2232,9 @@ const EMBEDDED_VOICES = {
         targets.forEach(t => { t.debuffType = kind; t.debuffTimer = 3.8; });
         audio.playJammerLaunch(); this.showPopup(`${att.name} が【${kind}】発動！`, '#3E2723');
       },
-      mathSolvedCount: 0,
-      mathStreak: 0,
-      activeMathChallenge: null,
-      memorySequence: [],
-      memoryStepIdx: 0,
-      flashTimer: null,
-
-      createLogicGateTexture(option) {
-        const c = document.createElement('canvas');
-        c.width = 256; c.height = 256;
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#FFFDF9';
-        ctx.beginPath();
-        ctx.roundRect(12, 12, 232, 232, 44);
-        ctx.fill();
-        ctx.lineWidth = 10;
-        ctx.strokeStyle = option.borderHex || '#F97316';
-        ctx.stroke();
-
-        const cx = 128, cy = 122;
-        ctx.fillStyle = option.fillHex || '#F97316';
-        ctx.strokeStyle = option.fillHex || '#F97316';
-        ctx.lineWidth = 14;
-
-        if (option.symbol === 'CIRCLE') {
-          ctx.beginPath(); ctx.arc(cx, cy, 52, 0, Math.PI * 2); ctx.fill();
-        } else if (option.symbol === 'TRIANGLE') {
-          ctx.beginPath(); ctx.moveTo(cx, cy - 56); ctx.lineTo(cx + 58, cy + 44); ctx.lineTo(cx - 58, cy + 44); ctx.closePath(); ctx.fill();
-        } else if (option.symbol === 'SQUARE') {
-          ctx.beginPath(); ctx.roundRect(cx - 48, cy - 48, 96, 96, 16); ctx.fill();
-        } else if (option.symbol === 'STAR') {
-          ctx.beginPath();
-          for (let i = 0; i < 10; i++) {
-            const r = i % 2 === 0 ? 58 : 26;
-            const a = -Math.PI / 2 + (i * Math.PI) / 5;
-            const px = cx + Math.cos(a) * r, py = cy + Math.sin(a) * r;
-            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-          }
-          ctx.closePath(); ctx.fill();
-        } else if (option.symbol === 'LEFT_ARROW') {
-          ctx.beginPath();
-          ctx.moveTo(cx + 42, cy - 36); ctx.lineTo(cx - 42, cy); ctx.lineTo(cx + 42, cy + 36);
-          ctx.stroke();
-        } else if (option.symbol === 'RIGHT_ARROW') {
-          ctx.beginPath();
-          ctx.moveTo(cx - 42, cy - 36); ctx.lineTo(cx + 42, cy); ctx.lineTo(cx - 42, cy + 36);
-          ctx.stroke();
-        } else if (option.symbol === 'CENTER_DOT') {
-          ctx.beginPath(); ctx.arc(cx, cy, 42, 0, Math.PI * 2); ctx.fill();
-          ctx.strokeStyle = '#93AB8A'; ctx.lineWidth = 8;
-          ctx.beginPath(); ctx.arc(cx, cy, 62, 0, Math.PI * 2); ctx.stroke();
-        }
-
-        ctx.fillStyle = '#3E2723';
-        ctx.font = '900 28px "Zen Maru Gothic", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(option.label || '', cx, 206);
-
-        const tex = new THREE.CanvasTexture(c);
-        tex.needsUpdate = true;
-        return tex;
-      },
-
-      generateMathChallenge() {
-        const diff = DIFFICULTIES[app.currentDiffIndex];
-        const isMemoryMode = (this.runMode === 'SOLO' && app.currentSoloMode === 'MEMORY_ROUTE');
-
-        const shapePool = [
-          { id: 'CIRCLE',   symbol: 'CIRCLE',   label: 'まる',   fillHex: '#F97316', borderHex: '#F97316' },
-          { id: 'TRIANGLE', symbol: 'TRIANGLE', label: 'さんかく', fillHex: '#93AB8A', borderHex: '#93AB8A' },
-          { id: 'SQUARE',   symbol: 'SQUARE',   label: 'しかく', fillHex: '#38BDF8', borderHex: '#38BDF8' },
-          { id: 'STAR',     symbol: 'STAR',     label: 'ほし',   fillHex: '#FBBF24', borderHex: '#FBBF24' }
-        ];
-
-        const dirPool = [
-          { id: 'LEFT',   symbol: 'LEFT_ARROW',  label: 'ひだり', fillHex: '#F97316', borderHex: '#F97316' },
-          { id: 'CENTER', symbol: 'CENTER_DOT',  label: 'まんなか', fillHex: '#93AB8A', borderHex: '#93AB8A' },
-          { id: 'RIGHT',  symbol: 'RIGHT_ARROW', label: 'みぎ',   fillHex: '#38BDF8', borderHex: '#38BDF8' }
-        ];
-
-        const choiceCount = diff.id === 'EASY' ? 2 : 3;
-        let choices = [];
-        let answerId = '';
-        let qText = '';
-        let tagText = '空間パズル';
-        let subHint = 'お題に合ったゲートへ傾けて飛び込もう！';
-
-        if (isMemoryMode) {
-          tagText = '記憶ルート';
-          const seqLen = diff.id === 'EASY' ? 2 : (this.speedLevel >= 4 ? 3 : 2);
-          if (!this.memorySequence || this.memorySequence.length === 0 || this.memoryStepIdx >= this.memorySequence.length) {
-            this.memorySequence = [];
-            for (let i = 0; i < seqLen; i++) {
-              this.memorySequence.push(dirPool[Math.floor(Math.random() * dirPool.length)]);
-            }
-            this.memoryStepIdx = 0;
-          }
-          const targetDir = this.memorySequence[this.memoryStepIdx];
-          answerId = targetDir.id;
-          const seqNames = this.memorySequence.map((s, idx) => idx === this.memoryStepIdx ? `[${s.label}]` : s.label).join(' → ');
-          qText = `順番記憶: ${seqNames}`;
-          subHint = `いまは ${this.memoryStepIdx + 1}/${this.memorySequence.length} 番目「${targetDir.label}」のゲートへ！`;
-
-          const others = dirPool.filter(d => d.id !== targetDir.id).sort(() => Math.random() - 0.5).slice(0, choiceCount - 1);
-          choices = [targetDir, ...others].sort(() => Math.random() - 0.5);
-        } else {
-          const invertRule = (diff.id === 'HARD' || diff.id === 'EXTREME') && Math.random() < 0.35;
-          tagText = invertRule ? '逆転推理パズル' : '空間パズル';
-          const picked = [...shapePool].sort(() => Math.random() - 0.5).slice(0, choiceCount);
-          const target = picked[Math.floor(Math.random() * picked.length)];
-          if (invertRule) {
-            const nonTarget = picked.find(p => p.id !== target.id) || picked[0];
-            answerId = nonTarget.id;
-            qText = `「${target.label}」ではないゲートへ！`;
-            subHint = 'お題の形・色をよく見て、それ以外を選ぼう！';
-          } else {
-            answerId = target.id;
-            qText = `「${target.label}」のゲートへ飛ぼう！`;
-            subHint = '目印の形と色を見極めて、正しいレーンへ！';
-          }
-          choices = picked.sort(() => Math.random() - 0.5);
-        }
-
-        this.activeMathChallenge = { answerId, qText, tagText, choices, resolved: false };
-
-        const bar = document.getElementById('hudMathPromptBar');
-        const tagEl = document.getElementById('hudMathModeTag');
-        const qEl = document.getElementById('hudMathQuestionText');
-        const hEl = document.getElementById('hudLogicSubHint');
-        if (bar) { bar.classList.remove('hidden'); bar.classList.add('flex'); }
-        if (tagEl) tagEl.textContent = tagText;
-        if (qEl) qEl.textContent = qText;
-        if (hEl) hEl.textContent = subHint;
-        return this.activeMathChallenge;
-      },
-
-      spawnMathGateWave() {
-        if (!this.scene) return;
-        const ch = this.generateMathChallenge();
-        const n = ch.choices.length;
-        const laneXs = n === 2 ? [-2.7, 2.7] : [-3.9, 0, 3.9];
-        const gateId = 'LG_' + Date.now() + '_' + Math.random();
-
-        ch.choices.forEach((opt, idx) => {
-          const gx = laneXs[idx];
-          const gy = 0;
-          const g = new THREE.Group();
-          const ringMat = new THREE.MeshLambertMaterial({ color: idx % 2 === 0 ? 0xF97316 : 0x93AB8A, flatShading: true });
-          const frame = new THREE.Mesh(new THREE.TorusGeometry(1.58, 0.16, 8, 20), ringMat);
-          const boardTex = this.createLogicGateTexture(opt);
-          const board = new THREE.Mesh(
-            new THREE.PlaneGeometry(2.15, 2.15),
-            new THREE.MeshBasicMaterial({ map: boardTex, transparent: true, opacity: 0.94, side: THREE.DoubleSide })
-          );
-          g.add(frame, board);
-          g.position.set(gx, gy, this.SPAWN_Z);
-          this.scene.add(g);
-
-          this.obstacles.push({
-            kind: 'MATH_GATE',
-            gateId,
-            choiceId: opt.id,
-            choiceLabel: opt.label,
-            isCorrect: opt.id === ch.answerId,
-            mesh: g,
-            x: gx, y: gy, z: this.SPAWN_Z,
-            radius: 1.85,
-            resolvedBy: new Set()
-          });
-        });
-      },
       getStoryQuestProgress(chapterIdx) {
         const sq = STORY_QUESTS[chapterIdx] || STORY_QUESTS[0];
-        const taskCur = sq.taskType === 'MATH' ? this.mathSolvedCount : (sq.taskType === 'RING' ? this.ringsCollected : this.nearMissCount);
+        const taskCur = sq.taskType === 'RING' ? this.ringsCollected : this.nearMissCount;
         const itemDone = this.storyItemsCollected >= sq.reqItemCount;
         const taskDone = taskCur >= sq.reqTaskVal;
         return { sq, taskCur, itemDone, taskDone, allDone: itemDone && taskDone };
@@ -2451,14 +2271,7 @@ const EMBEDDED_VOICES = {
           return;
         }
 
-        const isBrainPrimary = (mMode === 'SOLO' && (app.currentSoloMode === 'BRAIN_RUN' || app.currentSoloMode === 'SOROBAN_BEADS'));
-        const hasActiveGate = this.obstacles.some(o => o.kind === 'MATH_GATE' && o.z < 2);
-        if (!hasActiveGate && (isBrainPrimary || (mMode === 'STORY' && roll < 0.55) || (mMode === 'SOLO' && roll < 0.28))) {
-          this.spawnMathGateWave();
-          this.spawnTimer = Math.max(this.spawnTimer, 1.45);
-          return;
-        }
-        if (mMode === 'STORY') {
+                if (mMode === 'STORY') {
           const sq = STORY_QUESTS[app.currentMapIndex] || STORY_QUESTS[0];
           if (this.storyItemsCollected < sq.reqItemCount && roll < 0.34) {
             const gx = (Math.random() - 0.5) * 7.2;
@@ -2728,7 +2541,7 @@ const EMBEDDED_VOICES = {
                 o.mesh.visible = false;
                 if (!c.isBot) {
                   if (o.isCorrect) {
-                    this.mathSolvedCount++; if (this.memorySequence && this.memorySequence.length > 0) this.memoryStepIdx++;
+                    
                     this.mathStreak++;
                     this.comboCount++;
                     this.comboDecayTimer = 5.0;
@@ -2928,7 +2741,7 @@ const EMBEDDED_VOICES = {
 
     const app = {
       currentScreen: 'screenHome', mode: 'NONE', currentMapIndex: 0, currentDiffIndex: 1,
-      currentSoloMode: 'SPATIAL_LOGIC', botLevelSetting: 'RANDOM',
+      currentSoloMode: 'SURVIVAL', botLevelSetting: 'RANDOM',
       custom: { colorIndex: 0, shapeId: 'EGGPOD', partId: 'NONE' },
       clearedStages: {}, storyClearedMax: 0, pendingStoryChapterIndex: 0,
       coins: 500, ownedIds: ['OUTFIT_001', 'ITEM_001', 'COLL_001'],
@@ -3124,6 +2937,8 @@ const EMBEDDED_VOICES = {
         const sh = CRAFT_SHAPES.find(s => s.id === this.custom.shapeId) || CRAFT_SHAPES[0];
         const stLbl = document.getElementById('homeStageLabel');
         if (stLbl) stLbl.textContent = `${m.chapter}. ${m.name}`;
+        const trBadge = document.getElementById('homeStageTraitBadge');
+        if (trBadge) trBadge.textContent = `${'★'.repeat(m.difficultyStars || 1)} · ${m.gimmick}`;
         const shLbl = document.getElementById('homeSlotShape');
         if (shLbl) shLbl.textContent = sh.name.split('・')[0];
         const eqLbl = document.getElementById('homeEquipBonusLabel');
@@ -3282,11 +3097,11 @@ const EMBEDDED_VOICES = {
       startSoloSetup() { audio.init(); audio.playHello(); this.mode = 'SOLO'; gyro.calibrate(); this.renderQuickSelectors(); this.showScreen('screenSoloSetup'); },
       launchSoloGame() { this.mode = 'SOLO'; gyro.calibrate(); this.showScreen('screenGame'); game3d.onResize(); game3d.start('SOLO'); },
       launchQuickRandom() { audio.init(); audio.playHello(); this.currentSoloMode = 'RANDOM'; this.setMapIndex(Math.floor(Math.random()*MAPS.length)); this.mode = 'SOLO'; gyro.calibrate(); this.showScreen('screenGame'); game3d.onResize(); game3d.start('SOLO'); },
-      startOnlineLobby(prefill = '') { if (!netStatus.isOnline) return; audio.init(); audio.playHello(); this.mode = 'ONLINE'; this.showScreen('screenOnlineLobby'); if (prefill) { document.getElementById('onlineJoinCodeInput').value = prefill; onlineNet.joinRoom(prefill); } },
+      startOnlineLobby(prefill = '') { audio.init(); audio.playHello(); this.mode = 'ONLINE'; this.showScreen('screenOnlineLobby'); if (prefill) { document.getElementById('onlineJoinCodeInput').value = prefill; onlineNet.joinRoom(prefill); } },
       launchOnlineGame() { this.mode = 'ONLINE'; gyro.calibrate(); this.showScreen('screenGame'); game3d.onResize(); game3d.start('ONLINE'); },
-      startHostSetup() { if (!netStatus.isOnline) return; audio.init(); audio.playHello(); this.mode = 'HOST'; this.showScreen('screenHostLobby'); hostNet.initHost(); },
+      startHostSetup() { audio.init(); audio.playHello(); this.mode = 'HOST'; this.showScreen('screenHostLobby'); hostNet.initHost(); },
       launchHostGame() { if (hostNet.slots.filter(s => s !== null).length < 1) return; this.mode = 'HOST'; this.showScreen('screenGame'); game3d.onResize(); game3d.start('HOST'); },
-      startControllerSetup(prefill = '') { if (!netStatus.isOnline) return; audio.init(); this.mode = 'CONTROLLER'; this.showScreen('screenController'); if (prefill) document.getElementById('inputRoomCode').value = prefill; }
+      startControllerSetup(prefill = '') { audio.init(); this.mode = 'CONTROLLER'; this.showScreen('screenController'); if (prefill) document.getElementById('inputRoomCode').value = prefill; }
     };
 
     const accountMgr = {
