@@ -1238,7 +1238,7 @@ const EMBEDDED_VOICES = {
     };
 
     function createBotProfile(forcedLevel = null) {
-      const level = forcedLevel !== null ? forcedLevel : (1 + Math.floor(this.nextMatchRand() * 10));
+      const level = forcedLevel !== null ? forcedLevel : (1 + Math.floor(Math.random() * 10));
       const t = (level - 1) / 9;
       return {
         level,
@@ -1706,7 +1706,7 @@ const EMBEDDED_VOICES = {
       peer: null, roomCode: '', ruleMode: 'COOP', slots: new Array(10).fill(null),
       initHost() {
         this.destroy(); this.slots = new Array(10).fill(null);
-        this.roomCode = String(Math.floor(1000 + this.nextMatchRand() * 9000));
+        this.roomCode = String(Math.floor(1000 + Math.random() * 9000));
         document.getElementById('hostRoomCode').textContent = this.roomCode;
         this.renderLobbySlots();
         const qr = document.getElementById('qrcode'); qr.innerHTML = '';
@@ -2118,6 +2118,20 @@ const EMBEDDED_VOICES = {
           }
         }, 50);
       },
+      pushImmediateState() {
+        if (app.mode !== 'ONLINE' || !game3d.crafts[0]) return;
+        const mc = game3d.crafts[0];
+        const rollVal = mc.mesh ? mc.mesh.rotation.z : 0;
+        if (this.isHost) {
+          const me = this.roster.find(r => r.id === this.myId);
+          if (me) { me.score = game3d.teamScore; me.distance = Math.floor(game3d.teamDistance); me.alive = mc.alive; me.x = mc.x; me.y = mc.y; me.roll = rollVal; }
+          this.recalcRanks();
+          const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, ruleMode: this.ruleMode, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length };
+          Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); });
+        } else if (this.hostConn?.open) {
+          this.hostConn.send({ type: 'STATE', score: game3d.teamScore, distance: Math.floor(game3d.teamDistance), alive: mc.alive, x: mc.x, y: mc.y, roll: rollVal });
+        }
+      },
       sendJammer() {
         const mc = game3d.crafts[0];
         if (!mc?.alive || !mc.heldSabotageItem) return;
@@ -2501,28 +2515,37 @@ const EMBEDDED_VOICES = {
         this.hideReviveModal();
         const c = this.crafts[0];
         if (c) {
+          // 終わった現在地（x, y, distance, teamDistance）をそのまま維持して復活
           c.alive = true;
           c.invuln = 3.5;
           c.shieldCharges = Math.max(1, c.shieldCharges || 0);
           if (c.shieldMesh) c.shieldMesh.visible = true;
           c.debuffType = null;
           c.debuffTimer = 0;
-          c.y = Math.max(-2.2, Math.min(2.2, c.y));
+          c.vx = 0;
           c.vy = 0;
           c.mesh.visible = true;
+          if (typeof c.distance === 'number') {
+            this.teamDistance = Math.max(this.teamDistance, c.distance);
+          }
         }
+        // 現在位置と重なっている直近の障害物だけを前方に逃がし、現在地そのものは変えない
         this.obstacles.forEach(o => {
           if (o.kind === 'BLOCK' || o.kind === 'SPINNER') {
-            if (o.z > -32 && o.z < 12) {
-              o.z -= 42;
-              if (typeof o.worldZ === 'number') o.worldZ -= 42;
+            if (o.hitBy) o.hitBy.delete(0);
+            if (o.z > -8 && o.z < 8) {
+              o.z -= 36;
+              if (typeof o.worldZ === 'number') o.worldZ -= 36;
               o.mesh.position.z = o.z;
             }
           }
         });
         this.state = 'PLAYING';
+        if (this.runMode === 'ONLINE') {
+          onlineNet.pushImmediateState?.();
+        }
         audio.playRingCollect();
-        this.showPopup('復活！3.5秒無敵＆シールド！', '#93AB8A');
+        this.showPopup('現在地から復活！3.5秒無敵＆シールド！', '#93AB8A');
       },
       declineRevive() {
         this.hideReviveModal();
@@ -3132,7 +3155,7 @@ const EMBEDDED_VOICES = {
         this.rngSeed = s;
       },
       nextMatchRand() {
-        if (this.runMode !== 'ONLINE') return this.nextMatchRand();
+        if (this.runMode !== 'ONLINE') return Math.random();
         this.rngSeed = (this.rngSeed * 1664525 + 1013904223) >>> 0;
         return this.rngSeed / 4294967296;
       },
@@ -3341,7 +3364,7 @@ const EMBEDDED_VOICES = {
         if (this.idleRing1) this.idleRing1.visible = false;
         if (this.idleRing2) this.idleRing2.visible = false;
         if (this.showcaseCraft) this.showcaseCraft.visible = false;
-        if (this.state !== 'PLAYING' && this.state !== 'COUNTDOWN' && this.state !== 'SPECTATING') return;
+        if (this.state !== 'PLAYING' && this.state !== 'COUNTDOWN' && this.state !== 'SPECTATING' && this.state !== 'REVIVE_PROMPT') return;
 
         const mMode = this.runMode, curMap = MAPS[app.currentMapIndex], curDiff = DIFFICULTIES[app.currentDiffIndex], isStory = (mMode === 'STORY');
         const anyBoost = (mMode === 'SOLO' || mMode === 'ONLINE' || isStory) ? (this.directBoost || this.autoBoost) : this.crafts.some(c => c.alive && hostNet.slots[c.slotIndex]?.boost);
@@ -3392,6 +3415,7 @@ const EMBEDDED_VOICES = {
           if (c.debuffTimer > 0) { c.debuffTimer -= dt; c.debuffRing.visible = true; c.debuffRing.rotation.y += dt * 5; if (c.debuffTimer <= 0) { c.debuffType = null; c.debuffRing.visible = false; } } else c.debuffRing.visible = false;
           c.mesh.visible = c.alive && (c.invuln <= 0 || Math.floor(c.invuln * 16) % 2 === 0);
           if (!c.alive) continue;
+          if (this.state === 'REVIVE_PROMPT' && !c.isBot) continue;
 
           let inX = 0, inY = 0, ag = 12;
           if (c.isBot) { const cmd = this.computeHumanBotSteering(c, dt, this.lastTime/1000); inX = cmd.inX; inY = cmd.inY; ag = cmd.steerAgility; }
@@ -4280,7 +4304,7 @@ const EMBEDDED_VOICES = {
       },
       startSoloSetup() { audio.init(); audio.playHello(); this.mode = 'SOLO'; gyro.calibrate(); this.renderQuickSelectors(); this.showScreen('screenSoloSetup'); },
       launchSoloGame() { this.mode = 'SOLO'; gyro.calibrate(); this.showScreen('screenGame'); game3d.onResize(); game3d.start('SOLO'); },
-      launchQuickRandom() { audio.init(); audio.playHello(); this.currentSoloMode = 'RANDOM'; this.setMapIndex(Math.floor(this.nextMatchRand()*MAPS.length)); this.mode = 'SOLO'; gyro.calibrate(); this.showScreen('screenGame'); game3d.onResize(); game3d.start('SOLO'); },
+      launchQuickRandom() { audio.init(); audio.playHello(); this.currentSoloMode = 'RANDOM'; this.setMapIndex(Math.floor(Math.random()*MAPS.length)); this.mode = 'SOLO'; gyro.calibrate(); this.showScreen('screenGame'); game3d.onResize(); game3d.start('SOLO'); },
       startOnlineLobby(prefill = '') { audio.init(); audio.playHello(); this.mode = 'ONLINE'; this.showScreen('screenOnlineLobby'); if (prefill) { document.getElementById('onlineJoinCodeInput').value = prefill; onlineNet.joinRoom(prefill); } },
       launchOnlineGame() { this.mode = 'ONLINE'; gyro.calibrate(); this.showScreen('screenGame'); game3d.onResize(); game3d.start('ONLINE'); },
       startHostSetup() { audio.init(); audio.playHello(); this.mode = 'HOST'; this.showScreen('screenHostLobby'); hostNet.initHost(); },
@@ -4329,7 +4353,7 @@ const EMBEDDED_VOICES = {
         const carry = document.getElementById('acctCarryGuestData')?.checked ?? true;
         const fb = document.getElementById('acctFeedbackMsg');
         if (name.length < 2) { fb.textContent = '2文字以上で入力してください'; return; }
-        const tag = 'GR-' + String(Math.floor(1000 + this.nextMatchRand()*9000));
+        const tag = 'GR-' + String(Math.floor(1000 + Math.random()*9000));
         const id = 'acct_' + Date.now();
         this.accounts.unshift({ id, name, tag, pin, data: carry ? this.snapshot() : { coins: 500, ownedIds: ['OUTFIT_001','ITEM_001','COLL_001'], custom: { colorIndex: 0, shapeId: 'EGGPOD', partId: 'NONE' }, storyClearedMax: 0 } });
         this.activeId = id; localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.accounts)); localStorage.setItem(this.ACTIVE_KEY, id);
