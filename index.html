@@ -424,8 +424,7 @@
             <option value="3">げきむず</option>
           </select>
           <select id="selectBotLevelHome" class="clean-select min-w-0 w-full bg-[#FBF7F2] rounded-2xl px-2.5 py-2.5 text-[11px] font-extrabold text-cocoa-800">
-            <option value="RANDOM" selected>BOT: ランダム (5体)</option>
-            <option value="NONE">BOT: なし (1人)</option>
+            <option value="RANDOM" selected>BOT強さ: ランダム</option>
             <option value="1">BOT: Lv.1</option><option value="2">BOT: Lv.2</option><option value="3">BOT: Lv.3</option>
             <option value="4">BOT: Lv.4</option><option value="5">BOT: Lv.5</option><option value="6">BOT: Lv.6</option>
             <option value="7">BOT: Lv.7</option><option value="8">BOT: Lv.8</option><option value="9">BOT: Lv.9</option><option value="10">BOT: Lv.10</option>
@@ -462,7 +461,7 @@
           </button>
           <button id="btnOpenCustom" type="button" class="btn-peach py-3 px-2 flex flex-col items-center justify-center">
             <span class="text-xs font-black">きせかえ改造</span>
-            <span id="homeSlotShape" class="text-[10px] font-extrabold text-brand-600 truncate max-w-full mt-0.5">飛行機</span>
+            <span id="homeSlotShape" class="text-[10px] font-extrabold text-brand-600 truncate max-w-full mt-0.5">タマゴポッド</span>
           </button>
         </div>
       </div>
@@ -650,7 +649,7 @@
         <div id="customColorGrid" class="grid grid-cols-10 gap-1.5"></div>
       </div>
       <div class="bg-[#FBF7F2] rounded-2xl p-3 text-left">
-        <div class="text-xs font-extrabold mb-1.5">飛ぶ機体・生き物（全12種類）</div>
+        <div class="text-xs font-extrabold mb-1.5">機体の形（6種類）</div>
         <div id="customShapeGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5"></div>
       </div>
       <div class="bg-[#FBF7F2] rounded-2xl p-3 text-left">
@@ -807,6 +806,20 @@
             <span id="onlineMapTraits" class="px-2 py-0.5 rounded-full bg-[#FFFDF9] text-cocoa-600">標準コース</span>
           </div>
         </div>
+                <div class="bg-[#FBF7F2] rounded-2xl p-2.5 flex items-center justify-between gap-2 text-left">
+          <div>
+            <div class="text-[10px] font-black text-sage-600">オンライン複数人バトル＆BOT参加</div>
+            <div class="text-[10px] font-bold text-cocoa-600">仲間と対戦しつつBOT人数も自由に設定可能</div>
+          </div>
+          <select id="selectBotCountOnline" class="clean-select bg-white rounded-xl px-2.5 py-1.5 text-xs font-black text-brand-600 shrink-0">
+            <option value="0">BOT 0体</option>
+            <option value="2">BOT 2体</option>
+            <option value="4" selected>BOT 4体</option>
+            <option value="6">BOT 6体</option>
+            <option value="8">BOT 8体</option>
+            <option value="10">BOT 10体</option>
+          </select>
+        </div>
         <div id="onlineRosterList" class="grid grid-cols-2 gap-1.5"></div>
         <button id="btnOnlineStart" type="button" class="btn-sage w-full py-3 text-sm font-black">対戦スタート！</button>
       </div>
@@ -905,7 +918,7 @@
           </div>
         </div>
         <div class="soft-card px-3.5 py-2 text-center">
-          <div class="text-[9px] font-bold text-cocoa-600"><span id="hudDiffTag" class="text-brand-600">ふつう</span> / 目標 <span id="hudGoalDist">500</span>m</div>
+          <div class="text-[9px] font-bold text-cocoa-600"><span id="hudDiffTag" class="text-brand-600">ふつう</span> · <span id="hudLapBadge" class="text-sage-600 font-black">1周目</span> / <span id="hudGoalDist">500</span>m</div>
           <div class="text-xl font-black text-brand-600"><span id="hudDistance">0</span>m</div>
         </div>
         <div class="soft-card px-3.5 py-2 text-right">
@@ -2348,7 +2361,7 @@ const EMBEDDED_VOICES = {
 
     const game3d = {
       scene: null, camera: null, renderer: null, state: 'IDLE', runMode: 'SOLO', lastTime: 0,
-      tunnelGroup: null, outdoorGroup: null, outdoorClouds: [], stageEnv: 'INDOOR', floorMat: null, ringMat: null, railMat: null, tunnelRings: [], currentTunnelShape: '',
+      tunnelGroup: null, outdoorGroup: null, outdoorClouds: [], stageEnv: 'OUTDOOR', floorMat: null, ringMat: null, railMat: null, tunnelRings: [], currentTunnelShape: '',
       crafts: [], companionMeshes: [], rivalMeshes: {}, spectateTargetId: null, directBoost: false, autoBoost: false, obstacles: [], particles: [], spawnTimer: 0,
       storyItemsCollected: 0,
       teamScore: 0, teamDistance: 0, highScore: 0, bestDistance: 0, bestCombo: 1.0, bestNearMiss: 0,
@@ -2367,18 +2380,39 @@ const EMBEDDED_VOICES = {
         const container = document.getElementById('threeContainer');
         if (!container || typeof THREE === 'undefined') return;
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0xFFF7ED);
-        this.scene.fog = new THREE.Fog(0xFFF7ED, 45, 118);
-        this.camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.1, 150);
-        this.camera.position.set(0, 1.4, 11.5);
-        this.camera.lookAt(0, 0, -25);
+        this.scene.background = new THREE.Color(0x4A89C8);
+        this.scene.fog = new THREE.FogExp2(0x7FB5E0, 0.0042);
+        this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 650);
+        this.camera.position.set(0, 2.2, 11.5);
+        this.camera.lookAt(0, 0.5, -45);
         this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1.06;
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(this.renderer.domElement);
 
-        this.scene.add(new THREE.HemisphereLight(0xFFFDF9, 0xFED7AA, 0.98));
-        const dl = new THREE.DirectionalLight(0xFFFFFF, 0.65); dl.position.set(12, 22, 18); this.scene.add(dl);
+        const hemiLight = new THREE.HemisphereLight(0xBFE3FF, 0x5C4D3C, 0.85);
+        this.scene.add(hemiLight);
+        const sunLight = new THREE.DirectionalLight(0xFFF3D6, 1.65);
+        sunLight.position.set(55, 85, 45);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 1024;
+        sunLight.shadow.mapSize.height = 1024;
+        sunLight.shadow.camera.near = 10;
+        sunLight.shadow.camera.far = 260;
+        const dCam = 48;
+        sunLight.shadow.camera.left = -dCam;
+        sunLight.shadow.camera.right = dCam;
+        sunLight.shadow.camera.top = dCam;
+        sunLight.shadow.camera.bottom = -dCam;
+        sunLight.shadow.bias = -0.0005;
+        this.scene.add(sunLight);
+        const fillLight = new THREE.DirectionalLight(0x7CC4FA, 0.45);
+        fillLight.position.set(-40, 25, -50);
+        this.scene.add(fillLight);
         this.buildEnvironment();
         this.applyMapTheme(MAPS[app.currentMapIndex]);
 
@@ -2391,49 +2425,247 @@ const EMBEDDED_VOICES = {
         setT('homeBestDist', this.bestDistance.toLocaleString());
         setT('hudBestScore', Math.max(this.highScore, this.teamScore).toLocaleString());
       },
+      createRealisticTextures() {
+        if (this._realTex) return this._realTex;
+        // 地形・草地テクスチャ（細かな草目・土壌のノイズ＆ハイトマップ）
+        const gCan = document.createElement('canvas');
+        gCan.width = 256; gCan.height = 256;
+        const gCtx = gCan.getContext('2d');
+        gCtx.fillStyle = '#4E7A3A';
+        gCtx.fillRect(0, 0, 256, 256);
+        for (let i = 0; i < 4200; i++) {
+          const x = (i * 73) % 256;
+          const y = (i * 137) % 256;
+          const tone = i % 5;
+          gCtx.fillStyle = tone === 0 ? '#659648' : tone === 1 ? '#3B612B' : tone === 2 ? '#788848' : tone === 3 ? '#587E3F' : '#466A34';
+          gCtx.fillRect(x, y, 2, 3);
+        }
+        const terrainTex = new THREE.CanvasTexture(gCan);
+        terrainTex.wrapS = THREE.RepeatWrapping;
+        terrainTex.wrapT = THREE.RepeatWrapping;
+        terrainTex.repeat.set(36, 36);
+
+        // 岩肌・山岳テクスチャ（地層・クラック・陰影）
+        const rCan = document.createElement('canvas');
+        rCan.width = 256; rCan.height = 256;
+        const rCtx = rCan.getContext('2d');
+        rCtx.fillStyle = '#5E5852';
+        rCtx.fillRect(0, 0, 256, 256);
+        for (let y = 0; y < 256; y += 8) {
+          rCtx.fillStyle = (y % 16 === 0) ? 'rgba(42,38,34,0.25)' : 'rgba(138,130,120,0.16)';
+          rCtx.fillRect(0, y, 256, 4);
+        }
+        for (let i = 0; i < 2400; i++) {
+          const x = (i * 97) % 256;
+          const y = (i * 53) % 256;
+          rCtx.fillStyle = i % 2 === 0 ? 'rgba(30,27,24,0.28)' : 'rgba(165,158,148,0.22)';
+          rCtx.fillRect(x, y, 3, 2);
+        }
+        const rockTex = new THREE.CanvasTexture(rCan);
+        rockTex.wrapS = THREE.RepeatWrapping;
+        rockTex.wrapT = THREE.RepeatWrapping;
+        rockTex.repeat.set(6, 4);
+
+        // 水面・川テクスチャ（さざ波・反射ハイライト）
+        const wCan = document.createElement('canvas');
+        wCan.width = 256; wCan.height = 256;
+        const wCtx = wCan.getContext('2d');
+        const grad = wCtx.createLinearGradient(0, 0, 0, 256);
+        grad.addColorStop(0, '#1D6FA5');
+        grad.addColorStop(0.5, '#2989C4');
+        grad.addColorStop(1, '#165886');
+        wCtx.fillStyle = grad;
+        wCtx.fillRect(0, 0, 256, 256);
+        wCtx.strokeStyle = 'rgba(220, 244, 255, 0.28)';
+        wCtx.lineWidth = 1.5;
+        for (let i = 0; i < 90; i++) {
+          const rx = (i * 31) % 256;
+          const ry = (i * 47) % 256;
+          wCtx.beginPath();
+          wCtx.moveTo(rx, ry);
+          wCtx.lineTo(rx + 18, ry + 1.5);
+          wCtx.stroke();
+        }
+        const waterTex = new THREE.CanvasTexture(wCan);
+        waterTex.wrapS = THREE.RepeatWrapping;
+        waterTex.wrapT = THREE.RepeatWrapping;
+        waterTex.repeat.set(12, 32);
+
+        this._realTex = { terrainTex, rockTex, waterTex };
+        return this._realTex;
+      },
       buildEnvironment() {
         this.tunnelGroup = new THREE.Group(); this.scene.add(this.tunnelGroup);
-        this.floorMat = new THREE.MeshLambertMaterial({ color: 0xFFEDD5, flatShading: true });
-        const floor = new THREE.Mesh(new THREE.PlaneGeometry(16, 140), this.floorMat);
-        floor.rotation.x = -Math.PI / 2; floor.position.set(0, -4.6, -55); this.tunnelGroup.add(floor);
-        this.ringMat = new THREE.MeshLambertMaterial({ color: 0xFDBA74, flatShading: true });
-        this.railMat = new THREE.MeshLambertMaterial({ color: 0xF97316, flatShading: true });
-        const railGeo = new THREE.BoxGeometry(0.22, 0.22, 140);
-        const lR = new THREE.Mesh(railGeo, this.railMat); lR.position.set(-7.4, -4.4, -55);
-        const rR = new THREE.Mesh(railGeo, this.railMat); rR.position.set(7.4, -4.4, -55);
+        this.floorMat = new THREE.MeshStandardMaterial({ color: 0xE6CCB2, roughness: 0.75, metalness: 0.05 });
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(18, 180), this.floorMat);
+        floor.rotation.x = -Math.PI / 2; floor.position.set(0, -4.6, -75); this.tunnelGroup.add(floor);
+        this.ringMat = new THREE.MeshStandardMaterial({ color: 0xF97316, roughness: 0.4, metalness: 0.25 });
+        this.railMat = new THREE.MeshStandardMaterial({ color: 0x93AB8A, roughness: 0.5, metalness: 0.2 });
+        const railGeo = new THREE.BoxGeometry(0.24, 0.24, 180);
+        const lR = new THREE.Mesh(railGeo, this.railMat); lR.position.set(-7.4, -4.4, -75);
+        const rR = new THREE.Mesh(railGeo, this.railMat); rR.position.set(7.4, -4.4, -75);
         this.tunnelGroup.add(lR, rR);
         this.rebuildTunnelRings('OCTAGON');
 
+        // 広範囲でリアルな3Dワールド（外ステージ：大空・山脈・渓谷・川・森林・雲海）
         this.outdoorGroup = new THREE.Group();
-        this.outdoorGroup.visible = false;
+        this.outdoorGroup.visible = true;
+        if (this.tunnelGroup) this.tunnelGroup.visible = false;
         this.scene.add(this.outdoorGroup);
-        const islandSpecs = [
-          [-11.5, 1.8, -24, 3.2],
-          [12.0, 2.6, -32, 3.8],
-          [-13.5, -1.2, -54, 4.5],
-          [14.0, 3.2, -68, 5.0],
-          [0, 6.2, -88, 5.8]
-        ];
-        islandSpecs.forEach(([ix, iy, iz, sc]) => {
-          const ig = new THREE.Group();
-          const rock = new THREE.Mesh(new THREE.ConeGeometry(sc, sc * 1.65, 7), new THREE.MeshLambertMaterial({ color: 0x7C583C, flatShading: true }));
-          rock.rotation.x = Math.PI;
-          rock.position.y = -sc * 0.82;
-          const grass = new THREE.Mesh(new THREE.CylinderGeometry(sc * 1.03, sc * 0.98, 0.5, 9), new THREE.MeshLambertMaterial({ color: 0x4ADE80, flatShading: true }));
-          const fall = new THREE.Mesh(new THREE.BoxGeometry(sc * 0.28, sc * 2.4, 0.14), new THREE.MeshBasicMaterial({ color: 0xBAE6FD, transparent: true, opacity: 0.78 }));
-          fall.position.set(0, -sc * 1.15, sc * 0.88);
-          ig.add(rock, grass, fall);
-          ig.position.set(ix, iy, iz);
-          this.outdoorGroup.add(ig);
+        const { terrainTex, rockTex, waterTex } = this.createRealisticTextures();
+
+        // 空ドーム＆太陽ディスク（大気グラデーション）
+        const skyCanvas = document.createElement('canvas');
+        skyCanvas.width = 64; skyCanvas.height = 256;
+        const sCtx = skyCanvas.getContext('2d');
+        const skyGrad = sCtx.createLinearGradient(0, 0, 0, 256);
+        skyGrad.addColorStop(0.0, '#1E5FA8');
+        skyGrad.addColorStop(0.45, '#4A96D8');
+        skyGrad.addColorStop(0.82, '#A8D5F2');
+        skyGrad.addColorStop(1.0, '#E6F2FA');
+        sCtx.fillStyle = skyGrad;
+        sCtx.fillRect(0, 0, 64, 256);
+        const skyTex = new THREE.CanvasTexture(skyCanvas);
+        const skyDome = new THREE.Mesh(
+          new THREE.SphereGeometry(520, 32, 24),
+          new THREE.MeshBasicMaterial({ map: skyTex, side: THREE.BackSide, fog: false })
+        );
+        this.outdoorGroup.add(skyDome);
+
+        const sunDisc = new THREE.Mesh(
+          new THREE.SphereGeometry(14, 20, 16),
+          new THREE.MeshBasicMaterial({ color: 0xFFF7DC, fog: false })
+        );
+        sunDisc.position.set(165, 190, -340);
+        this.outdoorGroup.add(sunDisc);
+
+        // 広大な地形メッシュ（起伏のある大地・渓谷・遠景山岳）
+        const terrGeo = new THREE.PlaneGeometry(540, 540, 96, 96);
+        terrGeo.rotateX(-Math.PI / 2);
+        const posAttr = terrGeo.attributes.position;
+        for (let i = 0; i < posAttr.count; i++) {
+          const vx = posAttr.getX(i);
+          const vz = posAttr.getZ(i);
+          const distFromCenter = Math.hypot(vx, vz + 80);
+          // 中央は飛行・渓谷ルート、外周へ行くほど高いリアルな山脈へ隆起
+          const ridgeFactor = Math.max(0, (Math.abs(vx) - 22) / 190);
+          const farMtFactor = Math.max(0, (-vz - 120) / 140);
+          const hNoise =
+            Math.sin(vx * 0.035) * Math.cos(vz * 0.028) * 6.5 +
+            Math.sin(vx * 0.09 + vz * 0.07) * 2.4 +
+            Math.cos(vx * 0.19 - vz * 0.16) * 0.85;
+          const elevation = -16.5 + hNoise + Math.pow(ridgeFactor, 1.45) * 68 + Math.pow(farMtFactor, 1.35) * 52 + (distFromCenter > 220 ? 18 : 0);
+          posAttr.setY(i, elevation);
+        }
+        terrGeo.computeVertexNormals();
+        const terrMat = new THREE.MeshStandardMaterial({
+          map: terrainTex,
+          bumpMap: rockTex,
+          bumpScale: 0.45,
+          roughness: 0.88,
+          metalness: 0.02
         });
+        this.outdoorTerrain = new THREE.Mesh(terrGeo, terrMat);
+        this.outdoorTerrain.position.set(0, 0, -110);
+        this.outdoorTerrain.receiveShadow = true;
+        this.outdoorGroup.add(this.outdoorTerrain);
+
+        // 渓谷を流れるリアルな川・湖面
+        const waterGeo = new THREE.PlaneGeometry(220, 520, 24, 48);
+        waterGeo.rotateX(-Math.PI / 2);
+        this.outdoorWaterMat = new THREE.MeshStandardMaterial({
+          map: waterTex,
+          bumpMap: waterTex,
+          bumpScale: 0.16,
+          color: 0x3A9AD9,
+          roughness: 0.18,
+          metalness: 0.55,
+          transparent: true,
+          opacity: 0.86
+        });
+        this.outdoorWater = new THREE.Mesh(waterGeo, this.outdoorWaterMat);
+        this.outdoorWater.position.set(0, -14.2, -120);
+        this.outdoorGroup.add(this.outdoorWater);
+
+        // 遠景〜中景の重層山岳群（リアルな岩肌＆冠雪・森林グラデーション）
+        this.outdoorMountains = [];
+        const mtMatFar = new THREE.MeshStandardMaterial({ map: rockTex, color: 0x7A8FA6, roughness: 0.92, metalness: 0.04 });
+        const mtMatMid = new THREE.MeshStandardMaterial({ map: rockTex, color: 0x5C6B5B, roughness: 0.86, metalness: 0.06 });
+        const snowMat = new THREE.MeshStandardMaterial({ color: 0xF4F8FB, roughness: 0.7, metalness: 0.05 });
+
+        const peakSpecs = [
+          [-145, -18, -230, 54, 78, true],
+          [-68,  -18, -255, 62, 92, true],
+          [12,   -18, -270, 74, 106, true],
+          [92,   -18, -245, 66, 86, true],
+          [168,  -18, -215, 58, 74, false],
+          [-185, -18, -130, 48, 64, false],
+          [185,  -18, -120, 52, 68, false],
+          [-95,  -18, -165, 38, 46, false],
+          [102,  -18, -175, 42, 52, false]
+        ];
+        peakSpecs.forEach(([px, py, pz, rad, h, hasSnow], idx) => {
+          const mg = new THREE.Group();
+          const cone = new THREE.Mesh(
+            new THREE.ConeGeometry(rad, h, 14),
+            pz < -210 ? mtMatFar : mtMatMid
+          );
+          cone.position.y = h * 0.5;
+          cone.castShadow = true;
+          cone.receiveShadow = true;
+          mg.add(cone);
+          if (hasSnow && h > 72) {
+            const cap = new THREE.Mesh(new THREE.ConeGeometry(rad * 0.34, h * 0.28, 12), snowMat);
+            cap.position.y = h * 0.86;
+            mg.add(cap);
+          }
+          mg.position.set(px, py, pz);
+          this.outdoorGroup.add(mg);
+          this.outdoorMountains.push({ mesh: mg, baseZ: pz, idx });
+        });
+
+        // 広範囲のリアルな森林（幹＋階層針葉樹/広葉樹クラウン）
+        this.outdoorTrees = [];
+        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5A3E28, roughness: 0.92 });
+        const crownMatA = new THREE.MeshStandardMaterial({ map: terrainTex, color: 0x3B6E34, roughness: 0.84 });
+        const crownMatB = new THREE.MeshStandardMaterial({ map: terrainTex, color: 0x4E8542, roughness: 0.82 });
+        for (let t = 0; t < 72; t++) {
+          const side = (t % 2 === 0) ? -1 : 1;
+          const tx = side * (16 + ((t * 29) % 125));
+          const tz = 15 - ((t * 19) % 230);
+          const sc = 0.85 + (t % 5) * 0.32;
+          const tg = new THREE.Group();
+          const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.22 * sc, 0.34 * sc, 2.2 * sc, 7), trunkMat);
+          trunk.position.y = 1.1 * sc;
+          const c1 = new THREE.Mesh(new THREE.ConeGeometry(1.55 * sc, 3.2 * sc, 9), t % 3 === 0 ? crownMatB : crownMatA);
+          c1.position.y = 3.2 * sc;
+          const c2 = new THREE.Mesh(new THREE.ConeGeometry(1.15 * sc, 2.6 * sc, 9), crownMatA);
+          c2.position.y = 4.6 * sc;
+          tg.add(trunk, c1, c2);
+          tg.position.set(tx, -15.2 + Math.min(18, Math.max(0, (Math.abs(tx) - 22) * 0.14)), tz);
+          this.outdoorGroup.add(tg);
+          this.outdoorTrees.push({ mesh: tg, baseX: tx, baseZ: tz, sc });
+        }
+
+        // 立体感のあるリアルな雲海レイヤー（複数球体を合成した積雲・層積雲）
         this.outdoorClouds = [];
-        const cMat = new THREE.MeshLambertMaterial({ color: 0xFFFFFF, flatShading: true });
-        for (let i = 0; i < 22; i++) {
-          const cm = new THREE.Mesh(new THREE.SphereGeometry(2.8 + (i % 3) * 0.9, 8, 6), cMat);
-          cm.scale.set(1.9, 0.52, 1.2);
-          cm.position.set(((i * 37) % 52) - 26, -5.2 + (i % 3) * 0.6, 8 - i * 6.5);
-          this.outdoorGroup.add(cm);
-          this.outdoorClouds.push(cm);
+        const cMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.95, metalness: 0.0 });
+        for (let i = 0; i < 28; i++) {
+          const cg = new THREE.Group();
+          const puffCount = 4 + (i % 3);
+          for (let p = 0; p < puffCount; p++) {
+            const pr = 2.1 + ((i + p) % 3) * 0.75;
+            const puff = new THREE.Mesh(new THREE.SphereGeometry(pr, 12, 10), cMat);
+            puff.scale.set(1.45, 0.62, 1.15);
+            puff.position.set((p - (puffCount - 1) * 0.5) * 2.2, (p % 2) * 0.35, ((p * 17) % 5 - 2) * 0.55);
+            cg.add(puff);
+          }
+          const cx = ((i * 43) % 130) - 65;
+          const cy = -5.8 + (i % 4) * 1.4;
+          const cz = 18 - i * 8.2;
+          cg.position.set(cx, cy, cz);
+          this.outdoorGroup.add(cg);
+          this.outdoorClouds.push(cg);
         }
       },
       setStageEnv(env) {
@@ -2456,8 +2688,7 @@ const EMBEDDED_VOICES = {
         if (typeof MAPS !== 'undefined' && typeof app !== 'undefined') {
           this.applyMapTheme(MAPS[app.currentMapIndex]);
         }
-      },
-      createTunnelArchMesh(shapeType) {
+      },createTunnelArchMesh(shapeType) {
         if (shapeType === 'TORII') {
           const g = new THREE.Group();
           const p1 = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.32, 10.5, 6), this.railMat); p1.position.set(-7.3, 0.5, 0);
@@ -2518,16 +2749,12 @@ const EMBEDDED_VOICES = {
       applyMapTheme(mapObj) {
         if (!this.scene || !mapObj) return;
         if (this.stageEnv === 'OUTDOOR') {
-          this.scene.background.setHex(0x3BA9F5);
-          if (this.scene.fog) {
-            this.scene.fog.color.setHex(0x8FD3FF);
-            this.scene.fog.near = 35;
-            this.scene.fog.far = 145;
-          }
+          this.scene.background.setHex(0x5CA4DC);
+          this.scene.fog = new THREE.FogExp2(0x8FC5E8, 0.0036);
           return;
         }
         this.scene.background.setHex(mapObj.bgHex);
-        this.scene.fog.color.setHex(mapObj.fogHex);
+        this.scene.fog = new THREE.Fog(mapObj.fogHex, 50, 145);
         if (this.runMode === 'ONLINE' && this.scene.fog) {
           this.scene.fog.near = 28;
           this.scene.fog.far = 135;
@@ -2552,10 +2779,10 @@ const EMBEDDED_VOICES = {
       onResize() { if (!this.renderer || !this.camera) return; this.camera.aspect = window.innerWidth / window.innerHeight; this.camera.updateProjectionMatrix(); this.renderer.setSize(window.innerWidth, window.innerHeight); },
       createCraftMesh(colorNum, isGhost = false, shapeId = 'AIRPLANE', partId = 'NONE') {
         const group = new THREE.Group();
-        const mainMat = new THREE.MeshLambertMaterial({ color: colorNum, flatShading: true, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
-        const creamMat = new THREE.MeshLambertMaterial({ color: 0xFFFDF9, flatShading: true, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
-        const sageMat = new THREE.MeshLambertMaterial({ color: 0x93AB8A, flatShading: true, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
-        const darkMat = new THREE.MeshLambertMaterial({ color: 0x3E2723, flatShading: true, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
+        const mainMat = new THREE.MeshStandardMaterial({ color: colorNum, roughness: 0.34, metalness: 0.38, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
+        const creamMat = new THREE.MeshStandardMaterial({ color: 0xF7F9FC, roughness: 0.25, metalness: 0.22, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
+        const sageMat = new THREE.MeshStandardMaterial({ color: 0x6E8B66, roughness: 0.48, metalness: 0.25, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
+        const darkMat = new THREE.MeshStandardMaterial({ color: 0x2B211E, roughness: 0.42, metalness: 0.45, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
         const wings = {
           frontL: null, frontR: null, rearL: null, rearR: null,
           isFourWing: false, isMechanical: false,
@@ -2731,7 +2958,7 @@ const EMBEDDED_VOICES = {
           wings.frontL = makeWingPivot(-1, 1.25, 0.56, 0.12, 0.12, mainMat, 1);
           wings.frontR = makeWingPivot(1, 1.25, 0.56, 0.12, 0.12, mainMat, 1);
         } else {
-          // AIRPLANE (default first flying craft: fuselage, cockpit, main wings, tailplane, vertical fin & spinning propeller)
+          // AIRPLANE (default first flying craft)
           wings.isMechanical = true;
           const fuselage = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.22, 1.85, 14), mainMat);
           fuselage.rotation.x = Math.PI / 2;
@@ -2768,7 +2995,6 @@ const EMBEDDED_VOICES = {
       },
       animateBioWings(wings, flapPhase, vy, isBoosting, isHovering) {
         if (!wings) return;
-        // 機械機体（飛行機・ヘリ・UFO・ロケット）のローター／プロペラ回転アニメーション
         if (wings.propeller) {
           wings.propeller.rotation.z += isBoosting ? 0.85 : 0.55;
           if (wings.tailRotor) wings.tailRotor.rotation.x += 0.95;
@@ -2780,7 +3006,6 @@ const EMBEDDED_VOICES = {
           const s = (isBoosting ? 1.45 : 0.92) + Math.sin(flapPhase * 1.5) * 0.22;
           wings.flameMesh.scale.set(1, s, 1);
         }
-        // 鳥・トンボ・蝶・コウモリ・ドラゴンの羽ばたき＆滑空制御
         const isGliding = (!isBoosting && vy < -0.35);
         const amp = isGliding ? 0.08 : (isBoosting ? 0.68 : (isHovering ? 0.42 : 0.54));
         const baseDihedral = isGliding ? 0.16 : 0.08;
@@ -3071,15 +3296,19 @@ const EMBEDDED_VOICES = {
           group.position.set(0, 0, this.PLAYER_Z); this.scene.add(group);
           this.crafts.push({ slotIndex: 0, wings, vx: 0, vy: 0, flapPhase: 0, slotId: pal.id, name: myEntry ? myEntry.name : 'YOU', colorHex: pal.hex, isBot: false, botProfile: null, partId: myPart, shieldCharges: myPart === 'SHIELD' ? 1 : 0, shieldMesh, mesh: group, shadow, debuffRing, x: 0, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: 1, jammerCharge: 35, debuffType: null, debuffTimer: 0, botTargetX: 0, botTargetY: 0, botThinkTimer: 0, botWobbleSeed: 1, botBoostTimer: 0, botJamWait: 1, botBoostActive: false });
 
-          const shouldSpawnBots = (mMode === 'SOLO' && (soloMode === 'VS_BOT' || app.botLevelSetting !== 'NONE'));
+          const desiredBotCount = Math.max(0, Math.min(10, Number(app.botCount ?? 5)));
+          const shouldSpawnBots = (mMode === 'SOLO' && desiredBotCount > 0) || (mMode === 'ONLINE' && desiredBotCount > 0);
           if (shouldSpawnBots) {
-            for (let b = 1; b <= 5; b++) {
+            for (let b = 1; b <= desiredBotCount; b++) {
               const bPal = PLAYER_PALETTE[(app.custom.colorIndex + b * 3) % PLAYER_PALETTE.length];
               const prof = createBotProfile(app.getBotForcedLevel());
               const bSh = CRAFT_SHAPES[b % CRAFT_SHAPES.length].id;
               const { group: bg, shadow: bs, debuffRing: bd, wings: bw } = this.createCraftMesh(bPal.num, false, bSh, 'NONE');
-              const sx = ((b - 3) * 1.65); const sy = (b % 2 === 0 ? 0.55 : -0.45); bg.position.set(sx, sy, this.PLAYER_Z - 1.4); this.scene.add(bg);
-              this.crafts.push({ slotIndex: b, wings: bw, vx: 0, vy: 0, flapPhase: b * 1.1, slotId: bPal.id, name: `BOT-${b} Lv.${prof.level}`, colorHex: bPal.hex, isBot: true, botProfile: prof, partId: 'NONE', shieldCharges: 0, shieldMesh: null, mesh: bg, shadow: bs, debuffRing: bd, x: sx, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: b+1, jammerCharge: 30, debuffType: null, debuffTimer: 0, botTargetX: sx, botTargetY: 0, botThinkTimer: this.nextMatchRand()*0.2, botWobbleSeed: b*17, botBoostTimer: 0, botJamWait: prof.jamDelay, botBoostActive: false });
+              const sx = (((b - 1) % 5) - 2) * 1.65;
+              const sy = (b % 2 === 0 ? 0.55 : -0.45);
+              bg.position.set(sx, sy, this.PLAYER_Z - 1.4 - (b * 0.4));
+              this.scene.add(bg);
+              this.crafts.push({ slotIndex: b, wings: bw, vx: 0, vy: 0, flapPhase: b * 1.1, slotId: bPal.id, name: `BOT-${b} Lv.${prof.level}`, colorHex: bPal.hex, isBot: true, botProfile: prof, partId: 'NONE', shieldCharges: 0, shieldMesh: null, mesh: bg, shadow: bs, debuffRing: bd, x: sx, y: 0, alive: true, invuln: 0, score: 0, distance: 0, lap: 1, rank: b+1, jammerCharge: 30, debuffType: null, debuffTimer: 0, botTargetX: sx, botTargetY: 0, botThinkTimer: this.nextMatchRand()*0.2, botWobbleSeed: b*17, botBoostTimer: 0, botJamWait: prof.jamDelay, botBoostActive: false });
             }
           }
         } else if (this.scene && mMode === 'HOST') {
@@ -3256,7 +3485,7 @@ const EMBEDDED_VOICES = {
         const prof = c.botProfile || createBotProfile(5);
         c.botThinkTimer -= dt;
         if (c.botBoostTimer > 0) { c.botBoostTimer -= dt; c.botBoostActive = true; } else c.botBoostActive = false;
-        const canJam = (this.runMode === 'HOST' && hostNet.ruleMode === 'BATTLE') || (this.runMode === 'SOLO' && app.currentSoloMode === 'VS_BOT');
+        const canJam = (this.runMode === 'HOST' && hostNet.ruleMode === 'BATTLE') || (this.runMode === 'SOLO' && (app.currentSoloMode === 'VS_BOT' || (app.botCount || 0) > 0)) || this.runMode === 'ONLINE';
         if (canJam && (c.heldSabotageItem || c.jammerCharge >= 100)) {
           c.botJamWait -= dt;
           if (c.botJamWait <= 0) { c.botJamWait = prof.jamDelay * (0.7 + this.nextMatchRand()*0.7); this.activateJammer(c.slotIndex); }
@@ -3838,11 +4067,32 @@ const EMBEDDED_VOICES = {
           if (this.comboCount > 0) { this.comboDecayTimer -= dt; if (this.comboDecayTimer <= 0) this.comboCount = 0; }
         } else this.currentSpeed = 16;
 
-        if (this.stageEnv === 'OUTDOOR' && this.outdoorClouds) {
-          this.outdoorClouds.forEach(c => {
-            c.position.z += step * 0.55;
-            if (c.position.z > 14) c.position.z -= 143;
-          });
+        if (this.stageEnv === 'OUTDOOR') {
+          if (this.outdoorClouds) {
+            this.outdoorClouds.forEach(c => {
+              c.position.z += step * 0.65;
+              if (c.position.z > 22) c.position.z -= 229.6;
+            });
+          }
+          if (this.outdoorTrees) {
+            this.outdoorTrees.forEach(tr => {
+              tr.mesh.position.z += step * 0.92;
+              if (tr.mesh.position.z > 26) tr.mesh.position.z -= 230;
+            });
+          }
+          if (this.outdoorMountains) {
+            this.outdoorMountains.forEach(mt => {
+              mt.mesh.position.z += step * 0.14;
+              if (mt.mesh.position.z > -45) mt.mesh.position.z -= 235;
+            });
+          }
+          if (this.outdoorWaterMat?.map) {
+            this.outdoorWaterMat.map.offset.y -= dt * (this.currentSpeed * 0.022);
+            this.outdoorWaterMat.map.offset.x = Math.sin((this.lastTime || 0) * 0.0007) * 0.04;
+          }
+          if (this.outdoorTerrain?.material?.map) {
+            this.outdoorTerrain.material.map.offset.y -= dt * (this.currentSpeed * 0.011);
+          }
         }
         this.tunnelRings.forEach(r => { r.position.z += this.currentSpeed * dt; if (r.userData?.spinRing) r.rotation.z += r.userData.spinRing * dt; if (r.position.z > 14) r.position.z -= 132; });
 
@@ -3894,9 +4144,14 @@ const EMBEDDED_VOICES = {
           c.flapPhase = (c.flapPhase || 0) + dt * flapSpeed;
           this.animateBioWings(c.wings, c.flapPhase, c.vy, pbNow, isHovering);
 
-          const wingLiftBob = (c.wings?.isMechanical || (c.vy < -0.35 && !pbNow)) ? 0 : Math.sin(c.flapPhase) * 0.048;
-          const zLane = c.isBot ? (this.PLAYER_Z - 1.2 - (c.slotIndex % 3) * 0.45) : this.PLAYER_Z;
-          c.mesh.position.set(c.x, c.y + wingLiftBob, zLane);
+          const wingLiftBob = (c.vy < -0.35 && !pbNow) ? 0 : Math.sin(c.flapPhase) * 0.048;
+          const playerDist = this.crafts[0]?.distance || 0;
+          const distDelta = (c.distance || 0) - playerDist;
+          // 距離差が大きい場合もそのまま反映（前方に大きく離れれば奥へ、後方に離れれば手前／遠方へ）
+          const mappedZ = c.isBot
+            ? Math.max(-78, Math.min(18, this.PLAYER_Z - 1.5 - distDelta * 0.22 - (c.slotIndex % 3) * 0.35))
+            : this.PLAYER_Z;
+          c.mesh.position.set(c.x, c.y + wingLiftBob, mappedZ);
           // 鳥・トンボの3軸姿勢連動（旋回ロール・上昇下降ピッチ・進行方向ヨー）
           c.mesh.rotation.z = Math.max(-0.75, Math.min(0.75, -c.vx * 0.095));
           c.mesh.rotation.x = Math.max(-0.48, Math.min(0.48, c.vy * 0.075 - (pbNow ? 0.08 : 0)));
@@ -3905,8 +4160,21 @@ const EMBEDDED_VOICES = {
 
           if (this.state === 'PLAYING') {
             const pb = c.isBot ? c.botBoostActive : ((mMode === 'SOLO' || mMode === 'ONLINE' || isStory) ? (this.directBoost || this.autoBoost) : hostNet.slots[c.slotIndex]?.boost);
-            const craftSpeedMult = c.isBot ? (0.94 + ((c.botProfile?.level || 5) * 0.018) + (c.botBoostActive ? 0.28 : 0)) : ((c.turboTimer > 0) ? 1.38 : 1.0);
+            // マリオカートのようにBOTごとに速度差・加速・気まぐれが生まれ、大きな距離差が開いてもOK
+            const botPaceWave = c.isBot ? (1.0 + Math.sin((this.lastTime || 0) * 0.0011 + c.slotIndex * 1.7) * 0.14) : 1.0;
+            const craftSpeedMult = c.isBot
+              ? ((0.88 + ((c.botProfile?.level || 5) * 0.024) + (c.botBoostActive ? 0.34 : 0)) * botPaceWave)
+              : ((c.turboTimer > 0) ? 1.38 : 1.0);
+            const prevLap = Math.floor((c.distance || 0) / 600) + 1;
             c.distance += this.currentSpeed * craftSpeedMult * dt * 0.45;
+            const curLap = Math.floor(c.distance / 600) + 1;
+            c.lap = curLap;
+            if (!c.isBot && curLap > prevLap) {
+              c.score += 500;
+              this.teamScore += 500;
+              audio.playRingCollect();
+              this.showPopup(`コース1周達成！第${curLap}周目へ突入！（+500pts）`, '#93AB8A');
+            }
             if (!c.isBot && this.isRaceMode()) this.teamDistance = c.distance;
             if (this.isRaceMode() && !c.finishedRace && c.distance >= this.raceGoalDist) {
               c.finishedRace = true;
@@ -4385,7 +4653,7 @@ const EMBEDDED_VOICES = {
 
     const app = {
       currentScreen: 'screenHome', mode: 'NONE', currentMapIndex: 0, currentDiffIndex: 1,
-      currentSoloMode: 'SURVIVAL', botLevelSetting: 'RANDOM',
+      currentSoloMode: 'SURVIVAL', botLevelSetting: 'RANDOM', botCount: 5,
       custom: { colorIndex: 0, shapeId: 'AIRPLANE', partId: 'NONE' },
       clearedStages: {}, storyClearedMax: 0, pendingStoryChapterIndex: 0,
       coins: 500, ownedIds: ['OUTFIT_001', 'ITEM_001', 'COLL_001'],
@@ -4559,6 +4827,15 @@ const EMBEDDED_VOICES = {
         this.botLevelSetting = v || 'RANDOM';
         ['selectBotLevelHome','selectBotLevelHost'].forEach(id => { const el = document.getElementById(id); if (el && el.value !== this.botLevelSetting) el.value = this.botLevelSetting; });
       },
+      setBotCount(n) {
+        const val = Math.max(0, Math.min(10, parseInt(n, 10) || 0));
+        this.botCount = val;
+        ['selectBotCountHome','selectBotCountOnline'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && String(el.value) !== String(val)) el.value = String(val);
+        });
+        this.syncHomeLabels();
+      },
       getBotForcedLevel() { const n = parseInt(this.botLevelSetting, 10); return this.botLevelSetting === 'RANDOM' || isNaN(n) ? null : Math.max(1, Math.min(10, n)); },
       openCustomGarage() { this.renderCustomGarage(); this.showScreen('screenCustom'); },
       renderCustomGarage() {
@@ -4569,15 +4846,7 @@ const EMBEDDED_VOICES = {
         document.getElementById('customPreviewColorName').textContent = pal.name;
         document.getElementById('customPreviewPartDesc').textContent = `${pt.name}：${pt.effect}`;
         document.getElementById('customColorIndexLabel').textContent = `${this.custom.colorIndex+1} / 20`;
-        const previewMap = {
-          AIRPLANE: `<svg viewBox="0 0 80 80" class="w-14 h-14"><path d="M40 12 L48 32 L72 44 L72 52 L48 46 L46 62 L56 68 L56 72 L40 68 L24 72 L24 68 L34 62 L32 46 L8 52 L8 44 L32 32 Z" fill="${pal.hex}"/><ellipse cx="40" cy="30" rx="5" ry="10" fill="#FFFDF9"/></svg>`,
-          PAPERPLANE: `<svg viewBox="0 0 80 80" class="w-14 h-14"><polygon points="40,12 70,64 40,52 10,64" fill="${pal.hex}"/><polygon points="40,12 40,52 28,60" fill="#FFFDF9" opacity="0.85"/></svg>`,
-          HELICOPTER: `<svg viewBox="0 0 80 80" class="w-14 h-14"><rect x="14" y="18" width="52" height="5" rx="2.5" fill="#3E2723"/><rect x="37" y="22" width="6" height="8" fill="#93AB8A"/><ellipse cx="40" cy="44" rx="20" ry="15" fill="${pal.hex}"/><circle cx="34" cy="42" r="8" fill="#FFFDF9"/><rect x="24" y="63" width="32" height="4" rx="2" fill="#3E2723"/></svg>`,
-          UFO: `<svg viewBox="0 0 80 80" class="w-14 h-14"><path d="M24 38 A16 16 0 0 1 56 38 Z" fill="#FFFDF9"/><ellipse cx="40" cy="44" rx="30" ry="11" fill="${pal.hex}"/><circle cx="24" cy="44" r="3" fill="#FFFDF9"/><circle cx="40" cy="46" r="3" fill="#93AB8A"/><circle cx="56" cy="44" r="3" fill="#FFFDF9"/></svg>`,
-          ROCKET: `<svg viewBox="0 0 80 80" class="w-14 h-14"><path d="M40 12 C52 26 52 50 48 60 L32 60 C28 50 28 26 40 12 Z" fill="#FFFDF9"/><path d="M40 12 C46 20 48 26 48 28 L32 28 C32 26 34 20 40 12 Z" fill="${pal.hex}"/><polygon points="30,48 18,62 32,58" fill="${pal.hex}"/><polygon points="50,48 62,62 48,58" fill="${pal.hex}"/><circle cx="40" cy="39" r="6" fill="#93AB8A"/></svg>`,
-          BALLOON: `<svg viewBox="0 0 80 80" class="w-14 h-14"><circle cx="40" cy="34" r="22" fill="${pal.hex}"/><rect x="33" y="60" width="14" height="10" rx="3" fill="#93AB8A"/><line x1="34" y1="54" x2="35" y2="60" stroke="#3E2723" stroke-width="2"/><line x1="46" y1="54" x2="45" y2="60" stroke="#3E2723" stroke-width="2"/></svg>`
-        };
-        document.getElementById('customPreviewSvgBox').innerHTML = previewMap[sh.id] || `<svg viewBox="0 0 80 80" class="w-14 h-14"><ellipse cx="40" cy="42" rx="22" ry="18" fill="${pal.hex}"/><path d="M10 36 Q24 24 32 40 Z" fill="#FFFDF9"/><path d="M70 36 Q56 24 48 40 Z" fill="#FFFDF9"/><circle cx="35" cy="38" r="4" fill="#FFFDF9"/></svg>`;
+        document.getElementById('customPreviewSvgBox').innerHTML = `<svg viewBox="0 0 80 80" class="w-14 h-14"><ellipse cx="40" cy="42" rx="22" ry="25" fill="${pal.hex}"/><circle cx="34" cy="34" r="5" fill="#FFFDF9"/></svg>`;
         document.getElementById('customColorGrid').innerHTML = PLAYER_PALETTE.map((p, i) => `<button type="button" onclick="app.custom.colorIndex=${i};app.saveEconomy();app.renderCustomGarage();" class="w-full aspect-square rounded-full ${i===this.custom.colorIndex?'scale-110 ring-2 ring-cocoa-800':''}" style="background:${p.hex}"></button>`).join('');
         document.getElementById('customShapeGrid').innerHTML = CRAFT_SHAPES.map(s => `<button type="button" onclick="app.custom.shapeId='${s.id}';app.saveEconomy();app.renderCustomGarage();" class="p-2.5 rounded-2xl text-left ${s.id===this.custom.shapeId?'bg-brand-500 text-white':'bg-cream-200'}"><div class="text-xs font-extrabold truncate">${s.name}</div></button>`).join('');
         document.getElementById('customPartGrid').innerHTML = CRAFT_PARTS.map(p => `<button type="button" onclick="app.custom.partId='${p.id}';app.saveEconomy();app.renderCustomGarage();" class="p-2.5 rounded-2xl text-left ${p.id===this.custom.partId?'bg-sage-500 text-white':'bg-cream-200'}"><div class="text-xs font-extrabold truncate">${p.name}</div><div class="text-[10px] opacity-90 truncate">${p.effect}</div></button>`).join('');
@@ -4596,7 +4865,7 @@ const EMBEDDED_VOICES = {
         const eqLbl = document.getElementById('homeEquipBonusLabel');
         if (eqLbl) eqLbl.textContent = `スコア +${Math.round(this.getEquippedBonus() * 100)}%`;
         const desc = document.getElementById('homeSoloBtnDesc');
-        if (desc) desc.textContent = `${sm.label} · ${m.name.split('・')[0]} · ${d.jp}`;
+        if (desc) desc.textContent = `${sm.label} · BOT ${this.botCount ?? 5}体 · ${m.name.split('・')[0]} · ${d.jp}`;
       },
       renderQuickSelectors() {
         const ms = document.getElementById('quickMapSelect');
