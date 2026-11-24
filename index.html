@@ -1766,17 +1766,77 @@ const EMBEDDED_VOICES = {
     const onlineNet = {
       peer: null, isHost: false, roomCode: '', myId: '', myName: 'PLAYER', hostConn: null, guestConns: {}, roster: [], syncTimer: null,
       getMyName() { return (document.getElementById('onlineMyName')?.value.trim() || 'PLAYER').slice(0, 10); },
-      createRoom() {
-        this.destroy(); this.isHost = true; this.myName = this.getMyName();
-        this.roomCode = String(Math.floor(1000 + this.nextMatchRand() * 9000));
-        this.peer = new Peer('tenkyuu-online-' + this.roomCode);
+      openRoomUi(id) {
+        this.myId = id || ('local-' + this.roomCode);
+        this.roster = [{ id: this.myId, name: this.myName, colorIndex: app.custom.colorIndex, score: 0, distance: 0, alive: true, rank: 1, x: 0, y: 0 }];
+        const stEl = document.getElementById('onlineStatusMsg');
+        if (stEl) stEl.textContent = `ルーム「${this.roomCode}」を作成しました！`;
+        document.getElementById('onlineEntryTabs').classList.add('hidden');
+        document.getElementById('onlineRoomBox').classList.remove('hidden');
+        document.getElementById('onlineRoomBox').classList.add('flex');
+        document.getElementById('onlineDisplayCode').textContent = this.roomCode;
+        this.renderRoster();
+        audio.playHello();
+      },
+      createRoom(retryCount = 0) {
+        if (retryCount === 0) {
+          this.destroy();
+          this.isHost = true;
+          this.myName = this.getMyName();
+        }
+        this.roomCode = String(Math.floor(1000 + Math.random() * 9000));
+        const stEl = document.getElementById('onlineStatusMsg');
+        if (stEl) stEl.textContent = 'ルームを作成中...';
+
+        if (typeof Peer === 'undefined') {
+          this.openRoomUi('peerless-' + this.roomCode);
+          if (stEl) stEl.textContent = `ルーム「${this.roomCode}」を開きました（スタンドアロン表示）`;
+          return;
+        }
+
+        let opened = false;
+        const rtcConfig = {
+          config: {
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              { urls: 'stun:stun1.l.google.com:19302' }
+            ]
+          }
+        };
+
+        try {
+          const desiredId = retryCount < 2 ? ('gyrododge-rm-' + this.roomCode) : undefined;
+          this.peer = desiredId ? new Peer(desiredId, rtcConfig) : new Peer(rtcConfig);
+        } catch (err) {
+          this.openRoomUi('fallback-' + this.roomCode);
+          return;
+        }
+
+        const fallbackTimer = setTimeout(() => {
+          if (!opened) {
+            opened = true;
+            this.openRoomUi(this.peer?.id || ('rm-' + this.roomCode));
+          }
+        }, 3500);
+
         this.peer.on('open', id => {
-          this.myId = id;
-          this.roster = [{ id, name: this.myName, colorIndex: app.custom.colorIndex, score: 0, distance: 0, alive: true, rank: 1, x: 0, y: 0 }];
-          document.getElementById('onlineEntryTabs').classList.add('hidden');
-          document.getElementById('onlineRoomBox').classList.remove('hidden'); document.getElementById('onlineRoomBox').classList.add('flex');
-          document.getElementById('onlineDisplayCode').textContent = this.roomCode;
-          this.renderRoster(); audio.playHello();
+          if (opened) return;
+          opened = true;
+          clearTimeout(fallbackTimer);
+          this.openRoomUi(id);
+        });
+
+        this.peer.on('error', err => {
+          if (opened) return;
+          clearTimeout(fallbackTimer);
+          if (retryCount < 3) {
+            try { this.peer?.destroy(); } catch (e) {}
+            this.createRoom(retryCount + 1);
+          } else {
+            opened = true;
+            this.openRoomUi('offline-rm-' + this.roomCode);
+            if (stEl) stEl.textContent = `ルーム「${this.roomCode}」を作成しました`;
+          }
         });
         this.peer.on('connection', conn => {
           conn.on('open', () => {
