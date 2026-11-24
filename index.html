@@ -739,7 +739,7 @@
         <div class="soft-card px-3.5 py-2">
           <div class="text-[9px] font-bold text-cocoa-600">SCORE · BEST <span id="hudBestScore">0</span></div>
           <div class="flex items-center gap-2">
-            <span id="hudScore" class="text-xl font-black">0</span>
+            <span id="hudScore" class="text-lg sm:text-xl font-black tabular-nums">0</span>
             <span id="hudComboBadge" class="px-2 py-0.5 rounded-lg bg-cream-200 text-xs font-black">x1.0</span>
           </div>
         </div>
@@ -1848,7 +1848,11 @@ const EMBEDDED_VOICES = {
           conn.on('data', data => {
             const m = this.roster.find(r => r.id === conn.peer); if (!m) return;
             if (data.type === 'HELLO') { m.name = (data.name || m.name).slice(0, 10); this.broadcastRoster(); this.renderRoster(); }
-            else if (data.type === 'STATE') { m.score = data.score; m.distance = data.distance; m.alive = data.alive; m.x = data.x; m.y = data.y; m.roll = data.roll || 0; this.recalcRanks(); const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex }; Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); }); game3d.syncOnlineRivals(this.roster, this.myId); }
+            else if (data.type === 'STATE') { m.score = data.score; m.distance = data.distance; m.alive = data.alive; m.x = data.x; m.y = data.y; m.roll = data.roll || 0; this.recalcRanks(); const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime }; Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); }); game3d.syncOnlineRivals(this.roster, this.myId); }
+            else if (data.type === 'ITEM_TAKEN') {
+              game3d.consumeRemoteItem(data.itemId);
+              Object.entries(this.guestConns).forEach(([pid, gc]) => { if (pid !== conn.peer && gc.open) gc.send(data); });
+            }
             else if (data.type === 'JAM_ATTACK') {
               if (game3d.state === 'PLAYING' && game3d.crafts[0]?.alive) game3d.applyDirectDebuff(data.kind, m.name);
               Object.entries(this.guestConns).forEach(([pid, gc]) => { if (pid !== conn.peer && gc.open) gc.send({ type: 'JAM_HIT', kind: data.kind, from: m.name }); });
@@ -1912,13 +1916,28 @@ const EMBEDDED_VOICES = {
               this.roster = data.roster || [];
               if (typeof data.mapIndex === 'number') app.setMapIndex(data.mapIndex);
               if (typeof data.diffIndex === 'number') app.setDifficultyIndex(data.diffIndex);
+              if (typeof data.trackZ === 'number' && game3d.runMode === 'ONLINE') {
+                const diffZ = data.trackZ - game3d.sharedTrackZ;
+                if (Math.abs(diffZ) > 0.4) game3d.sharedTrackZ += diffZ * 0.35;
+              }
+              if (typeof data.matchTime === 'number' && game3d.runMode === 'ONLINE') {
+                game3d.sharedMatchTime += (data.matchTime - game3d.sharedMatchTime) * 0.35;
+              }
               this.renderRoster();
               game3d.syncOnlineRivals(this.roster, this.myId);
             } else if (data.type === 'START_MATCH') {
               if (typeof data.mapIndex === 'number') app.setMapIndex(data.mapIndex);
               if (typeof data.diffIndex === 'number') app.setDifficultyIndex(data.diffIndex);
               game3d.setMatchSeed(data.matchSeed);
+              game3d.onlineStageChunks = Array.isArray(data.initialItems) ? [data.initialItems] : [];
               app.launchOnlineGame();
+            } else if (data.type === 'STAGE_CHUNK') {
+              if (Array.isArray(data.items)) {
+                game3d.onlineStageChunks.push(data.items);
+                game3d.applyOnlineStageItems(data.items);
+              }
+            } else if (data.type === 'ITEM_TAKEN') {
+              game3d.consumeRemoteItem(data.itemId);
             } else if (data.type === 'JAM_HIT' && game3d.state === 'PLAYING' && game3d.crafts[0]?.alive) {
               game3d.applyDirectDebuff(data.kind, data.from);
             }
@@ -1978,7 +1997,7 @@ const EMBEDDED_VOICES = {
       recalcRanks() { const s = [...this.roster].sort((a,b) => (a.alive !== b.alive ? (a.alive ? -1 : 1) : b.score - a.score)); s.forEach((r,i) => r.rank = i+1); },
       broadcastRoster() {
         if (!this.isHost) return; this.recalcRanks();
-        const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex };
+        const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime };
         Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); });
         game3d.syncOnlineRivals(this.roster, this.myId);
       },
@@ -2004,10 +2023,26 @@ const EMBEDDED_VOICES = {
         if (!list) return;
         list.innerHTML = this.roster.map((r, i) => `<div class="bg-cream-200 rounded-xl px-2.5 py-1 text-xs font-extrabold truncate">#${i+1} ${r.name}</div>`).join('');
       },
+      broadcastStageChunk(items) {
+        if (!this.isHost || !items || !items.length) return;
+        const msg = { type: 'STAGE_CHUNK', items };
+        Object.values(this.guestConns).forEach(c => { if (c.open) c.send(msg); });
+      },
       hostStartMatch() {
         if (!this.isHost) return;
         this.roster.forEach(r => { r.score = 0; r.distance = 0; r.alive = true; });
-        const seed = Math.floor(Math.random() * 900000) + 100000; game3d.setMatchSeed(seed); const msg = { type: 'START_MATCH', mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, matchSeed: seed };
+        const seed = Math.floor(Math.random() * 900000) + 100000;
+        game3d.setMatchSeed(seed);
+        game3d.hostGeneratedUntilZ = -28;
+        game3d.onlineStageChunks = [];
+        const initItems = game3d.generateOnlineStageChunk(-28, -360);
+        const msg = {
+          type: 'START_MATCH',
+          mapIndex: app.currentMapIndex,
+          diffIndex: app.currentDiffIndex,
+          matchSeed: seed,
+          initialItems: initItems
+        };
         Object.values(this.guestConns).forEach(c => { if (c.open) c.send(msg); });
         app.launchOnlineGame();
       },
@@ -2021,7 +2056,7 @@ const EMBEDDED_VOICES = {
             const me = this.roster.find(r => r.id === this.myId);
             if (me) { me.score = game3d.teamScore; me.distance = Math.floor(game3d.teamDistance); me.alive = mc.alive; me.x = mc.x; me.y = mc.y; me.roll = rollVal; }
             this.recalcRanks();
-            const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex };
+            const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime };
             Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); });
             game3d.syncOnlineRivals(this.roster, this.myId);
           } else if (this.hostConn?.open) {
@@ -2046,6 +2081,15 @@ const EMBEDDED_VOICES = {
         game3d.showPopup(`【${meta.name}】を相手へ発射！`, meta.colorHex);
         if (this.isHost) Object.values(this.guestConns).forEach(c => { if (c.open) c.send({ type: 'JAM_HIT', kind: meta.id, from: this.myName }); });
         else if (this.hostConn?.open) this.hostConn.send({ type: 'JAM_ATTACK', kind: meta.id });
+      },
+      notifyItemTaken(itemId, kind) {
+        if (!itemId) return;
+        const msg = { type: 'ITEM_TAKEN', itemId, kind, by: this.myName };
+        if (this.isHost) {
+          Object.values(this.guestConns).forEach(c => { if (c.open) c.send(msg); });
+        } else if (this.hostConn?.open) {
+          this.hostConn.send(msg);
+        }
       },
       copyShareUrl() {
         const u = new URL(location.href); u.searchParams.set('online', this.roomCode);
@@ -2523,6 +2567,22 @@ const EMBEDDED_VOICES = {
 
         this.updateHud(); this.spawnTimer = 0.1;
         // スタート直後からコース上にリング・障害物・BOTがしっかり見えるよう初期ウェーブを配置
+        this.sharedTrackZ = 0;
+        this.sharedMatchTime = 0;
+        this.seenStageItemIds = new Set();
+        if (mMode === 'ONLINE') {
+          if (onlineNet.isHost) {
+            this.hostGeneratedUntilZ = -28;
+            this.onlineStageChunks = [];
+            const initItems = this.generateOnlineStageChunk(-28, -360);
+            this.applyOnlineStageItems(initItems);
+            onlineNet.broadcastStageChunk(initItems);
+          } else {
+            this.onlineStageChunks.forEach(chunk => this.applyOnlineStageItems(chunk));
+          }
+          this.runCountdown();
+          return;
+        }
         // スタート直後から障害物・リングが画面内にハッキリ見えるよう前方に配置
         const presetZs = [-28, -54, -82];
         for (let w = 0; w < presetZs.length; w++) {
@@ -2686,6 +2746,18 @@ const EMBEDDED_VOICES = {
         this.spawnSabotageProjectileAnim(meta.colorNum);
         this.showPopup(`【${meta.name}】発射！`, meta.colorHex);
       },
+      consumeRemoteItem(itemId) {
+        if (!itemId || !this.scene) return;
+        for (let i = this.obstacles.length - 1; i >= 0; i--) {
+          const o = this.obstacles[i];
+          if (o.itemId === itemId) {
+            o.mesh.visible = false;
+            this.scene.remove(o.mesh);
+            this.obstacles.splice(i, 1);
+          }
+        }
+      },
+
       getStoryQuestProgress(chapterIdx) {
         const sq = STORY_QUESTS[chapterIdx] || STORY_QUESTS[0];
         const taskCur = sq.taskType === 'RING' ? this.ringsCollected : this.nearMissCount;
@@ -2696,6 +2768,208 @@ const EMBEDDED_VOICES = {
       matchSeed: 123456,
       rngSeed: 123456,
       stageRollAngle: 0,
+      sharedTrackZ: 0,
+      sharedMatchTime: 0,
+      hostGeneratedUntilZ: 0,
+      onlineStageChunks: [],
+      seenStageItemIds: null,
+
+      generateOnlineStageChunk(fromZ, toZ) {
+        const curMap = MAPS[app.currentMapIndex] || MAPS[0];
+        const curDiff = DIFFICULTIES[app.currentDiffIndex] || DIFFICULTIES[1];
+        const items = [];
+        let cursorZ = fromZ;
+        let seq = this.onlineStageChunks.reduce((acc, c) => acc + c.length, 0);
+
+        while (cursorZ > toZ) {
+          const distAtCursor = Math.abs(cursorZ) * 0.45;
+          const zone = this.getStageZoneInfo(distAtCursor);
+          const speedLv = Math.min(10, 1 + Math.floor(distAtCursor / 110));
+          const roll = Math.random();
+
+          // 1. 旋回ゲート（スピナー）
+          if ((curMap.hasSpinner || zone.id === 'SPINNER' || curDiff.id === 'EXTREME' || speedLv >= 5) && roll > 0.72) {
+            const ang = Math.random() * Math.PI;
+            const rotSpeed = (Math.random() < 0.5 ? 1 : -1) * 1.45 * curDiff.moveSpeedMult;
+            items.push({
+              itemId: `ON_SP_${seq++}`,
+              kind: 'SPINNER',
+              worldZ: cursorZ,
+              x: 0, y: 0,
+              baseAngle: ang,
+              rotSpeed
+            });
+          } else if (roll > 0.76) {
+            // 2. お邪魔アイテムカプセル（全端末共通の同じ位置・同じ種類）
+            const itemMeta = SABOTAGE_ITEMS[Math.floor(Math.random() * SABOTAGE_ITEMS.length)];
+            items.push({
+              itemId: `ON_SAB_${seq++}`,
+              kind: 'SABOTAGE_ITEM',
+              sabotageId: itemMeta.id,
+              sabotageName: itemMeta.name,
+              worldZ: cursorZ,
+              x: (Math.random() - 0.5) * 7.6,
+              y: (Math.random() - 0.5) * 3.8
+            });
+          } else if (roll < (curMap.spawnPattern === 'RINGS_HEAVY' ? 0.36 : 0.24) + zone.ringBoost) {
+            // 3. 連続リングウェーブ
+            const count = Math.random() < zone.chainChance ? 3 : 1;
+            const startX = (Math.random() - 0.5) * 6.5;
+            const startY = (Math.random() - 0.5) * 3.4;
+            const dirX = (Math.random() < 0.5 ? 1 : -1) * 1.4;
+            const dirY = (Math.random() < 0.5 ? 1 : -1) * 0.9;
+            for (let k = 0; k < count; k++) {
+              items.push({
+                itemId: `ON_RNG_${seq++}`,
+                kind: 'RING',
+                worldZ: cursorZ - k * 8.5,
+                x: Math.max(-5.2, Math.min(5.2, startX + k * dirX)),
+                y: Math.max(-3.1, Math.min(3.1, startY + Math.sin(k * 1.1) * dirY))
+              });
+            }
+          } else {
+            // 4. 障害物ブロック（動く壁・高さ変動もすべてホスト座標で統一）
+            const cnt = (curMap.spawnPattern === 'DENSE_WALLS' || curDiff.id === 'HARD' || curDiff.id === 'EXTREME' || speedLv >= 4) ? 2 : 1;
+            for (let i = 0; i < cnt; i++) {
+              const w = Number((2.2 + Math.random() * 1.6).toFixed(2));
+              const h = Number((2.4 + Math.random() * 2.0).toFixed(2));
+              const d = 2.0;
+              const ox = Number(((Math.random() - 0.5) * 8.8).toFixed(2));
+              const oy = Number(((Math.random() - 0.5) * 4.0).toFixed(2));
+              const movingX = curMap.hasMoving || zone.id === 'WAVE' || curDiff.id === 'EXTREME' || (speedLv >= 3 && Math.random() < 0.5);
+              const movingY = zone.allowVerticalMove && Math.random() < 0.42;
+              items.push({
+                itemId: `ON_BLK_${seq++}`,
+                kind: 'BLOCK',
+                worldZ: cursorZ - i * 6.5,
+                x: ox, y: oy,
+                w, h, d,
+                moveAmpX: movingX ? 2.5 : 0,
+                moveAmpY: movingY ? 1.35 : 0,
+                moveSpeed: Number((2.05 * curDiff.moveSpeedMult).toFixed(3)),
+                movePhase: Number((Math.random() * 6.28).toFixed(3))
+              });
+            }
+          }
+
+          const stepZ = Math.max(15, (34 - speedLv * 1.6) * curDiff.spawnIntervalMult);
+          cursorZ -= stepZ;
+        }
+
+        this.hostGeneratedUntilZ = cursorZ;
+        this.onlineStageChunks.push(items);
+        return items;
+      },
+
+      applyOnlineStageItems(items) {
+        if (!this.scene || !Array.isArray(items)) return;
+        if (!this.seenStageItemIds) this.seenStageItemIds = new Set();
+        const curMap = MAPS[app.currentMapIndex] || MAPS[0];
+
+        items.forEach(desc => {
+          if (!desc || !desc.itemId || this.seenStageItemIds.has(desc.itemId)) return;
+          this.seenStageItemIds.add(desc.itemId);
+          const initialZ = desc.worldZ + this.sharedTrackZ;
+          if (initialZ > 16) return;
+
+          if (desc.kind === 'SPINNER') {
+            const g = new THREE.Group();
+            g.add(new THREE.Mesh(
+              new THREE.BoxGeometry(11.2, 1.2, 1.5),
+              new THREE.MeshLambertMaterial({ color: curMap.blockHex, emissive: curMap.blockHex, emissiveIntensity: 0.16, flatShading: true })
+            ));
+            g.position.set(0, 0, initialZ);
+            g.rotation.z = desc.baseAngle || 0;
+            this.scene.add(g);
+            this.obstacles.push({
+              itemId: desc.itemId,
+              kind: 'SPINNER',
+              mesh: g,
+              x: 0, y: 0,
+              worldZ: desc.worldZ,
+              z: initialZ,
+              baseAngle: desc.baseAngle || 0,
+              angle: desc.baseAngle || 0,
+              rotSpeed: desc.rotSpeed || 1.4,
+              halfLen: 5.6, halfThick: 0.6,
+              hitBy: new Set(), nearMissedBy: new Set()
+            });
+          } else if (desc.kind === 'SABOTAGE_ITEM') {
+            const meta = getSabotageMeta(desc.sabotageId);
+            const g = new THREE.Group();
+            const core = new THREE.Mesh(
+              new THREE.DodecahedronGeometry(0.85, 0),
+              new THREE.MeshLambertMaterial({ color: meta.colorNum, flatShading: true })
+            );
+            const outerRing = new THREE.Mesh(
+              new THREE.TorusGeometry(1.22, 0.14, 8, 18),
+              new THREE.MeshBasicMaterial({ color: 0xFFFDF9 })
+            );
+            g.add(core, outerRing);
+            g.position.set(desc.x, desc.y, initialZ);
+            this.scene.add(g);
+            this.obstacles.push({
+              itemId: desc.itemId,
+              kind: 'SABOTAGE_ITEM',
+              sabotageId: meta.id,
+              sabotageName: meta.name,
+              mesh: g,
+              x: desc.x, y: desc.y,
+              worldZ: desc.worldZ,
+              z: initialZ,
+              radius: 1.65,
+              collectedBy: new Set()
+            });
+          } else if (desc.kind === 'RING') {
+            const m = new THREE.Mesh(
+              new THREE.TorusGeometry(1.38, 0.18, 8, 14),
+              new THREE.MeshLambertMaterial({ color: curMap.stripeHex, emissive: curMap.stripeHex, emissiveIntensity: 0.25, flatShading: true })
+            );
+            m.position.set(desc.x, desc.y, initialZ);
+            this.scene.add(m);
+            this.obstacles.push({
+              itemId: desc.itemId,
+              kind: 'RING',
+              mesh: m,
+              x: desc.x, y: desc.y,
+              worldZ: desc.worldZ,
+              z: initialZ,
+              radius: 1.58,
+              collectedBy: new Set()
+            });
+          } else if (desc.kind === 'BLOCK') {
+            const g = this.createStyledObstacleGroup(desc.w, desc.h, desc.d || 2.0, curMap);
+            g.position.set(desc.x, desc.y, initialZ);
+            this.scene.add(g);
+            this.obstacles.push({
+              itemId: desc.itemId,
+              kind: 'BLOCK',
+              mesh: g,
+              baseX: desc.x, baseY: desc.y,
+              x: desc.x, y: desc.y,
+              worldZ: desc.worldZ,
+              z: initialZ,
+              halfW: desc.w / 2, halfH: desc.h / 2,
+              moveAmpX: desc.moveAmpX || 0,
+              moveAmpY: desc.moveAmpY || 0,
+              moveSpeed: desc.moveSpeed || 0,
+              movePhase: desc.movePhase || 0,
+              hitBy: new Set(), nearMissedBy: new Set()
+            });
+          }
+        });
+      },
+
+      extendOnlineStageIfNeeded() {
+        if (this.runMode !== 'ONLINE' || !onlineNet.isHost) return;
+        const frontierNeeded = -(this.sharedTrackZ + 280);
+        if (this.hostGeneratedUntilZ > frontierNeeded) {
+          const newItems = this.generateOnlineStageChunk(this.hostGeneratedUntilZ, frontierNeeded - 220);
+          this.applyOnlineStageItems(newItems);
+          onlineNet.broadcastStageChunk(newItems);
+        }
+      },
+
       setMatchSeed(seed) {
         const s = (typeof seed === 'number' && !isNaN(seed)) ? (seed >>> 0) : ((Math.floor(this.nextMatchRand() * 900000) + 100000) >>> 0);
         this.matchSeed = s;
@@ -2781,7 +3055,9 @@ const EMBEDDED_VOICES = {
           g.add(core, outerRing);
           g.position.set(gx, gy, this.SPAWN_Z);
           this.scene.add(g);
+          const sabId = `SAB_${this.obstacles.length}_${Math.floor(this.teamDistance)}_${Math.round(this.nextMatchRand() * 10000)}`;
           this.obstacles.push({
+            itemId: sabId,
             kind: 'SABOTAGE_ITEM',
             sabotageId: itemMeta.id,
             sabotageName: itemMeta.name,
@@ -2824,7 +3100,7 @@ const EMBEDDED_VOICES = {
             const gz = this.SPAWN_Z - k * 8.5;
             const m = new THREE.Mesh(new THREE.TorusGeometry(1.38,0.18,8,14), new THREE.MeshLambertMaterial({color:curMap.stripeHex,flatShading:true}));
             m.position.set(gx, gy, gz); this.scene.add(m);
-            this.obstacles.push({ kind:'RING', mesh:m, x:gx, y:gy, z:gz, radius:1.58, collectedBy:new Set() });
+            this.obstacles.push({ itemId: `RNG_${this.obstacles.length}_${k}_${Math.floor(this.teamDistance)}`, kind:'RING', mesh:m, x:gx, y:gy, z:gz, radius:1.58, collectedBy:new Set() });
           }
         } else {
           const cnt = (curMap.spawnPattern === 'DENSE_WALLS' || curDiff.id === 'HARD' || curDiff.id === 'EXTREME' || (mMode === 'SOLO' && this.speedLevel >= 4)) ? 2 : 1;
@@ -3076,17 +3352,27 @@ const EMBEDDED_VOICES = {
         if (this.state !== 'PLAYING' && this.state !== 'SPECTATING') return;
         this.teamScore += Math.floor(dt * 25 * (anyBoost ? 1.5 : 1) * (1 + app.getEquippedBonus()));
 
-        this.spawnTimer -= dt * (this.currentSpeed / 40);
-        if (this.spawnTimer <= 0) {
-          this.spawnWave();
-          const spM = isStory ? curMap.storySpawnMult : curDiff.spawnIntervalMult;
-          this.spawnTimer = Math.max(0.25, (0.88 - this.speedLevel * 0.055) * spM);
+        if (mMode === 'ONLINE') {
+          this.sharedTrackZ += this.currentSpeed * dt;
+          this.sharedMatchTime += dt;
+          if (onlineNet.isHost) this.extendOnlineStageIfNeeded();
+        } else {
+          this.spawnTimer -= dt * (this.currentSpeed / 40);
+          if (this.spawnTimer <= 0) {
+            this.spawnWave();
+            const spM = isStory ? curMap.storySpawnMult : curDiff.spawnIntervalMult;
+            this.spawnTimer = Math.max(0.25, (0.88 - this.speedLevel * 0.055) * spM);
+          }
         }
 
-        // ステージ自体の回転演出（ゾーンやスピナー・お邪魔効果に合わせて滑らかに回転）
+        // ステージ自体の回転演出（オンライン時は共有マッチ時間基準で全端末同じ角度）
         const zoneInfo = this.getStageZoneInfo(this.teamDistance);
         const rollTargetSpeed = (curMap.hasSpinner || zoneInfo.id === 'SPINNER' ? 0.42 : 0.16) * (this.currentSpeed >= 50 ? 1.35 : 1.0);
-        this.stageRollAngle += rollTargetSpeed * dt;
+        if (mMode === 'ONLINE') {
+          this.stageRollAngle = this.sharedMatchTime * rollTargetSpeed;
+        } else {
+          this.stageRollAngle += rollTargetSpeed * dt;
+        }
         if (this.tunnelGroup) {
           this.tunnelGroup.rotation.z = Math.sin(this.stageRollAngle) * 0.24 + this.stageRollAngle * 0.12;
         }
@@ -3103,16 +3389,30 @@ const EMBEDDED_VOICES = {
             if (o.fxTimer <= 0 || o.z < -85) { this.scene.remove(o.mesh); this.obstacles.splice(i, 1); }
             continue;
           }
-          o.z += this.currentSpeed * dt; o.mesh.position.z = o.z;
+          if (mMode === 'ONLINE' && typeof o.worldZ === 'number') {
+            o.z = o.worldZ + this.sharedTrackZ;
+          } else {
+            o.z += this.currentSpeed * dt;
+          }
+          o.mesh.position.z = o.z;
           if (o.kind === 'RING' || o.kind === 'RESCUE') o.mesh.rotation.z += dt * 2.5;
           else if (o.kind === 'STORY_ITEM') { o.mesh.rotation.y += dt * 3.2; o.mesh.rotation.z += dt * 1.6; }
           else if (o.kind === 'SABOTAGE_ITEM') { o.mesh.rotation.y -= dt * 3.6; o.mesh.rotation.x += dt * 1.8; }
           else if (o.kind === 'BLOCK' && (o.moveAmpX > 0 || o.moveAmpY > 0)) {
-            o.movePhase += dt * o.moveSpeed;
-            if (o.moveAmpX > 0) { o.x = Math.max(-5.2, Math.min(5.2, o.baseX + Math.sin(o.movePhase)*o.moveAmpX)); o.mesh.position.x = o.x; }
-            if (o.moveAmpY > 0) { o.y = Math.max(-3.0, Math.min(3.0, (o.baseY ?? o.y) + Math.cos(o.movePhase * 0.85)*o.moveAmpY)); o.mesh.position.y = o.y; }
+            const ph = (mMode === 'ONLINE' && typeof o.worldZ === 'number')
+              ? (o.movePhase + this.sharedMatchTime * o.moveSpeed)
+              : (o.movePhase += dt * o.moveSpeed);
+            if (o.moveAmpX > 0) { o.x = Math.max(-5.2, Math.min(5.2, o.baseX + Math.sin(ph)*o.moveAmpX)); o.mesh.position.x = o.x; }
+            if (o.moveAmpY > 0) { o.y = Math.max(-3.0, Math.min(3.0, (o.baseY ?? o.y) + Math.cos(ph * 0.85)*o.moveAmpY)); o.mesh.position.y = o.y; }
           }
-          else if (o.kind === 'SPINNER') { o.angle += o.rotSpeed * dt; o.mesh.rotation.z = o.angle; }
+          else if (o.kind === 'SPINNER') {
+            if (mMode === 'ONLINE' && typeof o.baseAngle === 'number') {
+              o.angle = o.baseAngle + this.sharedMatchTime * o.rotSpeed;
+            } else {
+              o.angle += o.rotSpeed * dt;
+            }
+            o.mesh.rotation.z = o.angle;
+          }
 
           if (o.z > -1.4 && o.z < 1.4) {
             for (const c of this.crafts) {
@@ -3123,6 +3423,10 @@ const EMBEDDED_VOICES = {
                 const pts = Math.round((150 + this.comboCount * 35) * this.getComboMultiplier() * this.getZonePointMultiplier(c.distance));
                 c.score += pts; if (!c.isBot || mMode === 'HOST') this.teamScore += pts;
                 this.ringsCollected++;
+                if (mMode === 'ONLINE' && !c.isBot && o.itemId) {
+                  o.mesh.visible = false;
+                  onlineNet.notifyItemTaken(o.itemId, o.kind);
+                }
                 if (mMode === 'SOLO' && app.currentSoloMode === 'RING_RUSH') { this.modeTimer = Math.min(60, this.modeTimer + 1.5); this.showPopup(`+1.5s! (+${pts})`); }
                 else this.showPopup(`RING +${pts}`);
                 if ((mMode === 'HOST' && hostNet.ruleMode === 'BATTLE') || mMode === 'ONLINE' || (mMode === 'SOLO' && app.currentSoloMode === 'VS_BOT')) c.jammerCharge = Math.min(100, c.jammerCharge + 35);
@@ -3156,6 +3460,7 @@ const EMBEDDED_VOICES = {
               } else if (o.kind === 'SABOTAGE_ITEM' && !o.collectedBy.has(c.slotIndex) && Math.hypot(c.x - o.x, c.y - o.y) <= o.radius + magAdd) {
                 o.collectedBy.add(c.slotIndex);
                 o.mesh.visible = false;
+                if (mMode === 'ONLINE' && !c.isBot && o.itemId) onlineNet.notifyItemTaken(o.itemId, o.kind);
                 c.heldSabotageItem = o.sabotageId;
                 c.jammerCharge = Math.min(100, c.jammerCharge + 40);
                 c.score += 150;
