@@ -263,7 +263,7 @@
         <!-- メインアクション1：しゅつげき！ -->
         <button id="btnStartFree" type="button" class="btn-orange anim-breathe-soft w-full py-4 px-4 text-center flex flex-col items-center justify-center">
           <span class="text-base sm:text-lg font-black">しゅつげき！</span>
-          <span id="homeSoloBtnDesc" class="text-[11px] font-extrabold opacity-90 truncate max-w-full mt-0.5">サバイバル · サンセット · ふつう</span>
+          <span id="homeSoloBtnDesc" class="text-[11px] font-extrabold opacity-90 truncate max-w-full mt-0.5">空間パズル · サンセット · ふつう</span>
         </button>
 
         <!-- サブアクション3つ（計4ボタン構成：冒険12章 / イラスト図鑑 / きせかえ・設定） -->
@@ -376,12 +376,18 @@
        ===================================================================== -->
   <section id="screenStoryMap" class="screen items-center justify-start px-4 pt-14 bg-[#FBF7F2]/90 backdrop-blur-md">
     <div class="w-full max-w-md flex flex-col items-center">
-      <div class="soft-card w-full px-4 py-3 mb-3 flex items-center justify-between">
-        <div class="text-left">
-          <h2 class="text-base font-black">ぼうけんマップ（全12章）</h2>
-          <p class="text-[11px] font-bold text-cocoa-600">すすむほど少しずつむずかしくなるよ</p>
+      <div class="soft-card w-full px-4 py-3 mb-2.5 flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <div class="text-left">
+            <h2 class="text-base font-black">ぼうけんマップ（全12章）</h2>
+            <p class="text-[11px] font-bold text-cocoa-600">アイテムと章タスクを達成すると仲間が増えて先に進めるよ！</p>
+          </div>
+          <div id="storyCoreCount" class="px-3 py-1 rounded-full bg-sage-100 text-sage-600 text-xs font-black">0 / 12</div>
         </div>
-        <div id="storyCoreCount" class="px-3 py-1 rounded-full bg-sage-100 text-sage-600 text-xs font-black">0 / 12</div>
+        <div class="bg-[#FBF7F2] rounded-2xl px-3 py-2 text-left">
+          <div class="text-[10px] font-extrabold text-sage-600 mb-1">いっしょに飛ぶ仲間（<span id="storyCompanionCount">0</span>/12体）</div>
+          <div id="storyCompanionsRow" class="flex flex-wrap gap-1.5 text-[10px] font-extrabold text-cocoa-600">まだ仲間はいません（第1章クリアで仲間加入！）</div>
+        </div>
       </div>
       <div id="storyChapterList" class="w-full flex flex-col items-center gap-2 pb-8"></div>
     </div>
@@ -396,6 +402,11 @@
       </div>
       <h3 id="storyDlgTitle" class="text-lg font-black">第1章 旅立ちの渓谷</h3>
       <p id="storyDlgText" class="bg-[#FBF7F2] rounded-2xl p-3.5 text-xs sm:text-sm font-bold leading-relaxed"></p>
+      <div class="bg-sage-100 rounded-2xl p-3 flex flex-col gap-1">
+        <div class="text-[10px] font-black text-sage-600">必須タスク＆カギアイテム（達成で次へ進める！）</div>
+        <div id="storyDlgTaskReq" class="text-xs font-black text-cocoa-800">光の羽根を1個取り、リングを2回くぐる</div>
+        <div id="storyDlgCompanionReward" class="text-[11px] font-extrabold text-brand-600 mt-0.5">クリア報酬仲間：ピーちゃん（旅立ちの小鳥）</div>
+      </div>
       <div class="grid grid-cols-3 gap-2 text-center">
         <div class="bg-[#FBF7F2] rounded-2xl p-2"><div class="text-[9px] text-cocoa-400">目標きょり</div><div id="storyDlgGoal" class="text-sm font-black">250m</div></div>
         <div class="bg-[#FBF7F2] rounded-2xl p-2"><div class="text-[9px] text-cocoa-400">むずかしさ</div><div id="storyDlgStars" class="text-sm font-black text-brand-600">★</div></div>
@@ -653,6 +664,23 @@
       <div id="hudModeTimerBar" class="hidden mx-auto bg-cocoa-800 text-cream-50 rounded-full px-4 py-1 text-xs font-extrabold gap-3">
         <span id="hudModeTimerLabel">TIME</span><span id="hudModeTimerValue" class="text-brand-400">60.0s</span>
       </div>
+      <!-- 頭を使う空間・記憶・推理HUD（そろばん計算なし） -->
+      <div id="hudMathPromptBar" class="hidden mx-auto soft-card px-4 py-2.5 flex flex-col items-center gap-1 text-center" style="min-width: 240px;">
+        <div class="flex items-center gap-2 text-[10px] font-black text-sage-600">
+          <span id="hudMathModeTag" class="px-2 py-0.5 rounded-full bg-sage-100">空間パズル</span>
+          <span>クリア数: <strong id="hudMathSolvedCount" class="text-brand-600">0</strong></span>
+        </div>
+        <div id="hudMathQuestionText" class="text-lg sm:text-xl font-black text-cocoa-800 tracking-wide leading-snug">
+          「○」のゲートへ飛ぼう！
+        </div>
+        <div id="hudLogicSubHint" class="text-[10px] font-extrabold text-brand-600">形・色・順番を見極めて傾けて進もう！</div>
+      </div>
+
+      <div id="hudStoryQuestBar" class="hidden mx-auto soft-pill px-3.5 py-1 text-[11px] font-black text-cocoa-800 gap-2 items-center">
+        <span id="hudStoryKeyItemStatus" class="text-brand-600">光の羽根: 0/1</span>
+        <span>·</span>
+        <span id="hudStoryTaskStatus" class="text-sage-600">タスク: 0/2</span>
+      </div>
       <div id="hudWindBanner" class="hidden mx-auto bg-sage-100 text-sage-600 rounded-full px-3 py-0.5 text-[10px] font-extrabold">横風中</div>
       <div id="hudPlayerChips" class="hidden flex-wrap justify-center gap-1"></div>
       <div id="hudCountdown" class="hidden text-center text-6xl font-black text-brand-500 mt-8">3</div>
@@ -742,6 +770,22 @@ const EMBEDDED_VOICES = {
 
 
 
+
+    const STORY_QUESTS = [
+      { chapter: 1,  keyItemName: '光の羽根',     reqItemCount: 1, taskType: 'MATH',     reqTaskVal: 2,  taskLabel: '光の羽根を1個取り、パズルゲートに2回正解する', companion: { id: 'COMP_01', name: 'ピーちゃん',   species: '旅立ちの小鳥',     colorNum: 0xFBBF24, buffText: 'スコア +5%' } },
+      { chapter: 2,  keyItemName: '若葉のしずく', reqItemCount: 1, taskType: 'RING',     reqTaskVal: 4,  taskLabel: '若葉のしずくを1個取り、リングを4回くぐる', companion: { id: 'COMP_02', name: 'ギンやんま',   species: '森のオニヤンマ',   colorNum: 0x34D399, buffText: 'リング吸収拡大' } },
+      { chapter: 3,  keyItemName: 'さくらの花びら', reqItemCount: 1, taskType: 'NEARMISS', reqTaskVal: 1, taskLabel: 'さくらの花びらを1個取り、ニアミス1回達成', companion: { id: 'COMP_03', name: 'モモ',         species: 'さくらインコ',     colorNum: 0xF472B6, buffText: 'スコア +8%' } },
+      { chapter: 4,  keyItemName: '黄金の羅針盤', reqItemCount: 1, taskType: 'RING',     reqTaskVal: 5,  taskLabel: '黄金の羅針盤を1個取り、リングを5回くぐる', companion: { id: 'COMP_04', name: 'スナフ',       species: '砂漠ハヤブサ',     colorNum: 0xF97316, buffText: '横風軽減' } },
+      { chapter: 5,  keyItemName: '氷晶の結晶',   reqItemCount: 2, taskType: 'MATH',     reqTaskVal: 4,  taskLabel: '氷晶の結晶を2個取り、パズルゲートに4回正解する', companion: { id: 'COMP_05', name: 'ユキマル',     species: '氷晶ペンギン',     colorNum: 0x38BDF8, buffText: 'スリップ安定' } },
+      { chapter: 6,  keyItemName: '雲の鍵',       reqItemCount: 2, taskType: 'RING',     reqTaskVal: 6,  taskLabel: '雲の鍵を2個取り、リングを6回くぐる', companion: { id: 'COMP_06', name: 'クモ助',       species: '天空フクロウ',     colorNum: 0xA78BFA, buffText: 'スコア +12%' } },
+      { chapter: 7,  keyItemName: '古代の石版',   reqItemCount: 2, taskType: 'NEARMISS', reqTaskVal: 3,  taskLabel: '古代の石版を2個取り、ニアミス3回達成', companion: { id: 'COMP_07', name: 'イシ丸',       species: '遺跡ツバメ',       colorNum: 0x93AB8A, buffText: '旋回スピードUP' } },
+      { chapter: 8,  keyItemName: '深海の真珠',   reqItemCount: 2, taskType: 'RING',     reqTaskVal: 7,  taskLabel: '深海の真珠を2個取り、リングを7回くぐる', companion: { id: 'COMP_08', name: 'ルリ',         species: '深海カワセミ',     colorNum: 0x06B6D4, buffText: 'コイン獲得 +15%' } },
+      { chapter: 9,  keyItemName: '金色の歯車',   reqItemCount: 3, taskType: 'NEARMISS', reqTaskVal: 3,  taskLabel: '金色の歯車を3個取り、ニアミス3回達成', companion: { id: 'COMP_09', name: 'チクタク',     species: '歯車ハチドリ',     colorNum: 0xFACC15, buffText: 'コンボ維持延長' } },
+      { chapter: 10, keyItemName: '電脳キューブ', reqItemCount: 3, taskType: 'RING',     reqTaskVal: 8,  taskLabel: '電脳キューブを3個取り、リングを8回くぐる', companion: { id: 'COMP_10', name: 'キラリ',       species: '電脳ホタル',       colorNum: 0x818CF8, buffText: 'スコア +15%' } },
+      { chapter: 11, keyItemName: '不死鳥の火種', reqItemCount: 3, taskType: 'NEARMISS', reqTaskVal: 4,  taskLabel: '不死鳥の火種を3個取り、ニアミス4回達成', companion: { id: 'COMP_11', name: 'メラ',         species: '火山フェニックス', colorNum: 0xFB7185, buffText: 'スコア +18%' } },
+      { chapter: 12, keyItemName: '天穹の星核',   reqItemCount: 3, taskType: 'RING',     reqTaskVal: 10, taskLabel: '天穹の星核を3個取り、リングを10回くぐる', companion: { id: 'COMP_12', name: 'ソラ',         species: '天穹の精霊鳥',     colorNum: 0xF97316, buffText: '全能力アップ' } }
+    ];
+
     const DIFFICULTIES = [
       { id: 'EASY', label: 'EASY', jp: 'かんたん', speedMult: 0.78, spawnIntervalMult: 1.28, scoreMult: 0.8, goalDist: 350, hitRadius: 0.44, moveSpeedMult: 0.7 },
       { id: 'NORMAL', label: 'NORMAL', jp: 'ふつう', speedMult: 1.0, spawnIntervalMult: 1.0, scoreMult: 1.0, goalDist: 500, hitRadius: 0.52, moveSpeedMult: 1.0 },
@@ -806,12 +850,12 @@ const EMBEDDED_VOICES = {
     ];
 
     const SOLO_MODES = [
-      { id: 'SURVIVAL', label: 'サバイバル' },
-      { id: 'VS_BOT', label: 'VS BOT' },
-      { id: 'TIME_ATTACK', label: '60秒' },
-      { id: 'RING_RUSH', label: 'リング' },
-      { id: 'SUDDEN_DEATH', label: '高速x2' },
-      { id: 'RANDOM', label: 'ランダム' }
+      { id: 'SPATIAL_LOGIC', label: '空間パズル' },
+      { id: 'MEMORY_ROUTE',  label: '記憶ルート' },
+      { id: 'SURVIVAL',      label: 'サバイバル' },
+      { id: 'VS_BOT',        label: 'VS BOT' },
+      { id: 'TIME_ATTACK',   label: '60秒' },
+      { id: 'RANDOM',        label: 'ランダム' }
     ];
 
     const VOICE_SLOTS = [
@@ -1586,7 +1630,8 @@ const EMBEDDED_VOICES = {
     const game3d = {
       scene: null, camera: null, renderer: null, state: 'IDLE', runMode: 'SOLO', lastTime: 0,
       tunnelGroup: null, floorMat: null, ringMat: null, railMat: null, tunnelRings: [], currentTunnelShape: '',
-      crafts: [], rivalMeshes: {}, directBoost: false, autoBoost: false, obstacles: [], particles: [], spawnTimer: 0,
+      crafts: [], companionMeshes: [], rivalMeshes: {}, directBoost: false, autoBoost: false, obstacles: [], particles: [], spawnTimer: 0,
+      storyItemsCollected: 0,
       teamScore: 0, teamDistance: 0, highScore: 0, bestDistance: 0, bestCombo: 1.0, bestNearMiss: 0,
       teamEnergy: 100, nearMissCount: 0, comboCount: 0, maxComboMult: 1.0, comboDecayTimer: 0,
       windForce: 0, windTimer: 3.0, modeTimer: 0, ringsCollected: 0, lastRandomWarp: 0,
@@ -1808,6 +1853,7 @@ const EMBEDDED_VOICES = {
       clearEntities() {
         if (!this.scene) return;
         this.crafts.forEach(c => this.scene.remove(c.mesh)); this.crafts = [];
+        this.companionMeshes.forEach(cm => this.scene.remove(cm.mesh)); this.companionMeshes = [];
         Object.values(this.rivalMeshes).forEach(m => this.scene.remove(m)); this.rivalMeshes = {};
         this.obstacles.forEach(o => this.scene.remove(o.mesh)); this.obstacles = [];
         this.particles.forEach(p => this.scene.remove(p.mesh)); this.particles = [];
@@ -1839,7 +1885,7 @@ const EMBEDDED_VOICES = {
         this.state = 'COUNTDOWN'; this.teamScore = 0; this.teamDistance = 0; this.teamEnergy = 100;
         this.nearMissCount = 0; this.comboCount = 0; this.maxComboMult = 1.0; this.comboDecayTimer = 0;
         this.windForce = 0; this.windTimer = 3.0; this.speedLevel = 1; this.lastRandomWarp = 0;
-        this.directBoost = false; this.shakeTime = 0; this.spawnTimer = 0.25; this.ringsCollected = 0; this.modeTimer = 0;
+        this.directBoost = false; this.shakeTime = 0; this.spawnTimer = 0.25; this.ringsCollected = 0; this.modeTimer = 0; this.storyItemsCollected = 0; this.mathSolvedCount = 0; this.mathStreak = 0; this.activeMathChallenge = null; this.memorySequence = []; this.memoryStepIdx = 0; if (this.flashTimer) clearInterval(this.flashTimer); document.getElementById('hudMathPromptBar')?.classList.add('hidden'); const scEl = document.getElementById('hudMathSolvedCount'); if (scEl) scEl.textContent = '0';
 
         if (mMode === 'SOLO') {
           if (soloMode === 'TIME_ATTACK') this.modeTimer = 60.0;
@@ -1886,6 +1932,21 @@ const EMBEDDED_VOICES = {
         const gm = document.getElementById('gameOverModal'); gm.classList.add('hidden'); gm.classList.remove('flex'); gm.style.display = 'none';
         document.getElementById('blindOverlay').classList.add('hidden'); document.getElementById('blindOverlay').classList.remove('flex');
         document.getElementById('hudWindBanner').classList.add('hidden');
+        const sqBar = document.getElementById('hudStoryQuestBar');
+        if (sqBar) {
+          sqBar.classList.toggle('hidden', !isStory);
+          sqBar.classList.toggle('flex', isStory);
+        }
+        if (isStory && this.scene) {
+          const unlockedComps = STORY_QUESTS.slice(0, Math.min(app.storyClearedMax, 4)).map(q => q.companion);
+          unlockedComps.forEach((comp, idx) => {
+            const sh = idx % 2 === 0 ? 'BIRD' : 'DRAGONFLY';
+            const built = this.createCraftMesh(comp.colorNum, false, sh, 'NONE');
+            built.group.scale.setScalar(0.55);
+            this.scene.add(built.group);
+            this.companionMeshes.push({ mesh: built.group, wings: built.wings, flapPhase: idx * 1.4, side: idx % 2 === 0 ? -1 : 1, tier: Math.floor(idx / 2) + 1 });
+          });
+        }
 
         const isDirect = (mMode === 'SOLO' || mMode === 'ONLINE' || isStory);
         const isVsBot = (mMode === 'SOLO' && soloMode === 'VS_BOT');
@@ -1985,6 +2046,185 @@ const EMBEDDED_VOICES = {
         targets.forEach(t => { t.debuffType = kind; t.debuffTimer = 3.8; });
         audio.playJammerLaunch(); this.showPopup(`${att.name} が【${kind}】発動！`, '#3E2723');
       },
+      mathSolvedCount: 0,
+      mathStreak: 0,
+      activeMathChallenge: null,
+      memorySequence: [],
+      memoryStepIdx: 0,
+      flashTimer: null,
+
+      createLogicGateTexture(option) {
+        const c = document.createElement('canvas');
+        c.width = 256; c.height = 256;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#FFFDF9';
+        ctx.beginPath();
+        ctx.roundRect(12, 12, 232, 232, 44);
+        ctx.fill();
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = option.borderHex || '#F97316';
+        ctx.stroke();
+
+        const cx = 128, cy = 122;
+        ctx.fillStyle = option.fillHex || '#F97316';
+        ctx.strokeStyle = option.fillHex || '#F97316';
+        ctx.lineWidth = 14;
+
+        if (option.symbol === 'CIRCLE') {
+          ctx.beginPath(); ctx.arc(cx, cy, 52, 0, Math.PI * 2); ctx.fill();
+        } else if (option.symbol === 'TRIANGLE') {
+          ctx.beginPath(); ctx.moveTo(cx, cy - 56); ctx.lineTo(cx + 58, cy + 44); ctx.lineTo(cx - 58, cy + 44); ctx.closePath(); ctx.fill();
+        } else if (option.symbol === 'SQUARE') {
+          ctx.beginPath(); ctx.roundRect(cx - 48, cy - 48, 96, 96, 16); ctx.fill();
+        } else if (option.symbol === 'STAR') {
+          ctx.beginPath();
+          for (let i = 0; i < 10; i++) {
+            const r = i % 2 === 0 ? 58 : 26;
+            const a = -Math.PI / 2 + (i * Math.PI) / 5;
+            const px = cx + Math.cos(a) * r, py = cy + Math.sin(a) * r;
+            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          }
+          ctx.closePath(); ctx.fill();
+        } else if (option.symbol === 'LEFT_ARROW') {
+          ctx.beginPath();
+          ctx.moveTo(cx + 42, cy - 36); ctx.lineTo(cx - 42, cy); ctx.lineTo(cx + 42, cy + 36);
+          ctx.stroke();
+        } else if (option.symbol === 'RIGHT_ARROW') {
+          ctx.beginPath();
+          ctx.moveTo(cx - 42, cy - 36); ctx.lineTo(cx + 42, cy); ctx.lineTo(cx - 42, cy + 36);
+          ctx.stroke();
+        } else if (option.symbol === 'CENTER_DOT') {
+          ctx.beginPath(); ctx.arc(cx, cy, 42, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#93AB8A'; ctx.lineWidth = 8;
+          ctx.beginPath(); ctx.arc(cx, cy, 62, 0, Math.PI * 2); ctx.stroke();
+        }
+
+        ctx.fillStyle = '#3E2723';
+        ctx.font = '900 28px "Zen Maru Gothic", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(option.label || '', cx, 206);
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.needsUpdate = true;
+        return tex;
+      },
+
+      generateMathChallenge() {
+        const diff = DIFFICULTIES[app.currentDiffIndex];
+        const isMemoryMode = (this.runMode === 'SOLO' && app.currentSoloMode === 'MEMORY_ROUTE');
+
+        const shapePool = [
+          { id: 'CIRCLE',   symbol: 'CIRCLE',   label: 'まる',   fillHex: '#F97316', borderHex: '#F97316' },
+          { id: 'TRIANGLE', symbol: 'TRIANGLE', label: 'さんかく', fillHex: '#93AB8A', borderHex: '#93AB8A' },
+          { id: 'SQUARE',   symbol: 'SQUARE',   label: 'しかく', fillHex: '#38BDF8', borderHex: '#38BDF8' },
+          { id: 'STAR',     symbol: 'STAR',     label: 'ほし',   fillHex: '#FBBF24', borderHex: '#FBBF24' }
+        ];
+
+        const dirPool = [
+          { id: 'LEFT',   symbol: 'LEFT_ARROW',  label: 'ひだり', fillHex: '#F97316', borderHex: '#F97316' },
+          { id: 'CENTER', symbol: 'CENTER_DOT',  label: 'まんなか', fillHex: '#93AB8A', borderHex: '#93AB8A' },
+          { id: 'RIGHT',  symbol: 'RIGHT_ARROW', label: 'みぎ',   fillHex: '#38BDF8', borderHex: '#38BDF8' }
+        ];
+
+        const choiceCount = diff.id === 'EASY' ? 2 : 3;
+        let choices = [];
+        let answerId = '';
+        let qText = '';
+        let tagText = '空間パズル';
+        let subHint = 'お題に合ったゲートへ傾けて飛び込もう！';
+
+        if (isMemoryMode) {
+          tagText = '記憶ルート';
+          const seqLen = diff.id === 'EASY' ? 2 : (this.speedLevel >= 4 ? 3 : 2);
+          if (!this.memorySequence || this.memorySequence.length === 0 || this.memoryStepIdx >= this.memorySequence.length) {
+            this.memorySequence = [];
+            for (let i = 0; i < seqLen; i++) {
+              this.memorySequence.push(dirPool[Math.floor(Math.random() * dirPool.length)]);
+            }
+            this.memoryStepIdx = 0;
+          }
+          const targetDir = this.memorySequence[this.memoryStepIdx];
+          answerId = targetDir.id;
+          const seqNames = this.memorySequence.map((s, idx) => idx === this.memoryStepIdx ? `[${s.label}]` : s.label).join(' → ');
+          qText = `順番記憶: ${seqNames}`;
+          subHint = `いまは ${this.memoryStepIdx + 1}/${this.memorySequence.length} 番目「${targetDir.label}」のゲートへ！`;
+
+          const others = dirPool.filter(d => d.id !== targetDir.id).sort(() => Math.random() - 0.5).slice(0, choiceCount - 1);
+          choices = [targetDir, ...others].sort(() => Math.random() - 0.5);
+        } else {
+          const invertRule = (diff.id === 'HARD' || diff.id === 'EXTREME') && Math.random() < 0.35;
+          tagText = invertRule ? '逆転推理パズル' : '空間パズル';
+          const picked = [...shapePool].sort(() => Math.random() - 0.5).slice(0, choiceCount);
+          const target = picked[Math.floor(Math.random() * picked.length)];
+          if (invertRule) {
+            const nonTarget = picked.find(p => p.id !== target.id) || picked[0];
+            answerId = nonTarget.id;
+            qText = `「${target.label}」ではないゲートへ！`;
+            subHint = 'お題の形・色をよく見て、それ以外を選ぼう！';
+          } else {
+            answerId = target.id;
+            qText = `「${target.label}」のゲートへ飛ぼう！`;
+            subHint = '目印の形と色を見極めて、正しいレーンへ！';
+          }
+          choices = picked.sort(() => Math.random() - 0.5);
+        }
+
+        this.activeMathChallenge = { answerId, qText, tagText, choices, resolved: false };
+
+        const bar = document.getElementById('hudMathPromptBar');
+        const tagEl = document.getElementById('hudMathModeTag');
+        const qEl = document.getElementById('hudMathQuestionText');
+        const hEl = document.getElementById('hudLogicSubHint');
+        if (bar) { bar.classList.remove('hidden'); bar.classList.add('flex'); }
+        if (tagEl) tagEl.textContent = tagText;
+        if (qEl) qEl.textContent = qText;
+        if (hEl) hEl.textContent = subHint;
+        return this.activeMathChallenge;
+      },
+
+      spawnMathGateWave() {
+        if (!this.scene) return;
+        const ch = this.generateMathChallenge();
+        const n = ch.choices.length;
+        const laneXs = n === 2 ? [-2.7, 2.7] : [-3.9, 0, 3.9];
+        const gateId = 'LG_' + Date.now() + '_' + Math.random();
+
+        ch.choices.forEach((opt, idx) => {
+          const gx = laneXs[idx];
+          const gy = 0;
+          const g = new THREE.Group();
+          const ringMat = new THREE.MeshLambertMaterial({ color: idx % 2 === 0 ? 0xF97316 : 0x93AB8A, flatShading: true });
+          const frame = new THREE.Mesh(new THREE.TorusGeometry(1.58, 0.16, 8, 20), ringMat);
+          const boardTex = this.createLogicGateTexture(opt);
+          const board = new THREE.Mesh(
+            new THREE.PlaneGeometry(2.15, 2.15),
+            new THREE.MeshBasicMaterial({ map: boardTex, transparent: true, opacity: 0.94, side: THREE.DoubleSide })
+          );
+          g.add(frame, board);
+          g.position.set(gx, gy, this.SPAWN_Z);
+          this.scene.add(g);
+
+          this.obstacles.push({
+            kind: 'MATH_GATE',
+            gateId,
+            choiceId: opt.id,
+            choiceLabel: opt.label,
+            isCorrect: opt.id === ch.answerId,
+            mesh: g,
+            x: gx, y: gy, z: this.SPAWN_Z,
+            radius: 1.85,
+            resolvedBy: new Set()
+          });
+        });
+      },
+      getStoryQuestProgress(chapterIdx) {
+        const sq = STORY_QUESTS[chapterIdx] || STORY_QUESTS[0];
+        const taskCur = sq.taskType === 'MATH' ? this.mathSolvedCount : (sq.taskType === 'RING' ? this.ringsCollected : this.nearMissCount);
+        const itemDone = this.storyItemsCollected >= sq.reqItemCount;
+        const taskDone = taskCur >= sq.reqTaskVal;
+        return { sq, taskCur, itemDone, taskDone, allDone: itemDone && taskDone };
+      },
       getStageZoneInfo(dist) {
         const cycle = Math.floor(dist / 100) % 4;
         if (cycle === 0) return { id: 'GLIDE', name: '滑空ゾーン', ringBoost: 0.08, allowVerticalMove: false, chainChance: 0.25 };
@@ -2017,6 +2257,28 @@ const EMBEDDED_VOICES = {
           return;
         }
 
+        const isBrainPrimary = (mMode === 'SOLO' && (app.currentSoloMode === 'BRAIN_RUN' || app.currentSoloMode === 'SOROBAN_BEADS'));
+        const hasActiveGate = this.obstacles.some(o => o.kind === 'MATH_GATE' && o.z < 2);
+        if (!hasActiveGate && (isBrainPrimary || (mMode === 'STORY' && roll < 0.55) || (mMode === 'SOLO' && roll < 0.28))) {
+          this.spawnMathGateWave();
+          this.spawnTimer = Math.max(this.spawnTimer, 1.45);
+          return;
+        }
+        if (mMode === 'STORY') {
+          const sq = STORY_QUESTS[app.currentMapIndex] || STORY_QUESTS[0];
+          if (this.storyItemsCollected < sq.reqItemCount && roll < 0.34) {
+            const gx = (Math.random() - 0.5) * 7.2;
+            const gy = (Math.random() - 0.5) * 3.8;
+            const g = new THREE.Group();
+            const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.95, 0), new THREE.MeshLambertMaterial({ color: 0xFBBF24, flatShading: true }));
+            const halo = new THREE.Mesh(new THREE.TorusGeometry(1.35, 0.12, 8, 18), new THREE.MeshBasicMaterial({ color: 0x93AB8A }));
+            g.add(gem, halo);
+            g.position.set(gx, gy, this.SPAWN_Z);
+            this.scene.add(g);
+            this.obstacles.push({ kind: 'STORY_ITEM', mesh: g, x: gx, y: gy, z: this.SPAWN_Z, radius: 1.65, collectedBy: new Set() });
+            return;
+          }
+        }
         const isRingMode = (mMode === 'SOLO' && app.currentSoloMode === 'RING_RUSH') || (mMode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE');
         const ringProb = (isRingMode ? 0.65 : (curMap.spawnPattern === 'RINGS_HEAVY' ? 0.38 : 0.24)) + zone.ringBoost;
 
@@ -2126,7 +2388,16 @@ const EMBEDDED_VOICES = {
 
         if (this.state === 'PLAYING') {
           this.teamDistance += this.currentSpeed * dt * 0.45;
-          if (isStory && this.teamDistance >= curMap.storyGoalDist) { app.markStoryChapterCleared(curMap.chapter); this.triggerGameOver(true); return; }
+          if (isStory && this.teamDistance >= curMap.storyGoalDist) {
+            const qp = this.getStoryQuestProgress(app.currentMapIndex);
+            if (qp.allDone) {
+              app.markStoryChapterCleared(curMap.chapter);
+              this.triggerGameOver(true);
+            } else {
+              this.triggerGameOver(false, true);
+            }
+            return;
+          }
           if (mMode === 'SOLO' && app.currentSoloMode === 'RANDOM') {
             const ws = Math.floor(this.teamDistance / 150);
             if (ws > this.lastRandomWarp) { this.lastRandomWarp = ws; const ni = (app.currentMapIndex + 1 + Math.floor(Math.random()*(MAPS.length-1))) % MAPS.length; app.setMapIndex(ni); audio.playSpeedUp(); this.showPopup(`ワープ！${MAPS[ni].name}`, '#F97316'); }
@@ -2204,6 +2475,20 @@ const EMBEDDED_VOICES = {
           }
         }
 
+        if (isStory && this.crafts[0] && this.companionMeshes.length > 0) {
+          const lead = this.crafts[0];
+          const tNow = (this.lastTime || 0) * 0.003;
+          this.companionMeshes.forEach((cm, idx) => {
+            const ox = lead.x + cm.side * (1.35 + cm.tier * 0.55) + Math.sin(tNow + idx) * 0.22;
+            const oy = lead.y + 0.45 + (cm.tier - 1) * 0.45 + Math.cos(tNow * 1.3 + idx) * 0.2;
+            const oz = this.PLAYER_Z + 0.55 * cm.tier;
+            cm.mesh.position.set(ox, oy, oz);
+            cm.mesh.rotation.z = lead.mesh.rotation.z * 0.85;
+            cm.mesh.rotation.x = lead.mesh.rotation.x * 0.85;
+            cm.flapPhase += dt * 24;
+            this.animateBioWings(cm.wings, cm.flapPhase, lead.vy || 0, false, false);
+          });
+        }
         if ((mMode === 'SOLO' || mMode === 'ONLINE' || isStory) && this.crafts[0] && this.camera) {
           this.camera.position.x += (this.crafts[0].x * 0.32 - this.camera.position.x) * Math.min(1, dt * 6);
           this.camera.position.y += ((1.4 + this.crafts[0].y * 0.25) - this.camera.position.y) * Math.min(1, dt * 6);
@@ -2222,6 +2507,7 @@ const EMBEDDED_VOICES = {
         for (let i = this.obstacles.length - 1; i >= 0; i--) {
           const o = this.obstacles[i]; o.z += this.currentSpeed * dt; o.mesh.position.z = o.z;
           if (o.kind === 'RING' || o.kind === 'RESCUE') o.mesh.rotation.z += dt * 2.5;
+          else if (o.kind === 'STORY_ITEM') { o.mesh.rotation.y += dt * 3.2; o.mesh.rotation.z += dt * 1.6; }
           else if (o.kind === 'BLOCK' && (o.moveAmpX > 0 || o.moveAmpY > 0)) {
             o.movePhase += dt * o.moveSpeed;
             if (o.moveAmpX > 0) { o.x = Math.max(-5.2, Math.min(5.2, o.baseX + Math.sin(o.movePhase)*o.moveAmpX)); o.mesh.position.x = o.x; }
@@ -2242,6 +2528,39 @@ const EMBEDDED_VOICES = {
                 else this.showPopup(`RING +${pts}`);
                 if ((mMode === 'HOST' && hostNet.ruleMode === 'BATTLE') || mMode === 'ONLINE' || (mMode === 'SOLO' && app.currentSoloMode === 'VS_BOT')) c.jammerCharge = Math.min(100, c.jammerCharge + 35);
                 audio.playRingCollect();
+              } else if (o.kind === 'MATH_GATE' && !o.resolvedBy.has(c.slotIndex) && Math.abs(c.x - o.x) <= 1.55 && Math.abs(c.y - o.y) <= 2.3) {
+                // 同じ問題グループ（gateId）の他ゲートも含めて解決済みにする
+                this.obstacles.forEach(other => { if (other.kind === 'MATH_GATE' && other.gateId === o.gateId) other.resolvedBy.add(c.slotIndex); });
+                o.mesh.visible = false;
+                if (!c.isBot) {
+                  if (o.isCorrect) {
+                    this.mathSolvedCount++; if (this.memorySequence && this.memorySequence.length > 0) this.memoryStepIdx++;
+                    this.mathStreak++;
+                    this.comboCount++;
+                    this.comboDecayTimer = 5.0;
+                    const mult = this.getComboMultiplier();
+                    if (mult > this.maxComboMult) this.maxComboMult = mult;
+                    const bonus = Math.round(450 * mult * curDiff.scoreMult);
+                    c.score += bonus;
+                    this.teamScore += bonus;
+                    const scEl = document.getElementById('hudMathSolvedCount');
+                    if (scEl) scEl.textContent = String(this.mathSolvedCount);
+                    audio.playNearMiss(Math.min(5, this.mathStreak + 2));
+                    this.showPopup(`せいかい！ +${bonus} (連続${this.mathStreak}問)`, '#93AB8A');
+                  } else {
+                    this.mathStreak = 0;
+                    this.comboCount = 0;
+                    audio.playHit();
+                    this.showPopup(`おしい！次は【${o.choiceLabel || '正解'}】を狙おう`, '#6D4C41');
+                  }
+                }
+              } else if (o.kind === 'STORY_ITEM' && !o.collectedBy.has(c.slotIndex) && Math.hypot(c.x - o.x, c.y - o.y) <= o.radius + magAdd) {
+                o.collectedBy.add(c.slotIndex);
+                o.mesh.visible = false;
+                this.storyItemsCollected++;
+                const sq = STORY_QUESTS[app.currentMapIndex] || STORY_QUESTS[0];
+                audio.playRescue();
+                this.showPopup(`【${sq.keyItemName}】GET! (${Math.min(this.storyItemsCollected, sq.reqItemCount)}/${sq.reqItemCount})`, '#93AB8A');
               } else if (o.kind === 'RESCUE' && !o.collectedBy.has(c.slotIndex) && Math.hypot(c.x - o.x, c.y - o.y) <= o.radius + magAdd) {
                 o.collectedBy.add(c.slotIndex);
                 const ally = this.crafts.find(a => !a.alive);
@@ -2285,9 +2604,12 @@ const EMBEDDED_VOICES = {
           return;
         }
         if (mMode === 'STORY') {
-          c.alive = false; const ok = this.teamDistance >= MAPS[app.currentMapIndex].storyGoalDist;
+          c.alive = false;
+          const distOk = this.teamDistance >= MAPS[app.currentMapIndex].storyGoalDist;
+          const qp = this.getStoryQuestProgress(app.currentMapIndex);
+          const ok = distOk && qp.allDone;
           if (ok) app.markStoryChapterCleared(MAPS[app.currentMapIndex].chapter);
-          this.triggerGameOver(ok); return;
+          this.triggerGameOver(ok, distOk && !qp.allDone); return;
         }
         if (mMode === 'SOLO' || mMode === 'ONLINE') {
           c.alive = false; const ok = this.teamDistance >= DIFFICULTIES[app.currentDiffIndex].goalDist;
@@ -2301,7 +2623,7 @@ const EMBEDDED_VOICES = {
           else if (!alive.length) this.triggerGameOver(false);
         }
       },
-      triggerGameOver(isClear = false) {
+      triggerGameOver(isClear = false, storyTaskIncomplete = false) {
         this.state = 'GAMEOVER';
         if (isClear) audio.playClear(); else audio.playCrash();
         if (this.runMode === 'HOST') hostNet.broadcastSnapshots(this.crafts);
@@ -2329,8 +2651,24 @@ const EMBEDDED_VOICES = {
         }
 
         const epBox = document.getElementById('resultStoryEpilogue'), nextBtn = document.getElementById('btnResultNextStory');
-        if (isStory && isClear) { epBox.classList.remove('hidden'); epBox.textContent = MAPS[app.currentMapIndex].clearText; nextBtn.classList.toggle('hidden', app.currentMapIndex >= MAPS.length - 1); }
-        else { epBox.classList.add('hidden'); nextBtn.classList.add('hidden'); }
+        if (isStory) {
+          const qp = this.getStoryQuestProgress(app.currentMapIndex);
+          epBox.classList.remove('hidden');
+          if (isClear) {
+            epBox.textContent = `${MAPS[app.currentMapIndex].clearText} 仲間【${qp.sq.companion.name}（${qp.sq.companion.species}）】が加わったよ！（効果：${qp.sq.companion.buffText}）`;
+            nextBtn.classList.toggle('hidden', app.currentMapIndex >= MAPS.length - 1);
+          } else {
+            const missItem = !qp.itemDone ? `【${qp.sq.keyItemName}】(${this.storyItemsCollected}/${qp.sq.reqItemCount})` : '';
+            const missTask = !qp.taskDone ? `【章タスク】(${qp.taskCur}/${qp.sq.reqTaskVal})` : '';
+            epBox.textContent = storyTaskIncomplete
+              ? `目標距離に到達したけど、${missItem} ${missTask} がまだ未達成！すべて達成すると仲間が加わって次の章へ進めるよ！`
+              : `ミッション条件：${qp.sq.taskLabel}`;
+            nextBtn.classList.add('hidden');
+          }
+        } else {
+          epBox.classList.add('hidden');
+          nextBtn.classList.add('hidden');
+        }
 
         const backBtn = document.getElementById('btnResultBackLobby');
         backBtn.classList.toggle('hidden', !(isHost || isOnline || isStory));
@@ -2361,6 +2699,13 @@ const EMBEDDED_VOICES = {
         document.getElementById('hudSpeedLv').textContent = this.speedLevel;
         const zEl = document.getElementById('hudZoneName');
         if (zEl) zEl.textContent = this.getStageZoneInfo(this.teamDistance).name;
+        if (this.runMode === 'STORY') {
+          const qp = this.getStoryQuestProgress(app.currentMapIndex);
+          const kEl = document.getElementById('hudStoryKeyItemStatus');
+          const tEl = document.getElementById('hudStoryTaskStatus');
+          if (kEl) kEl.textContent = `${qp.sq.keyItemName}: ${Math.min(this.storyItemsCollected, qp.sq.reqItemCount)}/${qp.sq.reqItemCount}${qp.itemDone ? ' ✓' : ''}`;
+          if (tEl) tEl.textContent = `${qp.sq.taskType === 'MATH' ? 'パズル正解' : (sq.taskType === 'RING' ? 'リング' : 'ニアミス')}: ${Math.min(qp.taskCur, qp.sq.reqTaskVal)}/${qp.sq.reqTaskVal}${qp.taskDone ? ' ✓' : ''}`;
+        }
         document.getElementById('hudSpeed').textContent = Math.round(this.currentSpeed * 3.4);
         if ((this.runMode === 'SOLO' && (app.currentSoloMode === 'TIME_ATTACK' || app.currentSoloMode === 'RING_RUSH')) || (this.runMode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE')) {
           document.getElementById('hudModeTimerLabel').textContent = app.currentSoloMode === 'RING_RUSH' ? `RUSH (${this.ringsCollected})` : 'TIME';
@@ -2389,7 +2734,7 @@ const EMBEDDED_VOICES = {
 
     const app = {
       currentScreen: 'screenHome', mode: 'NONE', currentMapIndex: 0, currentDiffIndex: 1,
-      currentSoloMode: 'SURVIVAL', botLevelSetting: 'RANDOM',
+      currentSoloMode: 'SPATIAL_LOGIC', botLevelSetting: 'RANDOM',
       custom: { colorIndex: 0, shapeId: 'EGGPOD', partId: 'NONE' },
       clearedStages: {}, storyClearedMax: 0, pendingStoryChapterIndex: 0,
       coins: 500, ownedIds: ['OUTFIT_001', 'ITEM_001', 'COLL_001'],
@@ -2622,10 +2967,20 @@ const EMBEDDED_VOICES = {
       },
       openStoryMap() { audio.init(); this.renderStoryChapterList(); this.showScreen('screenStoryMap'); },
       renderStoryChapterList() {
+        const compCountEl = document.getElementById('storyCompanionCount');
+        const compRowEl = document.getElementById('storyCompanionsRow');
+        const recruited = STORY_QUESTS.slice(0, this.storyClearedMax).map(q => q.companion);
+        if (compCountEl) compCountEl.textContent = String(recruited.length);
+        if (compRowEl) {
+          compRowEl.innerHTML = recruited.length
+            ? recruited.map(c => `<span class="px-2.5 py-1 rounded-full bg-sage-500 text-white text-[10px] font-black">${c.name}（${c.buffText}）</span>`).join('')
+            : 'まだ仲間はいません（第1章のアイテム＆タスク達成で仲間加入！）';
+        }
         const list = document.getElementById('storyChapterList'); if (!list) return;
         list.innerHTML = '';
-        const offsets = [0, -40, -58, -20, 34, 58, 26, -28, -56, -20, 34, 0];
+        const offsets = [0, -34, -48, -16, 28, 48, 22, -24, -46, -16, 28, 0];
         MAPS.forEach((m, idx) => {
+          const sq = STORY_QUESTS[idx] || STORY_QUESTS[0];
           const unlocked = idx <= this.storyClearedMax, cleared = m.chapter <= this.storyClearedMax, isCur = (idx === this.storyClearedMax);
           const row = document.createElement('div');
           row.className = 'w-full flex flex-col items-center py-1';
@@ -2637,17 +2992,23 @@ const EMBEDDED_VOICES = {
           btn.innerHTML = `<span class="text-xs">${unlocked ? (isCur ? `${m.chapter}章` : 'クリア') : '鍵'}</span>`;
           const lbl = document.createElement('div');
           lbl.className = `mt-1 text-[11px] font-extrabold ${unlocked?'text-cocoa-800':'text-cocoa-400'}`;
-          lbl.textContent = `${m.chapter}. ${m.name} (${m.storyGoalDist}m)`;
-          row.append(btn, lbl); list.appendChild(row);
+          lbl.textContent = `${m.chapter}. ${m.name} · 仲間:${sq.companion.name}`;
+          const sub = document.createElement('div');
+          sub.className = `text-[10px] font-bold ${unlocked?'text-sage-600':'text-cocoa-400'}`;
+          sub.textContent = cleared ? `達成済（${sq.keyItemName}）` : `条件: ${sq.taskLabel}`;
+          row.append(btn, lbl, sub); list.appendChild(row);
         });
       },
       openStoryDialogue(idx) {
         const m = MAPS[idx]; if (!m) return;
+        const sq = STORY_QUESTS[idx] || STORY_QUESTS[0];
         this.pendingStoryChapterIndex = idx;
         document.getElementById('storyDlgChapterBadge').textContent = `第${m.chapter}章`;
         document.getElementById('storyDlgShapeTag').textContent = m.tag;
         document.getElementById('storyDlgTitle').textContent = m.storyTitle;
         document.getElementById('storyDlgText').textContent = m.introText;
+        document.getElementById('storyDlgTaskReq').textContent = sq.taskLabel;
+        document.getElementById('storyDlgCompanionReward').textContent = `達成で仲間加入：${sq.companion.name}（${sq.companion.species} / ${sq.companion.buffText}）`;
         document.getElementById('storyDlgGoal').textContent = `${m.storyGoalDist}m`;
         document.getElementById('storyDlgStars').textContent = '★'.repeat(m.difficultyStars);
         document.getElementById('storyDlgGimmick').textContent = m.gimmick;
