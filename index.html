@@ -192,7 +192,7 @@
   <nav id="bottomNavDock" class="fixed bottom-0 left-0 right-0 z-30 px-3 pb-2.5 pt-1.5 pointer-events-none" style="padding-bottom: max(10px, env(safe-area-inset-bottom));">
     <div class="pointer-events-auto max-w-md mx-auto soft-card px-2 py-1.5 grid grid-cols-4 gap-1.5">
       <button id="navTabHome" type="button" class="py-2 rounded-2xl bg-brand-500 text-white font-extrabold text-xs">ホーム</button>
-      <button id="navTabStory" type="button" class="py-2 rounded-2xl text-cocoa-600 font-extrabold text-xs">冒険12章</button>
+      <button id="navTabStory" type="button" class="py-2 rounded-2xl text-cocoa-600 font-extrabold text-xs">冒険18章</button>
       <button id="navTabEncyclopedia" type="button" class="py-2 rounded-2xl text-cocoa-600 font-extrabold text-xs">イラスト図鑑</button>
       <button id="navTabCustom" type="button" class="py-2 rounded-2xl text-cocoa-600 font-extrabold text-xs">きせかえ改造</button>
     </div>
@@ -248,6 +248,12 @@
             <option value="9">10. ネオン・サイバーシティ</option>
             <option value="10">11. マグマ・ボルケーノ</option>
             <option value="11">12. コスモ・ヴォイド</option>
+            <option value="12">13. メープル・キャニオン</option>
+            <option value="13">14. サンゴ・ラグーン</option>
+            <option value="14">15. バンブー・テンプル</option>
+            <option value="15">16. ミラー・クリスタル</option>
+            <option value="16">17. オーロラ・スカイ</option>
+            <option value="17">18. ギャラクシー・コア</option>
           </select>
           <select id="quickDiffSelect" class="clean-select min-w-0 w-full bg-[#FBF7F2] rounded-2xl px-2.5 py-2.5 text-[11px] font-extrabold text-cocoa-800">
             <option value="0">かんたん</option>
@@ -256,7 +262,8 @@
             <option value="3">げきむず</option>
           </select>
           <select id="selectBotLevelHome" class="clean-select min-w-0 w-full bg-[#FBF7F2] rounded-2xl px-2.5 py-2.5 text-[11px] font-extrabold text-cocoa-800">
-            <option value="RANDOM">BOT: ランダム</option>
+            <option value="RANDOM" selected>BOT: ランダム (5体)</option>
+            <option value="NONE">BOT: なし (1人)</option>
             <option value="1">BOT: Lv.1</option><option value="2">BOT: Lv.2</option><option value="3">BOT: Lv.3</option>
             <option value="4">BOT: Lv.4</option><option value="5">BOT: Lv.5</option><option value="6">BOT: Lv.6</option>
             <option value="7">BOT: Lv.7</option><option value="8">BOT: Lv.8</option><option value="9">BOT: Lv.9</option><option value="10">BOT: Lv.10</option>
@@ -275,11 +282,11 @@
           <button id="btnModeHost" type="button" class="btn-peach py-2 px-2 text-xs font-extrabold truncate">モニター画面</button>
           <button id="btnModeRemote" type="button" class="btn-peach py-2 px-2 text-xs font-extrabold truncate">スマホリモコン</button>
         </div>
-                <!-- サブアクション3つ（計4ボタン構成：冒険12章 / イラスト図鑑 / きせかえ・設定） -->
+                <!-- サブアクション3つ（計4ボタン構成：冒険18章 / イラスト図鑑 / きせかえ・設定） -->
         <div class="grid grid-cols-3 gap-2 text-center">
           <button id="btnStartStory" type="button" class="btn-sage py-3 px-2 flex flex-col items-center justify-center">
-            <span class="text-xs font-black">冒険12章</span>
-            <span id="homeStoryProgressBadge" class="text-[10px] font-extrabold opacity-90 mt-0.5">0/12章</span>
+            <span class="text-xs font-black">冒険18章</span>
+            <span id="homeStoryProgressBadge" class="text-[10px] font-extrabold opacity-90 mt-0.5">0/18章</span>
           </button>
           <button id="btnOpenEncyclopediaQuick" type="button" class="btn-peach py-3 px-2 flex flex-col items-center justify-center">
             <span class="text-xs font-black">イラスト図鑑</span>
@@ -319,7 +326,7 @@
         </div>
         <div class="flex items-center gap-2 shrink-0">
           <span class="px-3 py-1.5 rounded-full bg-sage-100 text-sage-600 font-black text-xs">
-            収集 <span id="vaultProgressText">3 / 126</span>
+            収集 <span id="vaultProgressText">3 / 186</span>
           </span>
           <span class="px-3 py-1.5 rounded-full bg-brand-500 text-white font-black text-xs">
             <span id="shopCoinBalance">500</span>C
@@ -388,13 +395,13 @@
       <div class="soft-card w-full px-4 py-3 mb-2.5 flex flex-col gap-2">
         <div class="flex items-center justify-between">
           <div class="text-left">
-            <h2 class="text-base font-black">ぼうけんマップ（全12章）</h2>
+            <h2 class="text-base font-black">ぼうけんマップ（全18章）</h2>
             <p class="text-[11px] font-bold text-cocoa-600">アイテムと章タスクを達成すると仲間が増えて先に進めるよ！</p>
           </div>
-          <div id="storyCoreCount" class="px-3 py-1 rounded-full bg-sage-100 text-sage-600 text-xs font-black">0 / 12</div>
+          <div id="storyCoreCount" class="px-3 py-1 rounded-full bg-sage-100 text-sage-600 text-xs font-black">0 / 18</div>
         </div>
         <div class="bg-[#FBF7F2] rounded-2xl px-3 py-2 text-left">
-          <div class="text-[10px] font-extrabold text-sage-600 mb-1">いっしょに飛ぶ仲間（<span id="storyCompanionCount">0</span>/12体）</div>
+          <div class="text-[10px] font-extrabold text-sage-600 mb-1">いっしょに飛ぶ仲間（<span id="storyCompanionCount">0</span>/18体）</div>
           <div id="storyCompanionsRow" class="flex flex-wrap gap-1.5 text-[10px] font-extrabold text-cocoa-600">まだ仲間はいません（第1章クリアで仲間加入！）</div>
         </div>
       </div>
@@ -758,7 +765,7 @@
           <div id="virtualStickKnob" class="w-12 h-12 rounded-full bg-brand-500"></div>
         </div>
         <div class="pointer-events-auto flex flex-col items-end gap-2">
-          <button id="btnDirectJammer" type="button" class="hidden px-4 py-2.5 rounded-2xl bg-cream-200 text-cocoa-600 font-extrabold text-xs">お邪魔 (0%)</button>
+          <button id="btnDirectJammer" type="button" class="hidden min-w-[148px] min-h-[58px] px-5 py-4 rounded-3xl bg-cocoa-800 text-cream-50 font-black text-sm sm:text-base flex items-center justify-center">お邪魔 (0%)</button>
           <div class="flex gap-2">
             <button id="btnIngameAutoBoost" type="button" class="btn-peach px-3 py-3.5 text-xs font-extrabold">自動加速: OFF</button>
             <button id="btnIngameReset" type="button" class="btn-peach px-3 py-3.5 text-xs font-extrabold">正面リセット</button>
@@ -846,7 +853,13 @@ const EMBEDDED_VOICES = {
       { chapter: 9,  keyItemName: '金色の歯車',   reqItemCount: 3, taskType: 'NEARMISS', reqTaskVal: 3,  taskLabel: '金色の歯車を3個取り、ニアミス3回達成', companion: { id: 'COMP_09', name: 'チクタク',     species: '歯車ハチドリ',     colorNum: 0xFACC15, buffText: 'コンボ維持延長' } },
       { chapter: 10, keyItemName: '電脳キューブ', reqItemCount: 3, taskType: 'RING',     reqTaskVal: 8,  taskLabel: '電脳キューブを3個取り、リングを8回くぐる', companion: { id: 'COMP_10', name: 'キラリ',       species: '電脳ホタル',       colorNum: 0x818CF8, buffText: 'スコア +15%' } },
       { chapter: 11, keyItemName: '不死鳥の火種', reqItemCount: 3, taskType: 'NEARMISS', reqTaskVal: 4,  taskLabel: '不死鳥の火種を3個取り、ニアミス4回達成', companion: { id: 'COMP_11', name: 'メラ',         species: '火山フェニックス', colorNum: 0xFB7185, buffText: 'スコア +18%' } },
-      { chapter: 12, keyItemName: '天穹の星核',   reqItemCount: 3, taskType: 'RING',     reqTaskVal: 10, taskLabel: '天穹の星核を3個取り、リングを10回くぐる', companion: { id: 'COMP_12', name: 'ソラ',         species: '天穹の精霊鳥',     colorNum: 0xF97316, buffText: '全能力アップ' } }
+      { chapter: 12, keyItemName: '天穹の星核',   reqItemCount: 3, taskType: 'RING',     reqTaskVal: 10, taskLabel: '天穹の星核を3個取り、リングを10回くぐる', companion: { id: 'COMP_12', name: 'ソラ',         species: '天穹の精霊鳥',     colorNum: 0xF97316, buffText: '全能力アップ' } },
+      { chapter: 13, keyItemName: '紅葉の結晶',   reqItemCount: 2, taskType: 'RING',     reqTaskVal: 8,  taskLabel: '紅葉の結晶を2個取り、リングを8回くぐる', companion: { id: 'COMP_13', name: 'カエデ',       species: '紅葉アカトンボ',   colorNum: 0xEA580C, buffText: '横風耐性アップ' } },
+      { chapter: 14, keyItemName: 'サンゴの宝珠', reqItemCount: 2, taskType: 'NEARMISS', reqTaskVal: 3,  taskLabel: 'サンゴの宝珠を2個取り、ニアミス3回達成', companion: { id: 'COMP_14', name: 'サンゴ丸',     species: '海風カモメ',       colorNum: 0x14B8A6, buffText: 'リング吸収拡大' } },
+      { chapter: 15, keyItemName: '竹林の秘巻',   reqItemCount: 3, taskType: 'RING',     reqTaskVal: 9,  taskLabel: '竹林の秘巻を3個取り、リングを9回くぐる', companion: { id: 'COMP_15', name: 'タケチヨ',     species: '竹林ウグイス',     colorNum: 0x4D7C0F, buffText: '旋回スピードUP' } },
+      { chapter: 16, keyItemName: '鏡面のプリズム', reqItemCount: 3, taskType: 'NEARMISS', reqTaskVal: 4, taskLabel: '鏡面のプリズムを3個取り、ニアミス4回達成', companion: { id: 'COMP_16', name: 'ミラージュ',   species: '氷晶ハヤブサ',     colorNum: 0x0284C7, buffText: 'スリップ制御UP' } },
+      { chapter: 17, keyItemName: '極光の羽飾り', reqItemCount: 3, taskType: 'RING',     reqTaskVal: 11, taskLabel: '極光の羽飾りを3個取り、リングを11回くぐる', companion: { id: 'COMP_17', name: 'オーロ',       species: '極光フクロウ',     colorNum: 0x6366F1, buffText: 'スコア +20%' } },
+      { chapter: 18, keyItemName: '銀河の王冠',   reqItemCount: 4, taskType: 'NEARMISS', reqTaskVal: 5,  taskLabel: '銀河の王冠を4個取り、ニアミス5回達成', companion: { id: 'COMP_18', name: 'コスモス',     species: '銀河フェニックス', colorNum: 0x7C3AED, buffText: '究極マスター加護' } }
     ];
 
 
@@ -880,7 +893,13 @@ const EMBEDDED_VOICES = {
       { id: 'CLOCKWORK', chapter: 9, storyTitle: '第9章 時計塔', name: 'クロックワーク・タワー', tag: '巨大歯車', gimmick: '歯車＆可動壁', tunnelShape: 'GEAR', obstacleShape: 'CLOCK_GEAR', bgHex: 0xFFFBEB, fogHex: 0xFFFBEB, floorHex: 0xFEF3C7, ringHex: 0xFCD34D, railHex: 0xD97706, blockHex: 0x78350F, stripeHex: 0xF59E0B, spawnPattern: 'MOVING_GATES', speedBonus: 1.10, slippery: false, hasWind: false, hasMoving: true, hasSpinner: true, storyGoalDist: 600, storySpeedMult: 1.20, storySpawnMult: 0.84, difficultyStars: 4, introText: '「歯車と動く壁が交錯する時計塔だ！」', clearText: '「第9章クリア！残りはあと3章！」' },
       { id: 'CYBER', chapter: 10, storyTitle: '第10章 電脳都市', name: 'ネオン・サイバーシティ', tag: '電脳ゲート', gimmick: '高速スライド壁', tunnelShape: 'SQUARE', obstacleShape: 'NEON_GATE', bgHex: 0xEEF2FF, fogHex: 0xEEF2FF, floorHex: 0xE0E7FF, ringHex: 0xA5B4FC, railHex: 0x6366F1, blockHex: 0x312E81, stripeHex: 0xF472B6, spawnPattern: 'MOVING_GATES', speedBonus: 1.14, slippery: false, hasWind: false, hasMoving: true, hasSpinner: false, storyGoalDist: 650, storySpeedMult: 1.26, storySpawnMult: 0.80, difficultyStars: 4, introText: '「高速スライドするゲートを突破しよう！」', clearText: '「第10章クリア！いよいよ終盤だ！」' },
       { id: 'VOLCANO', chapter: 11, storyTitle: '第11章 灼熱火山', name: 'マグマ・ボルケーノ', tag: '溶岩迷路', gimmick: '高密度＆熱風', tunnelShape: 'HEXAGON', obstacleShape: 'MAGMA', bgHex: 0xFEF2F2, fogHex: 0xFEF2F2, floorHex: 0xFEE2E2, ringHex: 0xFCA5A5, railHex: 0xEF4444, blockHex: 0x7F1D1D, stripeHex: 0xFB923C, spawnPattern: 'DENSE_WALLS', speedBonus: 1.16, slippery: false, hasWind: true, hasMoving: true, hasSpinner: false, storyGoalDist: 700, storySpeedMult: 1.33, storySpawnMult: 0.74, difficultyStars: 5, introText: '「灼熱の火山ステージを駆け抜けよう！」', clearText: '「第11章クリア！次はついに最終章だ！」' },
-      { id: 'COSMO', chapter: 12, storyTitle: '最終章 コスモ・ヴォイド', name: 'コスモ・ヴォイド', tag: '次元星環', gimmick: '全ギミック複合', tunnelShape: 'VOID', obstacleShape: 'VOID_POLY', bgHex: 0xF5F3FF, fogHex: 0xF5F3FF, floorHex: 0xEDE9FE, ringHex: 0xC4B5FD, railHex: 0x8B5CF6, blockHex: 0x4C1D95, stripeHex: 0xFBBF24, spawnPattern: 'ALL_MIX', speedBonus: 1.22, slippery: false, hasWind: true, hasMoving: true, hasSpinner: true, storyGoalDist: 800, storySpeedMult: 1.42, storySpawnMult: 0.68, difficultyStars: 5, introText: '「最後の光のコアを取り戻して世界を救おう！」', clearText: '「全12章クリアおめでとう！最高のフライトだったよ！」' }
+      { id: 'COSMO', chapter: 12, storyTitle: '第12章 コスモ・ヴォイド', name: 'コスモ・ヴォイド', tag: '次元星環', gimmick: '全ギミック複合', tunnelShape: 'VOID', obstacleShape: 'VOID_POLY', bgHex: 0xF5F3FF, fogHex: 0xF5F3FF, floorHex: 0xEDE9FE, ringHex: 0xC4B5FD, railHex: 0x8B5CF6, blockHex: 0x4C1D95, stripeHex: 0xFBBF24, spawnPattern: 'ALL_MIX', speedBonus: 1.22, slippery: false, hasWind: true, hasMoving: true, hasSpinner: true, storyGoalDist: 800, storySpeedMult: 1.42, storySpawnMult: 0.68, difficultyStars: 5, introText: '「次元の星環を抜けて新たな空の扉を開こう！」', clearText: '「第12章クリア！さらに広がる新ステージへ！」' },
+      { id: 'MAPLE', chapter: 13, storyTitle: '第13章 紅葉の渓谷', name: 'メープル・キャニオン', tag: '紅葉気流', gimmick: '秋風＆連続リング', tunnelShape: 'OCTAGON', obstacleShape: 'TRUNK', bgHex: 0xFFF7ED, fogHex: 0xFFF7ED, floorHex: 0xFFEDD5, ringHex: 0xFB923C, railHex: 0xEA580C, blockHex: 0x7C2D12, stripeHex: 0xFBBF24, spawnPattern: 'RINGS_HEAVY', speedBonus: 1.12, slippery: false, hasWind: true, hasMoving: false, hasSpinner: false, storyGoalDist: 850, storySpeedMult: 1.32, storySpawnMult: 0.78, difficultyStars: 3, introText: '「秋風が吹く紅葉の渓谷をリングに乗って滑空しよう！」', clearText: '「第13章クリア！紅葉のコアを手に入れた！」' },
+      { id: 'LAGOON', chapter: 14, storyTitle: '第14章 南国サンゴ礁', name: 'サンゴ・ラグーン', tag: 'サンゴ環礁', gimmick: '潮風＆回転ゲート', tunnelShape: 'CIRCLE', obstacleShape: 'CORAL_REEF', bgHex: 0xF0FDFA, fogHex: 0xF0FDFA, floorHex: 0xCCFBF1, ringHex: 0x5EEAD4, railHex: 0x14B8A6, blockHex: 0x115E59, stripeHex: 0xF97316, spawnPattern: 'SPINNER_RUN', speedBonus: 1.14, slippery: false, hasWind: true, hasMoving: false, hasSpinner: true, storyGoalDist: 900, storySpeedMult: 1.36, storySpawnMult: 0.76, difficultyStars: 4, introText: '「エメラルドの海風と回転サンゴを抜けて進もう！」', clearText: '「第14章クリア！サンゴのコアを獲得！」' },
+      { id: 'BAMBOO', chapter: 15, storyTitle: '第15章 竹林の古寺', name: 'バンブー・テンプル', tag: '竹林スラローム', gimmick: '竹柱の連なり', tunnelShape: 'TORII', obstacleShape: 'TRUNK', bgHex: 0xF2F7F0, fogHex: 0xF2F7F0, floorHex: 0xDCE8D7, ringHex: 0x93AB8A, railHex: 0x4D7C0F, blockHex: 0x1A2E05, stripeHex: 0xFBBF24, spawnPattern: 'DENSE_WALLS', speedBonus: 1.16, slippery: false, hasWind: false, hasMoving: true, hasSpinner: false, storyGoalDist: 950, storySpeedMult: 1.40, storySpawnMult: 0.74, difficultyStars: 4, introText: '「静かな竹林の古寺で細かなスラロームに挑戦！」', clearText: '「第15章クリア！竹林のコアを回収！」' },
+      { id: 'MIRROR', chapter: 16, storyTitle: '第16章 鏡面クリスタル洞窟', name: 'ミラー・クリスタル', tag: '鏡面氷晶', gimmick: '氷スリップ＆旋回', tunnelShape: 'DIAMOND', obstacleShape: 'CRYSTAL', bgHex: 0xECFEFF, fogHex: 0xECFEFF, floorHex: 0xCFFAFE, ringHex: 0x38BDF8, railHex: 0x0284C7, blockHex: 0x0C4A6E, stripeHex: 0xE879F9, spawnPattern: 'HIGH_SPEED', speedBonus: 1.20, slippery: true, hasWind: false, hasMoving: true, hasSpinner: true, storyGoalDist: 1000, storySpeedMult: 1.44, storySpawnMult: 0.72, difficultyStars: 5, introText: '「つるつる滑る鏡の洞窟で早めの旋回を決めよう！」', clearText: '「第16章クリア！鏡面のコアを手に入れた！」' },
+      { id: 'AURORA', chapter: 17, storyTitle: '第17章 極夜のオーロラ空域', name: 'オーロラ・スカイ', tag: '極光ウェーブ', gimmick: '極光気流＆可動壁', tunnelShape: 'HEXAGON', obstacleShape: 'CLOUD_PILLAR', bgHex: 0xEEF2FF, fogHex: 0xEEF2FF, floorHex: 0xE0E7FF, ringHex: 0x34D399, railHex: 0x6366F1, blockHex: 0x1E1B4B, stripeHex: 0x38BDF8, spawnPattern: 'MOVING_GATES', speedBonus: 1.24, slippery: false, hasWind: true, hasMoving: true, hasSpinner: false, storyGoalDist: 1050, storySpeedMult: 1.48, storySpawnMult: 0.70, difficultyStars: 5, introText: '「オーロラが揺れる夜空の気流を乗りこなそう！」', clearText: '「第17章クリア！ついに最後の銀河ステージへ！」' },
+      { id: 'GALAXY', chapter: 18, storyTitle: '最終章 ギャラクシー・コア', name: 'ギャラクシー・コア', tag: '銀河星団', gimmick: '超高速・全ギミック総力戦', tunnelShape: 'VOID', obstacleShape: 'VOID_POLY', bgHex: 0xFAF5FF, fogHex: 0xFAF5FF, floorHex: 0xF3E8FF, ringHex: 0xF97316, railHex: 0x7C3AED, blockHex: 0x3B0764, stripeHex: 0xFBBF24, spawnPattern: 'ALL_MIX', speedBonus: 1.28, slippery: true, hasWind: true, hasMoving: true, hasSpinner: true, storyGoalDist: 1150, storySpeedMult: 1.54, storySpawnMult: 0.66, difficultyStars: 5, introText: '「銀河の中心に眠る究極のスターコアを目指そう！」', clearText: '「全18章完全制覇おめでとう！君は伝説のスカイマスターだ！」' }
     ];
 
     const PLAYER_PALETTE = [
@@ -2246,13 +2265,14 @@ const EMBEDDED_VOICES = {
           group.position.set(0, 0, this.PLAYER_Z); this.scene.add(group);
           this.crafts.push({ slotIndex: 0, wings, vx: 0, vy: 0, flapPhase: 0, slotId: pal.id, name: myEntry ? myEntry.name : 'YOU', colorHex: pal.hex, isBot: false, botProfile: null, partId: myPart, shieldCharges: myPart === 'SHIELD' ? 1 : 0, shieldMesh, mesh: group, shadow, debuffRing, x: 0, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: 1, jammerCharge: 35, debuffType: null, debuffTimer: 0, botTargetX: 0, botTargetY: 0, botThinkTimer: 0, botWobbleSeed: 1, botBoostTimer: 0, botJamWait: 1, botBoostActive: false });
 
-          if (mMode === 'SOLO' && soloMode === 'VS_BOT') {
+          const shouldSpawnBots = (mMode === 'SOLO' && (soloMode === 'VS_BOT' || app.botLevelSetting !== 'NONE'));
+          if (shouldSpawnBots) {
             for (let b = 1; b <= 5; b++) {
               const bPal = PLAYER_PALETTE[(app.custom.colorIndex + b * 3) % PLAYER_PALETTE.length];
               const prof = createBotProfile(app.getBotForcedLevel());
               const bSh = CRAFT_SHAPES[b % CRAFT_SHAPES.length].id;
               const { group: bg, shadow: bs, debuffRing: bd, wings: bw } = this.createCraftMesh(bPal.num, false, bSh, 'NONE');
-              const sx = ((b / 5) - 0.5) * 6.5; bg.position.set(sx, 0, this.PLAYER_Z); this.scene.add(bg);
+              const sx = ((b - 3) * 1.65); const sy = (b % 2 === 0 ? 0.55 : -0.45); bg.position.set(sx, sy, this.PLAYER_Z - 1.4); this.scene.add(bg);
               this.crafts.push({ slotIndex: b, wings: bw, vx: 0, vy: 0, flapPhase: b * 1.1, slotId: bPal.id, name: `BOT-${b} Lv.${prof.level}`, colorHex: bPal.hex, isBot: true, botProfile: prof, partId: 'NONE', shieldCharges: 0, shieldMesh: null, mesh: bg, shadow: bs, debuffRing: bd, x: sx, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: b+1, jammerCharge: 30, debuffType: null, debuffTimer: 0, botTargetX: sx, botTargetY: 0, botThinkTimer: Math.random()*0.2, botWobbleSeed: b*17, botBoostTimer: 0, botJamWait: prof.jamDelay, botBoostActive: false });
             }
           }
@@ -2459,7 +2479,7 @@ const EMBEDDED_VOICES = {
           return;
         }
 
-                const allowSabotageBox = (mMode === 'ONLINE') || (mMode === 'SOLO' && app.currentSoloMode === 'VS_BOT') || (mMode === 'HOST' && hostNet.ruleMode === 'BATTLE');
+                const allowSabotageBox = (mMode === 'ONLINE') || (mMode === 'SOLO' && (app.currentSoloMode === 'VS_BOT' || app.botLevelSetting !== 'NONE')) || (mMode === 'HOST' && hostNet.ruleMode === 'BATTLE');
         if (allowSabotageBox && roll > 0.76) {
           const itemMeta = SABOTAGE_ITEMS[Math.floor(Math.random() * SABOTAGE_ITEMS.length)];
           const gx = (Math.random() - 0.5) * 7.6;
@@ -2690,7 +2710,8 @@ const EMBEDDED_VOICES = {
           this.animateBioWings(c.wings, c.flapPhase, c.vy, pbNow, isHovering);
 
           const wingLiftBob = (c.vy < -0.35 && !pbNow) ? 0 : Math.sin(c.flapPhase) * 0.048;
-          c.mesh.position.set(c.x, c.y + wingLiftBob, this.PLAYER_Z);
+          const zLane = c.isBot ? (this.PLAYER_Z - 1.2 - (c.slotIndex % 3) * 0.45) : this.PLAYER_Z;
+          c.mesh.position.set(c.x, c.y + wingLiftBob, zLane);
           // 鳥・トンボの3軸姿勢連動（旋回ロール・上昇下降ピッチ・進行方向ヨー）
           c.mesh.rotation.z = Math.max(-0.75, Math.min(0.75, -c.vx * 0.095));
           c.mesh.rotation.x = Math.max(-0.48, Math.min(0.48, c.vy * 0.075 - (pbNow ? 0.08 : 0)));
@@ -2878,7 +2899,7 @@ const EMBEDDED_VOICES = {
         const mMode = this.runMode;
         const isTimedNonLethal = (mMode === 'SOLO' && (app.currentSoloMode === 'TIME_ATTACK' || app.currentSoloMode === 'RING_RUSH')) || (mMode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE');
         if (isTimedNonLethal) { c.invuln = 1.8; c.score = Math.max(0, c.score - 150); if (!c.isBot) this.teamScore = Math.max(0, this.teamScore - 150); audio.playHit(); this.showPopup('-150 pts', '#6D4C41'); return; }
-        if (mMode === 'SOLO' && app.currentSoloMode === 'VS_BOT') {
+        if (mMode === 'SOLO' && (app.currentSoloMode === 'VS_BOT' || app.botLevelSetting !== 'NONE')) {
           c.alive = false; audio.playHit();
           const alive = this.crafts.filter(x => x.alive);
           if (c.slotIndex === 0) {
@@ -2985,7 +3006,7 @@ const EMBEDDED_VOICES = {
         if (specBtn) specBtn.classList.toggle('hidden', this.getAliveSpectateTargets().length === 0);
 
         const rankBox = document.getElementById('resultRankingList');
-        if (mMode === 'SOLO' && app.currentSoloMode === 'VS_BOT') {
+        if (mMode === 'SOLO' && (app.currentSoloMode === 'VS_BOT' || app.botLevelSetting !== 'NONE')) {
           rankBox.classList.remove('hidden'); rankBox.classList.add('flex');
           rankBox.innerHTML = [...this.crafts].sort((a,b) => a.rank - b.rank).map(c => `<div class="flex justify-between text-xs font-extrabold"><span>#${c.rank} ${c.name} (${Math.floor(c.distance)}m)</span><span>${c.score} pts</span></div>`).join('');
         } else if (isOnline && onlineNet.roster.length > 0) {
@@ -3000,7 +3021,7 @@ const EMBEDDED_VOICES = {
         setTimeout(() => { if (this.state === 'GAMEOVER') { const m = document.getElementById('gameOverModal'); m.classList.remove('hidden'); m.classList.add('flex'); m.style.display = 'flex'; } }, 450);
       },
       updateHud() {
-        const isVsBot = (this.runMode === 'SOLO' && app.currentSoloMode === 'VS_BOT');
+        const isVsBot = (this.runMode === 'SOLO' && (app.currentSoloMode === 'VS_BOT' || app.botLevelSetting !== 'NONE'));
         document.getElementById('hudScore').textContent = this.teamScore.toLocaleString();
         document.getElementById('hudComboBadge').textContent = `x${this.getComboMultiplier().toFixed(1)}`;
         document.getElementById('hudDistance').textContent = Math.floor(this.teamDistance).toLocaleString();
@@ -3040,10 +3061,10 @@ const EMBEDDED_VOICES = {
           if (mc.heldSabotageItem) {
             const meta = getSabotageMeta(mc.heldSabotageItem);
             jb.textContent = `【${meta.name}】を使う！`;
-            jb.className = mc.alive ? 'px-4 py-3 rounded-2xl bg-brand-500 text-white font-black text-xs anim-breathe-soft' : 'px-4 py-2.5 rounded-2xl bg-cream-200 text-cocoa-400 font-extrabold text-xs';
+            jb.className = mc.alive ? 'min-w-[164px] min-h-[64px] px-6 py-4 rounded-3xl bg-brand-500 text-white font-black text-sm sm:text-base anim-breathe-soft flex items-center justify-center' : 'min-w-[148px] min-h-[56px] px-5 py-3.5 rounded-3xl bg-cocoa-800/85 text-cream-50 font-black text-xs sm:text-sm flex items-center justify-center';
           } else {
             jb.textContent = pct >= 100 ? 'お邪魔発動！' : `お邪魔 (${pct}%)`;
-            jb.className = pct >= 100 && mc.alive ? 'px-4 py-2.5 rounded-2xl bg-cocoa-800 text-cream-50 font-extrabold text-xs' : 'px-4 py-2.5 rounded-2xl bg-cream-200 text-cocoa-400 font-extrabold text-xs';
+            jb.className = pct >= 100 && mc.alive ? 'min-w-[164px] min-h-[64px] px-6 py-4 rounded-3xl bg-brand-500 text-white font-black text-sm sm:text-base anim-breathe-soft flex items-center justify-center' : 'min-w-[148px] min-h-[56px] px-5 py-3.5 rounded-3xl bg-cocoa-800/85 text-cream-50 font-black text-xs sm:text-sm flex items-center justify-center';
           }
           if (isVsBot) {
             document.getElementById('hudPlayerChips').innerHTML = this.crafts.map(c => `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-cream-50 ${c.alive?'':'opacity-40 line-through'}">${c.name}</span>`).join('');
@@ -3117,7 +3138,7 @@ const EMBEDDED_VOICES = {
       updateCoinAndCollectionUI() {
         const s = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
         s('homeCoinBalance', this.coins.toLocaleString()); s('shopCoinBalance', this.coins.toLocaleString());
-        s('homeCollectionCountBadge', `${this.ownedIds.length}/126`); s('vaultProgressText', `${this.ownedIds.length} / 126`);
+        s('homeCollectionCountBadge', `${this.ownedIds.length}/126`); s('vaultProgressText', `${this.ownedIds.length} / 186`);
       },
 
       // イラスト＆3D回転付き図鑑・交換所
@@ -3292,8 +3313,8 @@ const EMBEDDED_VOICES = {
       markStageCleared(mapId, diffId) { this.clearedStages[`${mapId}_${diffId}`] = true; accountMgr.saveActiveProfile(); },
       markStoryChapterCleared(ch) { if (ch > this.storyClearedMax) this.storyClearedMax = ch; this.updateStoryBadges(); accountMgr.saveActiveProfile(); },
       updateStoryBadges() {
-        const b1 = document.getElementById('homeStoryProgressBadge'); if (b1) b1.textContent = `${this.storyClearedMax}/12章`;
-        const b2 = document.getElementById('storyCoreCount'); if (b2) b2.textContent = `${this.storyClearedMax} / 12`;
+        const b1 = document.getElementById('homeStoryProgressBadge'); if (b1) b1.textContent = `${this.storyClearedMax}/${MAPS.length}章`;
+        const b2 = document.getElementById('storyCoreCount'); if (b2) b2.textContent = `${this.storyClearedMax} / ${MAPS.length}`;
       },
       openStoryMap() { audio.init(); this.renderStoryChapterList(); this.showScreen('screenStoryMap'); },
       renderStoryChapterList() {
@@ -3308,7 +3329,7 @@ const EMBEDDED_VOICES = {
         }
         const list = document.getElementById('storyChapterList'); if (!list) return;
         list.innerHTML = '';
-        const offsets = [0, -34, -48, -16, 28, 48, 22, -24, -46, -16, 28, 0];
+        const offsets = [0, -34, -48, -16, 28, 48, 22, -24, -46, -16, 28, 48, 22, -24, -46, -16, 28, 0];
         MAPS.forEach((m, idx) => {
           const sq = STORY_QUESTS[idx] || STORY_QUESTS[0];
           const unlocked = idx <= this.storyClearedMax, cleared = m.chapter <= this.storyClearedMax, isCur = (idx === this.storyClearedMax);
