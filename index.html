@@ -694,6 +694,29 @@
   <section id="screenGame" class="screen bg-transparent pointer-events-none">
     <div id="blindOverlay" class="hidden fixed inset-0 z-20 pointer-events-none items-center justify-center bg-cocoa-800/80 text-cream-50 font-black text-lg">視界妨害中！</div>
 
+    <!-- お邪魔アイテム被弾時の画面エフェクト（雲スモーク・状態バッジ） -->
+    <div id="debuffScreenOverlay" class="hidden fixed inset-0 z-15 pointer-events-none flex items-center justify-center">
+      <div id="debuffCloudLayer" class="hidden absolute inset-0" style="background: radial-gradient(circle at 25% 30%, rgba(255,253,249,0.94) 0%, rgba(247,234,224,0.88) 42%, rgba(255,253,249,0.96) 100%);"></div>
+      <div id="debuffStatusPill" class="mt-24 px-4 py-1.5 rounded-full bg-cocoa-800/90 text-cream-50 text-xs font-black">
+        お邪魔効果中！
+      </div>
+    </div>
+
+    <!-- 観戦モードHUD（自分の終了後に相手の3Dフライトをリアルタイム観戦） -->
+    <div id="spectateBannerBar" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30 w-[92%] max-w-md soft-card px-4 py-3 flex flex-col gap-2 pointer-events-auto">
+      <div class="flex items-center justify-between gap-2">
+        <div class="text-left min-w-0">
+          <div class="text-[10px] font-black text-sage-600">観戦モード（相手のフライト中）</div>
+          <div id="spectateTargetLabel" class="text-sm font-black text-cocoa-800 truncate">相手プレイヤー · 0m · 0 pts</div>
+        </div>
+        <span class="px-2.5 py-1 rounded-full bg-brand-500 text-white text-[10px] font-black shrink-0">LIVE</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <button id="btnSpectateNext" type="button" class="btn-peach py-2.5 px-2 text-xs font-extrabold">次の相手を見る ↻</button>
+        <button id="btnSpectateFinish" type="button" class="btn-orange py-2.5 px-2 text-xs font-black">リザルトへ進む</button>
+      </div>
+    </div>
+
     <div id="gameHud" class="fixed top-0 left-0 right-0 z-20 pointer-events-none p-3 pt-12 flex flex-col gap-1.5 max-w-5xl mx-auto">
       <div class="flex items-start justify-between gap-2">
         <div class="soft-card px-3.5 py-2">
@@ -762,6 +785,7 @@
         <div id="resultRankingList" class="hidden w-full bg-[#FBF7F2] rounded-2xl p-3 flex-col gap-1 text-left max-h-32 overflow-y-auto"></div>
         <div class="w-full flex flex-col gap-2">
           <button id="btnResultNextStory" type="button" class="hidden btn-sage w-full py-3 text-sm font-extrabold">次の章へ →</button>
+          <button id="btnResultSpectate" type="button" class="hidden btn-sage w-full py-3 text-sm font-black">相手のフライトを観戦する</button>
           <button id="btnResultRetry" type="button" class="btn-orange w-full py-3.5 text-base font-black">もう一度遊ぶ</button>
           <button id="btnResultBackLobby" type="button" class="hidden btn-peach w-full py-2.5 text-xs font-extrabold">一覧へもどる</button>
           <button id="btnResultHome" type="button" class="btn-peach w-full py-2.5 text-xs font-extrabold">ホームへもどる</button>
@@ -824,6 +848,18 @@ const EMBEDDED_VOICES = {
       { chapter: 11, keyItemName: '不死鳥の火種', reqItemCount: 3, taskType: 'NEARMISS', reqTaskVal: 4,  taskLabel: '不死鳥の火種を3個取り、ニアミス4回達成', companion: { id: 'COMP_11', name: 'メラ',         species: '火山フェニックス', colorNum: 0xFB7185, buffText: 'スコア +18%' } },
       { chapter: 12, keyItemName: '天穹の星核',   reqItemCount: 3, taskType: 'RING',     reqTaskVal: 10, taskLabel: '天穹の星核を3個取り、リングを10回くぐる', companion: { id: 'COMP_12', name: 'ソラ',         species: '天穹の精霊鳥',     colorNum: 0xF97316, buffText: '全能力アップ' } }
     ];
+
+
+    const SABOTAGE_ITEMS = [
+      { id: 'REVERSE', name: 'あべこべミラー', short: '左右あべこべ', duration: 3.8, colorHex: '#F97316', colorNum: 0xF97316 },
+      { id: 'BLIND',   name: 'もくもくスモーク', short: '視界スモーク', duration: 3.8, colorHex: '#6D4C41', colorNum: 0x6D4C41 },
+      { id: 'HEAVY',   name: 'ずっしりおもり',   short: '機体ヘビー化', duration: 3.8, colorHex: '#3E2723', colorNum: 0x3E2723 },
+      { id: 'GUST',    name: 'とつぜん突風',     short: '横風アタック', duration: 3.5, colorHex: '#93AB8A', colorNum: 0x93AB8A },
+      { id: 'SHRINK',  name: 'ちびっこミニ化',   short: '翼ミニ化',     duration: 3.8, colorHex: '#EA580C', colorNum: 0xEA580C }
+    ];
+    function getSabotageMeta(id) {
+      return SABOTAGE_ITEMS.find(x => x.id === id) || SABOTAGE_ITEMS[0];
+    }
 
     const DIFFICULTIES = [
       { id: 'EASY', label: 'EASY', jp: 'かんたん', speedMult: 0.78, spawnIntervalMult: 1.28, scoreMult: 0.8, goalDist: 350, hitRadius: 0.44, moveSpeedMult: 0.7 },
@@ -1723,7 +1759,7 @@ const EMBEDDED_VOICES = {
           conn.on('data', data => {
             const m = this.roster.find(r => r.id === conn.peer); if (!m) return;
             if (data.type === 'HELLO') { m.name = (data.name || m.name).slice(0, 10); this.broadcastRoster(); this.renderRoster(); }
-            else if (data.type === 'STATE') { m.score = data.score; m.distance = data.distance; m.alive = data.alive; m.x = data.x; m.y = data.y; this.recalcRanks(); this.broadcastRoster(); }
+            else if (data.type === 'STATE') { m.score = data.score; m.distance = data.distance; m.alive = data.alive; m.x = data.x; m.y = data.y; m.roll = data.roll || 0; this.recalcRanks(); const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex }; Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); }); game3d.syncOnlineRivals(this.roster, this.myId); }
             else if (data.type === 'JAM_ATTACK') {
               if (game3d.state === 'PLAYING' && game3d.crafts[0]?.alive) game3d.applyDirectDebuff(data.kind, m.name);
               Object.entries(this.guestConns).forEach(([pid, gc]) => { if (pid !== conn.peer && gc.open) gc.send({ type: 'JAM_HIT', kind: data.kind, from: m.name }); });
@@ -1788,22 +1824,34 @@ const EMBEDDED_VOICES = {
         this.syncTimer = setInterval(() => {
           if (app.mode !== 'ONLINE' || !game3d.crafts[0]) return;
           const mc = game3d.crafts[0];
+          const rollVal = mc.mesh ? mc.mesh.rotation.z : 0;
           if (this.isHost) {
             const me = this.roster.find(r => r.id === this.myId);
-            if (me) { me.score = game3d.teamScore; me.distance = Math.floor(game3d.teamDistance); me.alive = mc.alive; me.x = mc.x; me.y = mc.y; }
-            this.broadcastRoster();
+            if (me) { me.score = game3d.teamScore; me.distance = Math.floor(game3d.teamDistance); me.alive = mc.alive; me.x = mc.x; me.y = mc.y; me.roll = rollVal; }
+            this.recalcRanks();
+            const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex };
+            Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); });
+            game3d.syncOnlineRivals(this.roster, this.myId);
           } else if (this.hostConn?.open) {
-            this.hostConn.send({ type: 'STATE', score: game3d.teamScore, distance: Math.floor(game3d.teamDistance), alive: mc.alive, x: mc.x, y: mc.y });
+            this.hostConn.send({ type: 'STATE', score: game3d.teamScore, distance: Math.floor(game3d.teamDistance), alive: mc.alive, x: mc.x, y: mc.y, roll: rollVal });
           }
-        }, 120);
+        }, 50);
       },
       sendJammer() {
-        const mc = game3d.crafts[0]; if (!mc?.alive || mc.jammerCharge < 100) return;
-        mc.jammerCharge = 0; game3d.teamScore += 200;
-        const kind = ['BLIND','REVERSE','HEAVY'][Math.floor(Math.random()*3)];
-        audio.playJammerLaunch(); game3d.showPopup(`お邪魔【${kind}】発動！`, '#3E2723');
-        if (this.isHost) Object.values(this.guestConns).forEach(c => { if (c.open) c.send({ type: 'JAM_HIT', kind, from: this.myName }); });
-        else if (this.hostConn?.open) this.hostConn.send({ type: 'JAM_ATTACK', kind });
+        const mc = game3d.crafts[0];
+        if (!mc?.alive) return;
+        const hasHeld = Boolean(mc.heldSabotageItem);
+        if (!hasHeld && mc.jammerCharge < 100) return;
+        const chosenId = hasHeld ? mc.heldSabotageItem : SABOTAGE_ITEMS[Math.floor(Math.random() * SABOTAGE_ITEMS.length)].id;
+        const meta = getSabotageMeta(chosenId);
+        if (hasHeld) mc.heldSabotageItem = null;
+        else mc.jammerCharge = 0;
+        mc.score += 250;
+        game3d.teamScore += 250;
+        audio.playJammerLaunch();
+        game3d.showPopup(`【${meta.name}】を相手へ発射！`, meta.colorHex);
+        if (this.isHost) Object.values(this.guestConns).forEach(c => { if (c.open) c.send({ type: 'JAM_HIT', kind: meta.id, from: this.myName }); });
+        else if (this.hostConn?.open) this.hostConn.send({ type: 'JAM_ATTACK', kind: meta.id });
       },
       copyShareUrl() {
         const u = new URL(location.href); u.searchParams.set('online', this.roomCode);
@@ -1816,7 +1864,7 @@ const EMBEDDED_VOICES = {
     const game3d = {
       scene: null, camera: null, renderer: null, state: 'IDLE', runMode: 'SOLO', lastTime: 0,
       tunnelGroup: null, floorMat: null, ringMat: null, railMat: null, tunnelRings: [], currentTunnelShape: '',
-      crafts: [], companionMeshes: [], rivalMeshes: {}, directBoost: false, autoBoost: false, obstacles: [], particles: [], spawnTimer: 0,
+      crafts: [], companionMeshes: [], rivalMeshes: {}, spectateTargetId: null, directBoost: false, autoBoost: false, obstacles: [], particles: [], spawnTimer: 0,
       storyItemsCollected: 0,
       teamScore: 0, teamDistance: 0, highScore: 0, bestDistance: 0, bestCombo: 1.0, bestNearMiss: 0,
       teamEnergy: 100, nearMissCount: 0, comboCount: 0, maxComboMult: 1.0, comboDecayTimer: 0,
@@ -2051,18 +2099,122 @@ const EMBEDDED_VOICES = {
           if (r.id === myId) return; active.add(r.id);
           if (!this.rivalMeshes[r.id]) {
             const pal = PLAYER_PALETTE[(r.colorIndex || i) % PLAYER_PALETTE.length];
-            const m = this.createCraftMesh(pal.num, true).group; this.scene.add(m); this.rivalMeshes[r.id] = m;
+            const sh = CRAFT_SHAPES[(r.colorIndex || i) % CRAFT_SHAPES.length]?.id || 'BIRD';
+            const built = this.createCraftMesh(pal.num, true, sh, 'NONE');
+            built.group.position.set(r.x || 0, r.y || 0, this.PLAYER_Z - 1.5);
+            this.scene.add(built.group);
+            this.rivalMeshes[r.id] = {
+              group: built.group,
+              wings: built.wings,
+              targetX: r.x || 0,
+              targetY: r.y || 0,
+              targetRoll: r.roll || 0,
+              flapPhase: i * 1.2,
+              alive: Boolean(r.alive)
+            };
           }
-          this.rivalMeshes[r.id].visible = Boolean(r.alive);
-          this.rivalMeshes[r.id].position.set(r.x || 0, r.y || 0, this.PLAYER_Z - 1.5);
+          const entry = this.rivalMeshes[r.id];
+          entry.alive = Boolean(r.alive);
+          entry.group.visible = entry.alive;
+          entry.targetX = typeof r.x === 'number' ? r.x : entry.targetX;
+          entry.targetY = typeof r.y === 'number' ? r.y : entry.targetY;
+          entry.targetRoll = typeof r.roll === 'number' ? r.roll : entry.targetRoll;
         });
-        Object.keys(this.rivalMeshes).forEach(id => { if (!active.has(id)) { this.scene.remove(this.rivalMeshes[id]); delete this.rivalMeshes[id]; } });
+        Object.keys(this.rivalMeshes).forEach(id => {
+          if (!active.has(id)) {
+            this.scene.remove(this.rivalMeshes[id].group || this.rivalMeshes[id]);
+            delete this.rivalMeshes[id];
+          }
+        });
       },
       applyDirectDebuff(kind, fromName) {
         const c = this.crafts[0]; if (!c?.alive) return;
-        c.debuffType = kind; c.debuffTimer = 3.8; audio.playHit();
-        this.showPopup(`${fromName} から【${kind}】！`, '#3E2723');
+        const meta = getSabotageMeta(kind);
+        c.debuffType = meta.id;
+        c.debuffTimer = meta.duration;
+        c.debuffWindDir = Math.random() < 0.5 ? -1 : 1;
+        audio.playHit();
+        this.showPopup(`${fromName} から【${meta.name}】！`, meta.colorHex);
       },
+      getAliveSpectateTargets() {
+        const list = [];
+        if (this.runMode === 'ONLINE') {
+          (onlineNet.roster || []).forEach(r => {
+            if (r.id !== onlineNet.myId && r.alive) {
+              const entry = this.rivalMeshes[r.id];
+              list.push({
+                id: r.id,
+                name: r.name || 'RIVAL',
+                score: r.score || 0,
+                distance: r.distance || 0,
+                getPos: () => entry?.group ? entry.group.position : new THREE.Vector3(r.x || 0, r.y || 0, this.PLAYER_Z - 1.5)
+              });
+            }
+          });
+        } else {
+          this.crafts.forEach(c => {
+            if (c.alive && c.slotIndex !== 0) {
+              list.push({
+                id: 'craft_' + c.slotIndex,
+                name: c.name || `P${c.slotIndex + 1}`,
+                score: c.score || 0,
+                distance: Math.floor(c.distance || 0),
+                getPos: () => c.mesh ? c.mesh.position : new THREE.Vector3(c.x || 0, c.y || 0, this.PLAYER_Z)
+              });
+            }
+          });
+        }
+        return list;
+      },
+      enterSpectateMode() {
+        const targets = this.getAliveSpectateTargets();
+        if (!targets.length) {
+          this.triggerGameOver(false);
+          return;
+        }
+        this.state = 'SPECTATING';
+        if (!this.spectateTargetId || !targets.some(t => t.id === this.spectateTargetId)) {
+          this.spectateTargetId = targets[0].id;
+        }
+        const gm = document.getElementById('gameOverModal');
+        if (gm) { gm.classList.add('hidden'); gm.classList.remove('flex'); gm.style.display = 'none'; }
+        document.getElementById('directPlayControls')?.classList.add('hidden');
+        const sb = document.getElementById('spectateBannerBar');
+        if (sb) { sb.classList.remove('hidden'); sb.style.display = 'flex'; }
+        this.updateSpectateHud();
+        this.showPopup('相手のフライトを観戦中！', '#93AB8A');
+      },
+      cycleSpectateTarget() {
+        const targets = this.getAliveSpectateTargets();
+        if (!targets.length) {
+          this.exitSpectateToResult();
+          return;
+        }
+        const curIdx = targets.findIndex(t => t.id === this.spectateTargetId);
+        const next = targets[(curIdx + 1) % targets.length];
+        this.spectateTargetId = next.id;
+        this.updateSpectateHud();
+      },
+      updateSpectateHud() {
+        const targets = this.getAliveSpectateTargets();
+        if (!targets.length) {
+          this.exitSpectateToResult();
+          return;
+        }
+        let cur = targets.find(t => t.id === this.spectateTargetId);
+        if (!cur) {
+          cur = targets[0];
+          this.spectateTargetId = cur.id;
+        }
+        const lbl = document.getElementById('spectateTargetLabel');
+        if (lbl) lbl.textContent = `${cur.name} · ${Math.floor(cur.distance)}m · ${cur.score.toLocaleString()} pts`;
+      },
+      exitSpectateToResult() {
+        const sb = document.getElementById('spectateBannerBar');
+        if (sb) { sb.classList.add('hidden'); sb.style.display = 'none'; }
+        this.triggerGameOver(false);
+      },
+
       start(forcedMode = null) {
         this.runMode = forcedMode || app.mode || 'SOLO';
         const mMode = this.runMode, curMap = MAPS[app.currentMapIndex], curDiff = DIFFICULTIES[app.currentDiffIndex], isStory = (mMode === 'STORY'), soloMode = app.currentSoloMode;
@@ -2071,7 +2223,7 @@ const EMBEDDED_VOICES = {
         this.state = 'COUNTDOWN'; this.teamScore = 0; this.teamDistance = 0; this.teamEnergy = 100;
         this.nearMissCount = 0; this.comboCount = 0; this.maxComboMult = 1.0; this.comboDecayTimer = 0;
         this.windForce = 0; this.windTimer = 3.0; this.speedLevel = 1; this.lastRandomWarp = 0;
-        this.directBoost = false; this.autoBoost = !!gyro.defaultAutoBoost; this.shakeTime = 0; this.spawnTimer = 0.25; this.ringsCollected = 0; this.modeTimer = 0; this.storyItemsCollected = 0; this.mathSolvedCount = 0; this.mathStreak = 0;  if (this.flashTimer) clearInterval(this.flashTimer); document.getElementById('hudMathPromptBar')?.classList.add('hidden'); const scEl = document.getElementById('hudMathSolvedCount'); if (scEl) scEl.textContent = '0';
+        this.spectateTargetId = null; const sbInit = document.getElementById('spectateBannerBar'); if (sbInit) { sbInit.classList.add('hidden'); sbInit.style.display = 'none'; } this.directBoost = false; this.autoBoost = !!gyro.defaultAutoBoost; this.shakeTime = 0; this.spawnTimer = 0.25; this.ringsCollected = 0; this.modeTimer = 0; this.storyItemsCollected = 0; this.mathSolvedCount = 0; this.mathStreak = 0;  if (this.flashTimer) clearInterval(this.flashTimer); document.getElementById('hudMathPromptBar')?.classList.add('hidden'); const scEl = document.getElementById('hudMathSolvedCount'); if (scEl) scEl.textContent = '0';
 
         if (mMode === 'SOLO') {
           if (soloMode === 'TIME_ATTACK') this.modeTimer = 60.0;
@@ -2165,7 +2317,15 @@ const EMBEDDED_VOICES = {
           btn.className = this.autoBoost ? 'btn-orange px-3 py-3.5 text-xs font-extrabold' : 'btn-peach px-3 py-3.5 text-xs font-extrabold';
         }
       },
-      getComboMultiplier() { return Math.min(5.0, 1.0 + this.comboCount * 0.5 + (app.custom.partId === 'TURBO' ? 0.3 : 0) + app.getEquippedBonus()); },
+      getZonePointMultiplier(dist) {
+        const cycle = Math.floor((dist || 0) / 100) % 4;
+        return [1.0, 1.2, 1.4, 1.6][cycle] || 1.0;
+      },
+      getComboMultiplier() {
+        const streakBonus = Math.min(4.0, this.comboCount * 0.25);
+        const gearBonus = (app.custom.partId === 'TURBO' ? 0.25 : 0) + app.getEquippedBonus();
+        return Math.min(6.0, Number((1.0 + streakBonus + gearBonus).toFixed(2)));
+      },
       runCountdown() {
         const cd = document.getElementById('hudCountdown'); cd.classList.remove('hidden');
         const hasV = audio.playStartVoice(); let c = 3; cd.textContent = c;
@@ -2183,15 +2343,20 @@ const EMBEDDED_VOICES = {
         clearTimeout(this._pt); this._pt = setTimeout(() => el.classList.add('opacity-0'), 1000);
       },
       triggerDirectJammer() {
-        if (this.runMode === 'ONLINE') onlineNet.sendJammer();
-        else if (this.runMode === 'SOLO' && app.currentSoloMode === 'VS_BOT') this.activateJammer(0);
+        const mc = this.crafts[0];
+        if (!mc || !mc.alive) return;
+        if (this.runMode === 'ONLINE') {
+          onlineNet.sendJammer();
+        } else {
+          this.activateJammer(0);
+        }
       },
       computeHumanBotSteering(c, dt, nowSec) {
         const prof = c.botProfile || createBotProfile(5);
         c.botThinkTimer -= dt;
         if (c.botBoostTimer > 0) { c.botBoostTimer -= dt; c.botBoostActive = true; } else c.botBoostActive = false;
         const canJam = (this.runMode === 'HOST' && hostNet.ruleMode === 'BATTLE') || (this.runMode === 'SOLO' && app.currentSoloMode === 'VS_BOT');
-        if (canJam && c.jammerCharge >= 100) {
+        if (canJam && (c.heldSabotageItem || c.jammerCharge >= 100)) {
           c.botJamWait -= dt;
           if (c.botJamWait <= 0) { c.botJamWait = prof.jamDelay * (0.7 + Math.random()*0.7); this.activateJammer(c.slotIndex); }
         }
@@ -2225,12 +2390,35 @@ const EMBEDDED_VOICES = {
         return { inX: Math.max(-1, Math.min(1, (c.botTargetX + wx) / this.BOUNDS_X)), inY: Math.max(-1, Math.min(1, (c.botTargetY + wy) / this.BOUNDS_Y)), steerAgility: prof.steerAgility };
       },
       activateJammer(attackerSlot) {
-        const att = this.crafts.find(c => c.slotIndex === attackerSlot && c.alive); if (!att || att.jammerCharge < 100) return;
-        const targets = this.crafts.filter(c => c.alive && c.slotIndex !== attackerSlot); if (!targets.length) return;
-        att.jammerCharge = 0; att.score += 200; if (!att.isBot) this.teamScore += 200;
-        const kind = ['BLIND','REVERSE','HEAVY'][Math.floor(Math.random()*3)];
-        targets.forEach(t => { t.debuffType = kind; t.debuffTimer = 3.8; });
-        audio.playJammerLaunch(); this.showPopup(`${att.name} が【${kind}】発動！`, '#3E2723');
+        const att = this.crafts.find(c => c.slotIndex === attackerSlot && c.alive);
+        if (!att) return;
+        const hasHeldItem = Boolean(att.heldSabotageItem);
+        if (!hasHeldItem && att.jammerCharge < 100) return;
+        const targets = this.crafts.filter(c => c.alive && c.slotIndex !== attackerSlot);
+        if (!targets.length) {
+          if (hasHeldItem) {
+            const meta = getSabotageMeta(att.heldSabotageItem);
+            att.heldSabotageItem = null;
+            att.score += 300;
+            if (!att.isBot) this.teamScore += 300;
+            audio.playJammerLaunch();
+            this.showPopup(`【${meta.name}】発動！ +300 pts`, meta.colorHex);
+          }
+          return;
+        }
+        const chosenId = hasHeldItem ? att.heldSabotageItem : SABOTAGE_ITEMS[Math.floor(Math.random() * SABOTAGE_ITEMS.length)].id;
+        const meta = getSabotageMeta(chosenId);
+        if (hasHeldItem) att.heldSabotageItem = null;
+        else att.jammerCharge = 0;
+        att.score += 250;
+        if (!att.isBot) this.teamScore += 250;
+        targets.forEach(t => {
+          t.debuffType = meta.id;
+          t.debuffTimer = meta.duration;
+          t.debuffWindDir = Math.random() < 0.5 ? -1 : 1;
+        });
+        audio.playJammerLaunch();
+        this.showPopup(`${att.name} が【${meta.name}】発射！`, meta.colorHex);
       },
       getStoryQuestProgress(chapterIdx) {
         const sq = STORY_QUESTS[chapterIdx] || STORY_QUESTS[0];
@@ -2271,7 +2459,35 @@ const EMBEDDED_VOICES = {
           return;
         }
 
-                if (mMode === 'STORY') {
+                const allowSabotageBox = (mMode === 'ONLINE') || (mMode === 'SOLO' && app.currentSoloMode === 'VS_BOT') || (mMode === 'HOST' && hostNet.ruleMode === 'BATTLE');
+        if (allowSabotageBox && roll > 0.76) {
+          const itemMeta = SABOTAGE_ITEMS[Math.floor(Math.random() * SABOTAGE_ITEMS.length)];
+          const gx = (Math.random() - 0.5) * 7.6;
+          const gy = (Math.random() - 0.5) * 3.8;
+          const g = new THREE.Group();
+          const core = new THREE.Mesh(
+            new THREE.DodecahedronGeometry(0.85, 0),
+            new THREE.MeshLambertMaterial({ color: itemMeta.colorNum, flatShading: true })
+          );
+          const outerRing = new THREE.Mesh(
+            new THREE.TorusGeometry(1.22, 0.14, 8, 18),
+            new THREE.MeshBasicMaterial({ color: 0xFFFDF9 })
+          );
+          g.add(core, outerRing);
+          g.position.set(gx, gy, this.SPAWN_Z);
+          this.scene.add(g);
+          this.obstacles.push({
+            kind: 'SABOTAGE_ITEM',
+            sabotageId: itemMeta.id,
+            sabotageName: itemMeta.name,
+            mesh: g,
+            x: gx, y: gy, z: this.SPAWN_Z,
+            radius: 1.65,
+            collectedBy: new Set()
+          });
+          return;
+        }
+        if (mMode === 'STORY') {
           const sq = STORY_QUESTS[app.currentMapIndex] || STORY_QUESTS[0];
           if (this.storyItemsCollected < sq.reqItemCount && roll < 0.34) {
             const gx = (Math.random() - 0.5) * 7.2;
@@ -2388,12 +2604,12 @@ const EMBEDDED_VOICES = {
         if (this.idleRing1) this.idleRing1.visible = false;
         if (this.idleRing2) this.idleRing2.visible = false;
         if (this.showcaseCraft) this.showcaseCraft.visible = false;
-        if (this.state !== 'PLAYING' && this.state !== 'COUNTDOWN') return;
+        if (this.state !== 'PLAYING' && this.state !== 'COUNTDOWN' && this.state !== 'SPECTATING') return;
 
         const mMode = this.runMode, curMap = MAPS[app.currentMapIndex], curDiff = DIFFICULTIES[app.currentDiffIndex], isStory = (mMode === 'STORY');
         const anyBoost = (mMode === 'SOLO' || mMode === 'ONLINE' || isStory) ? (this.directBoost || this.autoBoost) : this.crafts.some(c => c.alive && hostNet.slots[c.slotIndex]?.boost);
 
-        if (this.state === 'PLAYING') {
+        if (this.state === 'PLAYING' || this.state === 'SPECTATING') {
           this.teamDistance += this.currentSpeed * dt * 0.45;
           if (isStory && this.teamDistance >= curMap.storyGoalDist) {
             const qp = this.getStoryQuestProgress(app.currentMapIndex);
@@ -2444,14 +2660,23 @@ const EMBEDDED_VOICES = {
 
           const hasStab = c.partId === 'STABILIZER';
           let lerp = curMap.slippery ? (hasStab ? 10 : 5.8) : ag;
-          if (c.debuffTimer > 0) { if (c.debuffType === 'REVERSE') inX = -inX; else if (c.debuffType === 'HEAVY') lerp = 4.0; }
+          let extraGustX = 0;
+          if (c.debuffTimer > 0) {
+            if (c.debuffType === 'REVERSE') inX = -inX;
+            else if (c.debuffType === 'HEAVY') lerp = 3.8;
+            else if (c.debuffType === 'GUST') extraGustX = (c.debuffWindDir || 1) * 4.6;
+            else if (c.debuffType === 'SHRINK') { lerp *= 0.72; c.mesh.scale.setScalar(0.62); }
+          }
+          if (c.debuffTimer <= 0 || c.debuffType !== 'SHRINK') {
+            c.mesh.scale.setScalar(1.0);
+          }
 
           const tx = Math.max(-this.BOUNDS_X, Math.min(this.BOUNDS_X, inX * this.BOUNDS_X));
           const ty = Math.max(-this.BOUNDS_Y, Math.min(this.BOUNDS_Y, inY * this.BOUNDS_Y));
           const isBioAgile = (app.custom.shapeId === 'DRAGONFLY' || app.custom.shapeId === 'BIRD');
           const springStiff = lerp * (isBioAgile ? 1.28 : 1.05);
           const damping = isBioAgile ? 0.72 : 0.78;
-          const ax = (tx - c.x) * springStiff + (this.windForce || 0) * (hasStab ? 0.35 : 1);
+          const ax = (tx - c.x) * springStiff + ((this.windForce || 0) + (extraGustX || 0)) * (hasStab ? 0.35 : 1);
           const ay = (ty - c.y) * springStiff;
           c.vx = ((c.vx || 0) + ax * dt) * Math.pow(damping, dt * 16);
           c.vy = ((c.vy || 0) + ay * dt) * Math.pow(damping, dt * 16);
@@ -2475,7 +2700,12 @@ const EMBEDDED_VOICES = {
           if (this.state === 'PLAYING') {
             const pb = c.isBot ? c.botBoostActive : ((mMode === 'SOLO' || mMode === 'ONLINE' || isStory) ? (this.directBoost || this.autoBoost) : hostNet.slots[c.slotIndex]?.boost);
             c.distance += this.currentSpeed * dt * 0.45;
-            c.score += Math.floor(dt * 25 * (pb ? 1.6 : 1) * curDiff.scoreMult * (c.partId === 'TURBO' ? 1.3 : 1) * (1 + app.getEquippedBonus()));
+            const speedFactor = 1.0 + Math.max(0, (this.currentSpeed - 40) / 80);
+            const zoneMult = this.getZonePointMultiplier(c.distance);
+            const rawDistPts = dt * 20 * speedFactor * zoneMult * (pb ? 1.35 : 1.0) * curDiff.scoreMult * (1 + app.getEquippedBonus());
+            c._ptsCarry = (c._ptsCarry || 0) + rawDistPts;
+            const addDistPts = Math.floor(c._ptsCarry);
+            if (addDistPts > 0) { c.score += addDistPts; c._ptsCarry -= addDistPts; }
             if ((mMode === 'HOST' && hostNet.ruleMode === 'BATTLE') || mMode === 'ONLINE' || (mMode === 'SOLO' && app.currentSoloMode === 'VS_BOT')) {
               c.jammerCharge = Math.min(100, c.jammerCharge + dt * (pb ? 14 : 9) * (c.partId === 'RADAR' ? 1.4 : 1));
             }
@@ -2496,12 +2726,43 @@ const EMBEDDED_VOICES = {
             this.animateBioWings(cm.wings, cm.flapPhase, lead.vy || 0, false, false);
           });
         }
-        if ((mMode === 'SOLO' || mMode === 'ONLINE' || isStory) && this.crafts[0] && this.camera) {
+        if (mMode === 'ONLINE' && this.rivalMeshes) {
+          Object.values(this.rivalMeshes).forEach(entry => {
+            if (!entry || !entry.group) return;
+            entry.group.visible = entry.alive;
+            if (!entry.alive) return;
+            const prevX = entry.group.position.x;
+            const prevY = entry.group.position.y;
+            const smooth = Math.min(1, dt * 16);
+            const nx = prevX + (entry.targetX - prevX) * smooth;
+            const ny = prevY + (entry.targetY - prevY) * smooth;
+            const vxSim = (nx - prevX) / Math.max(0.008, dt);
+            const vySim = (ny - prevY) / Math.max(0.008, dt);
+            entry.group.position.set(nx, ny, this.PLAYER_Z - 1.5);
+            entry.group.rotation.z = Math.max(-0.75, Math.min(0.75, -vxSim * 0.085));
+            entry.group.rotation.x = Math.max(-0.45, Math.min(0.45, vySim * 0.065));
+            entry.flapPhase = (entry.flapPhase || 0) + dt * 24;
+            this.animateBioWings(entry.wings, entry.flapPhase, vySim, false, Math.hypot(vxSim, vySim) < 0.5);
+          });
+        }
+        if (this.state === 'SPECTATING' && this.camera) {
+          const targets = this.getAliveSpectateTargets();
+          if (!targets.length) {
+            this.exitSpectateToResult();
+            return;
+          }
+          const cur = targets.find(t => t.id === this.spectateTargetId) || targets[0];
+          this.spectateTargetId = cur.id;
+          const pos = cur.getPos();
+          this.camera.position.x += (pos.x * 0.45 - this.camera.position.x) * Math.min(1, dt * 7);
+          this.camera.position.y += ((1.4 + pos.y * 0.35) - this.camera.position.y) * Math.min(1, dt * 7);
+          this.updateSpectateHud();
+        } else if ((mMode === 'SOLO' || mMode === 'ONLINE' || isStory) && this.crafts[0] && this.camera) {
           this.camera.position.x += (this.crafts[0].x * 0.32 - this.camera.position.x) * Math.min(1, dt * 6);
           this.camera.position.y += ((1.4 + this.crafts[0].y * 0.25) - this.camera.position.y) * Math.min(1, dt * 6);
         }
 
-        if (this.state !== 'PLAYING') return;
+        if (this.state !== 'PLAYING' && this.state !== 'SPECTATING') return;
         this.teamScore += Math.floor(dt * 25 * (anyBoost ? 1.5 : 1) * (1 + app.getEquippedBonus()));
 
         this.spawnTimer -= dt * (this.currentSpeed / 40);
@@ -2515,6 +2776,7 @@ const EMBEDDED_VOICES = {
           const o = this.obstacles[i]; o.z += this.currentSpeed * dt; o.mesh.position.z = o.z;
           if (o.kind === 'RING' || o.kind === 'RESCUE') o.mesh.rotation.z += dt * 2.5;
           else if (o.kind === 'STORY_ITEM') { o.mesh.rotation.y += dt * 3.2; o.mesh.rotation.z += dt * 1.6; }
+          else if (o.kind === 'SABOTAGE_ITEM') { o.mesh.rotation.y -= dt * 3.6; o.mesh.rotation.x += dt * 1.8; }
           else if (o.kind === 'BLOCK' && (o.moveAmpX > 0 || o.moveAmpY > 0)) {
             o.movePhase += dt * o.moveSpeed;
             if (o.moveAmpX > 0) { o.x = Math.max(-5.2, Math.min(5.2, o.baseX + Math.sin(o.movePhase)*o.moveAmpX)); o.mesh.position.x = o.x; }
@@ -2528,7 +2790,7 @@ const EMBEDDED_VOICES = {
               const magAdd = c.partId === 'MAGNET' ? 2.1 : 0.5;
               if (o.kind === 'RING' && !o.collectedBy.has(c.slotIndex) && Math.hypot(c.x - o.x, c.y - o.y) <= o.radius + magAdd) {
                 o.collectedBy.add(c.slotIndex);
-                const pts = Math.round(250 * this.getComboMultiplier());
+                const pts = Math.round((150 + this.comboCount * 35) * this.getComboMultiplier() * this.getZonePointMultiplier(c.distance));
                 c.score += pts; if (!c.isBot || mMode === 'HOST') this.teamScore += pts;
                 this.ringsCollected++;
                 if (mMode === 'SOLO' && app.currentSoloMode === 'RING_RUSH') { this.modeTimer = Math.min(60, this.modeTimer + 1.5); this.showPopup(`+1.5s! (+${pts})`); }
@@ -2561,6 +2823,19 @@ const EMBEDDED_VOICES = {
                     this.showPopup(`おしい！次は【${o.choiceLabel || '正解'}】を狙おう`, '#6D4C41');
                   }
                 }
+              } else if (o.kind === 'SABOTAGE_ITEM' && !o.collectedBy.has(c.slotIndex) && Math.hypot(c.x - o.x, c.y - o.y) <= o.radius + magAdd) {
+                o.collectedBy.add(c.slotIndex);
+                o.mesh.visible = false;
+                c.heldSabotageItem = o.sabotageId;
+                c.jammerCharge = Math.min(100, c.jammerCharge + 40);
+                c.score += 150;
+                if (!c.isBot) {
+                  this.teamScore += 150;
+                  audio.playRingCollect();
+                  this.showPopup(`お邪魔GET【${o.sabotageName}】！`, '#F97316');
+                } else {
+                  c.botJamWait = Math.min(c.botJamWait, 0.45);
+                }
               } else if (o.kind === 'STORY_ITEM' && !o.collectedBy.has(c.slotIndex) && Math.hypot(c.x - o.x, c.y - o.y) <= o.radius + magAdd) {
                 o.collectedBy.add(c.slotIndex);
                 o.mesh.visible = false;
@@ -2581,7 +2856,7 @@ const EMBEDDED_VOICES = {
                 else if (d < hr + (c.partId === 'RADAR' ? 1.55 : 0.85) && !o.nearMissedBy.has(c.slotIndex)) {
                   o.nearMissedBy.add(c.slotIndex); this.comboCount++; this.comboDecayTimer = 4.2;
                   const mult = this.getComboMultiplier(); if (mult > this.maxComboMult) this.maxComboMult = mult;
-                  const bPts = Math.round(200 * mult * curDiff.scoreMult);
+                  const bPts = Math.round((220 + this.speedLevel * 20) * mult * curDiff.scoreMult);
                   c.score += bPts;
                   if (!c.isBot || mMode === 'HOST') { this.teamScore += bPts; this.nearMissCount++; audio.playNearMiss(this.comboCount); this.showPopup(`あぶなっ！ +${bPts} (x${mult.toFixed(1)})`); }
                   if ((mMode === 'HOST' && hostNet.ruleMode === 'BATTLE') || mMode === 'ONLINE' || (mMode === 'SOLO' && app.currentSoloMode === 'VS_BOT')) c.jammerCharge = Math.min(100, c.jammerCharge + 30);
@@ -2606,8 +2881,15 @@ const EMBEDDED_VOICES = {
         if (mMode === 'SOLO' && app.currentSoloMode === 'VS_BOT') {
           c.alive = false; audio.playHit();
           const alive = this.crafts.filter(x => x.alive);
-          if (c.slotIndex === 0) this.triggerGameOver(false);
-          else if (alive.length <= 1) { if (alive[0]) { alive[0].score += 1000; this.teamScore += 1000; } this.triggerGameOver(true); }
+          if (c.slotIndex === 0) {
+            if (alive.length > 0) this.enterSpectateMode();
+            else this.triggerGameOver(false);
+          } else if (alive.length <= 1) {
+            if (alive[0]) { alive[0].score += 1000; this.teamScore += 1000; }
+            const sb = document.getElementById('spectateBannerBar');
+            if (sb) { sb.classList.add('hidden'); sb.style.display = 'none'; }
+            this.triggerGameOver(this.crafts[0]?.alive || false);
+          }
           return;
         }
         if (mMode === 'STORY') {
@@ -2618,7 +2900,18 @@ const EMBEDDED_VOICES = {
           if (ok) app.markStoryChapterCleared(MAPS[app.currentMapIndex].chapter);
           this.triggerGameOver(ok, distOk && !qp.allDone); return;
         }
-        if (mMode === 'SOLO' || mMode === 'ONLINE') {
+        if (mMode === 'ONLINE') {
+          c.alive = false; audio.playHit();
+          const aliveRivals = (onlineNet.roster || []).filter(r => r.id !== onlineNet.myId && r.alive);
+          if (aliveRivals.length > 0) {
+            this.enterSpectateMode();
+          } else {
+            const ok = this.teamDistance >= DIFFICULTIES[app.currentDiffIndex].goalDist;
+            this.triggerGameOver(ok);
+          }
+          return;
+        }
+        if (mMode === 'SOLO') {
           c.alive = false; const ok = this.teamDistance >= DIFFICULTIES[app.currentDiffIndex].goalDist;
           if (ok) app.markStageCleared(MAPS[app.currentMapIndex].id, DIFFICULTIES[app.currentDiffIndex].id);
           this.triggerGameOver(ok); return;
@@ -2629,6 +2922,12 @@ const EMBEDDED_VOICES = {
           if (this.crafts.length > 1 && alive.length <= 1) { if (alive[0]) alive[0].score += 1000; this.triggerGameOver(true); }
           else if (!alive.length) this.triggerGameOver(false);
         }
+      },
+      computeRunCoinReward(score, distance, rings, nearMiss) {
+        const fromScore = Math.floor((score || 0) / 40);
+        const fromActions = (rings || 0) * 6 + (nearMiss || 0) * 8;
+        const fromDist = Math.floor((distance || 0) * 0.1);
+        return Math.max(5, fromScore + fromActions + fromDist);
       },
       triggerGameOver(isClear = false, storyTaskIncomplete = false) {
         this.state = 'GAMEOVER';
@@ -2682,13 +2981,16 @@ const EMBEDDED_VOICES = {
         backBtn.textContent = isStory ? '12章一覧へもどる' : 'ロビーへもどる';
         document.getElementById('btnResultRetry').classList.toggle('hidden', isOnline && !onlineNet.isHost);
 
+        const specBtn = document.getElementById('btnResultSpectate');
+        if (specBtn) specBtn.classList.toggle('hidden', this.getAliveSpectateTargets().length === 0);
+
         const rankBox = document.getElementById('resultRankingList');
         if (mMode === 'SOLO' && app.currentSoloMode === 'VS_BOT') {
           rankBox.classList.remove('hidden'); rankBox.classList.add('flex');
-          rankBox.innerHTML = [...this.crafts].sort((a,b) => a.rank - b.rank).map(c => `<div class="flex justify-between text-xs font-extrabold"><span>#${c.rank} ${c.name}</span><span>${c.score} pts</span></div>`).join('');
+          rankBox.innerHTML = [...this.crafts].sort((a,b) => a.rank - b.rank).map(c => `<div class="flex justify-between text-xs font-extrabold"><span>#${c.rank} ${c.name} (${Math.floor(c.distance)}m)</span><span>${c.score} pts</span></div>`).join('');
         } else if (isOnline && onlineNet.roster.length > 0) {
           rankBox.classList.remove('hidden'); rankBox.classList.add('flex'); onlineNet.recalcRanks();
-          rankBox.innerHTML = [...onlineNet.roster].sort((a,b) => a.rank - b.rank).map(r => `<div class="flex justify-between text-xs font-extrabold"><span>#${r.rank} ${r.name}</span><span>${r.score} pts</span></div>`).join('');
+          rankBox.innerHTML = [...onlineNet.roster].sort((a,b) => a.rank - b.rank).map(r => `<div class="flex justify-between text-xs font-extrabold"><span>#${r.rank} ${r.name} (${r.distance || 0}m) ${r.alive ? '飛行中' : ''}</span><span>${r.score} pts</span></div>`).join('');
         } else rankBox.classList.add('hidden');
 
         const coinReward = Math.max(20, Math.floor(finalDist * 0.35) + this.nearMissCount * 15 + (isClear ? 120 : 0));
@@ -2711,22 +3013,41 @@ const EMBEDDED_VOICES = {
           const kEl = document.getElementById('hudStoryKeyItemStatus');
           const tEl = document.getElementById('hudStoryTaskStatus');
           if (kEl) kEl.textContent = `${qp.sq.keyItemName}: ${Math.min(this.storyItemsCollected, qp.sq.reqItemCount)}/${qp.sq.reqItemCount}${qp.itemDone ? ' ✓' : ''}`;
-          if (tEl) tEl.textContent = `${qp.sq.taskType === 'MATH' ? 'パズル正解' : (sq.taskType === 'RING' ? 'リング' : 'ニアミス')}: ${Math.min(qp.taskCur, qp.sq.reqTaskVal)}/${qp.sq.reqTaskVal}${qp.taskDone ? ' ✓' : ''}`;
+          if (tEl) tEl.textContent = `${qp.qp.sq.taskType === 'MATH' ? 'パズル正解' : (sq.taskType === 'RING' ? 'リング' : 'ニアミス')}: ${Math.min(qp.taskCur, qp.sq.reqTaskVal)}/${qp.sq.reqTaskVal}${qp.taskDone ? ' ✓' : ''}`;
         }
         document.getElementById('hudSpeed').textContent = Math.round(this.currentSpeed * 3.4);
         if ((this.runMode === 'SOLO' && (app.currentSoloMode === 'TIME_ATTACK' || app.currentSoloMode === 'RING_RUSH')) || (this.runMode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE')) {
           document.getElementById('hudModeTimerLabel').textContent = app.currentSoloMode === 'RING_RUSH' ? `RUSH (${this.ringsCollected})` : 'TIME';
           document.getElementById('hudModeTimerValue').textContent = `${Math.max(0, this.modeTimer).toFixed(1)}s`;
         }
-        if (isVsBot && this.crafts[0]) {
-          const pct = Math.floor(this.crafts[0].jammerCharge), jb = document.getElementById('btnDirectJammer');
-          jb.textContent = pct >= 100 ? 'お邪魔発動！' : `お邪魔 (${pct}%)`;
-          jb.className = pct >= 100 && this.crafts[0].alive ? 'px-4 py-2.5 rounded-2xl bg-cocoa-800 text-cream-50 font-extrabold text-xs' : 'px-4 py-2.5 rounded-2xl bg-cream-200 text-cocoa-400 font-extrabold text-xs';
-          document.getElementById('hudPlayerChips').innerHTML = this.crafts.map(c => `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-cream-50 ${c.alive?'':'opacity-40 line-through'}">${c.name}</span>`).join('');
-        } else if (this.runMode === 'ONLINE' && this.crafts[0]) {
-          const pct = Math.floor(this.crafts[0].jammerCharge), jb = document.getElementById('btnDirectJammer');
-          jb.textContent = pct >= 100 ? 'お邪魔発動！' : `お邪魔 (${pct}%)`;
-          jb.className = pct >= 100 && this.crafts[0].alive ? 'px-4 py-2.5 rounded-2xl bg-cocoa-800 text-cream-50 font-extrabold text-xs' : 'px-4 py-2.5 rounded-2xl bg-cream-200 text-cocoa-400 font-extrabold text-xs';
+        if (this.crafts[0]) {
+          const mc = this.crafts[0];
+          const ov = document.getElementById('debuffScreenOverlay');
+          const cl = document.getElementById('debuffCloudLayer');
+          const st = document.getElementById('debuffStatusPill');
+          if (ov && cl && st) {
+            const activeDebuff = mc.alive && mc.debuffTimer > 0 && mc.debuffType;
+            ov.classList.toggle('hidden', !activeDebuff);
+            if (activeDebuff) {
+              const meta = getSabotageMeta(mc.debuffType);
+              cl.classList.toggle('hidden', mc.debuffType !== 'BLIND');
+              st.textContent = `${meta.name}（${meta.short}） ${mc.debuffTimer.toFixed(1)}s`;
+            }
+          }
+        }
+        if ((isVsBot || this.runMode === 'ONLINE') && this.crafts[0]) {
+          const mc = this.crafts[0], pct = Math.floor(mc.jammerCharge), jb = document.getElementById('btnDirectJammer');
+          if (mc.heldSabotageItem) {
+            const meta = getSabotageMeta(mc.heldSabotageItem);
+            jb.textContent = `【${meta.name}】を使う！`;
+            jb.className = mc.alive ? 'px-4 py-3 rounded-2xl bg-brand-500 text-white font-black text-xs anim-breathe-soft' : 'px-4 py-2.5 rounded-2xl bg-cream-200 text-cocoa-400 font-extrabold text-xs';
+          } else {
+            jb.textContent = pct >= 100 ? 'お邪魔発動！' : `お邪魔 (${pct}%)`;
+            jb.className = pct >= 100 && mc.alive ? 'px-4 py-2.5 rounded-2xl bg-cocoa-800 text-cream-50 font-extrabold text-xs' : 'px-4 py-2.5 rounded-2xl bg-cream-200 text-cocoa-400 font-extrabold text-xs';
+          }
+          if (isVsBot) {
+            document.getElementById('hudPlayerChips').innerHTML = this.crafts.map(c => `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-cream-50 ${c.alive?'':'opacity-40 line-through'}">${c.name}</span>`).join('');
+          }
         }
       },
       loop(ts) {
@@ -3312,6 +3633,9 @@ const EMBEDDED_VOICES = {
       btnIngameReset: () => gyro.calibrate(),
       btnDirectJammer: () => game3d.triggerDirectJammer(),
 
+      btnSpectateNext: () => game3d.cycleSpectateTarget(),
+      btnSpectateFinish: () => game3d.exitSpectateToResult(),
+      btnResultSpectate: () => game3d.enterSpectateMode(),
       btnResultNextStory: () => app.advanceNextStoryChapter(),
       btnResultRetry: () => game3d.restart(),
       btnResultBackLobby: () => app.backToLobby(),
