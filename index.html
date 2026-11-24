@@ -646,7 +646,7 @@
           <div class="text-xl font-black text-brand-600"><span id="hudDistance">0</span>m</div>
         </div>
         <div class="soft-card px-3.5 py-2 text-right">
-          <div class="text-[9px] font-bold text-cocoa-600">LV.<span id="hudSpeedLv">1</span> · <span id="hudCompassBadge">N 0°</span></div>
+          <div class="text-[9px] font-bold text-cocoa-600"><span id="hudZoneName" class="text-sage-600">滑空ゾーン</span> · LV.<span id="hudSpeedLv">1</span></div>
           <div class="text-xl font-black text-brand-600"><span id="hudSpeed">120</span><span class="text-[10px]">km/h</span></div>
         </div>
       </div>
@@ -788,12 +788,12 @@ const EMBEDDED_VOICES = {
     ];
 
     const CRAFT_SHAPES = [
-      { id: 'EGGPOD', name: 'タマゴ・ポッド', desc: 'ころんと可愛い丸型ポッド' },
-      { id: 'BUNNY',  name: 'クラウド・バニー', desc: 'うさ耳ウィングの軽快機' },
-      { id: 'DELTA',  name: 'リーフ・グライダー', desc: '安定バランス翼' },
-      { id: 'UFO',    name: 'ぷかぷかUFO', desc: 'ふわふわ円盤フォルム' },
-      { id: 'ROCKET', name: 'キャンディ・ロケット', desc: 'まっすぐ速いロケット型' },
-      { id: 'DRAGON', name: 'ドラゴン・ウィング', desc: '大きなV字翼' }
+      { id: 'EGGPOD',    name: 'タマゴ・ポッド', desc: 'ぱたぱた羽ばたく丸型ポッド' },
+      { id: 'BIRD',      name: '小鳥グライダー', desc: '軽やかに滑空する小鳥フォルム' },
+      { id: 'DRAGONFLY', name: 'トンボ・ウィング', desc: '4枚羽でホバリング＆急旋回' },
+      { id: 'BUNNY',     name: 'クラウド・バニー', desc: 'うさ耳ウィングの軽快機' },
+      { id: 'DELTA',     name: 'リーフ・グライダー', desc: '安定バランス翼' },
+      { id: 'DRAGON',    name: 'ドラゴン・ウィング', desc: '大きなV字翼' }
     ];
 
     const CRAFT_PARTS = [
@@ -1708,48 +1708,74 @@ const EMBEDDED_VOICES = {
         const mainMat = new THREE.MeshLambertMaterial({ color: colorNum, flatShading: true, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
         const creamMat = new THREE.MeshLambertMaterial({ color: 0xFFFDF9, flatShading: true, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
         const sageMat = new THREE.MeshLambertMaterial({ color: 0x93AB8A, flatShading: true, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
+        const wings = { frontL: null, frontR: null, rearL: null, rearR: null, isFourWing: false };
 
-        if (shapeId === 'EGGPOD') {
-          const egg = new THREE.Mesh(new THREE.SphereGeometry(0.68, 14, 12), mainMat);
-          egg.scale.set(1.0, 0.85, 1.35);
-          const visor = new THREE.Mesh(new THREE.SphereGeometry(0.42, 12, 10), creamMat);
-          visor.position.set(0, 0.25, -0.35);
-          const wingL = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.12, 0.45), sageMat);
-          wingL.position.set(-0.75, 0, 0.15);
-          const wingR = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.12, 0.45), sageMat);
-          wingR.position.set(0.75, 0, 0.15);
-          group.add(egg, visor, wingL, wingR);
+        const makeWingPivot = (side, wLen, wChord, zOff, yOff, mat, phaseSign = 1) => {
+          const piv = new THREE.Group();
+          piv.position.set(side * 0.32, yOff, zOff);
+          const blade = new THREE.Mesh(new THREE.BoxGeometry(wLen, 0.08, wChord), mat);
+          blade.position.set(side * (wLen * 0.5), 0, 0);
+          piv.add(blade);
+          piv.userData.side = side;
+          piv.userData.phaseSign = phaseSign;
+          group.add(piv);
+          return piv;
+        };
+
+        if (shapeId === 'BIRD') {
+          const body = new THREE.Mesh(new THREE.SphereGeometry(0.55, 14, 12), mainMat);
+          body.scale.set(0.9, 0.85, 1.45);
+          const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 12, 10), creamMat);
+          head.position.set(0, 0.22, -0.62);
+          const beak = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.34, 6), sageMat);
+          beak.rotation.x = -Math.PI / 2; beak.position.set(0, 0.18, -0.96);
+          const tail = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.08, 0.45), sageMat);
+          tail.position.set(0, 0.1, 0.82); tail.rotation.x = 0.25;
+          group.add(body, head, beak, tail);
+          wings.frontL = makeWingPivot(-1, 1.05, 0.52, -0.05, 0.12, mainMat, 1);
+          wings.frontR = makeWingPivot(1, 1.05, 0.52, -0.05, 0.12, mainMat, 1);
+        } else if (shapeId === 'DRAGONFLY') {
+          const thorax = new THREE.Mesh(new THREE.SphereGeometry(0.36, 12, 10), mainMat);
+          thorax.scale.set(0.95, 0.9, 1.25);
+          const head = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 10), creamMat);
+          head.position.set(0, 0.06, -0.48);
+          const abdomen = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.07, 1.45, 8), sageMat);
+          abdomen.rotation.x = Math.PI / 2; abdomen.position.set(0, 0, 0.92);
+          group.add(thorax, head, abdomen);
+          wings.isFourWing = true;
+          wings.frontL = makeWingPivot(-1, 1.25, 0.32, -0.18, 0.14, creamMat, 1);
+          wings.frontR = makeWingPivot(1, 1.25, 0.32, -0.18, 0.14, creamMat, 1);
+          wings.rearL  = makeWingPivot(-1, 1.12, 0.30, 0.24, 0.10, mainMat, -1);
+          wings.rearR  = makeWingPivot(1, 1.12, 0.30, 0.24, 0.10, mainMat, -1);
         } else if (shapeId === 'BUNNY') {
-          const body = new THREE.Mesh(new THREE.SphereGeometry(0.6, 12, 10), mainMat);
+          const body = new THREE.Mesh(new THREE.SphereGeometry(0.58, 12, 10), mainMat);
           body.scale.set(0.95, 0.85, 1.3);
-          const earL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.65, 0.22), creamMat);
-          earL.position.set(-0.24, 0.62, 0.1); earL.rotation.z = 0.22;
-          const earR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.65, 0.22), creamMat);
-          earR.position.set(0.24, 0.62, 0.1); earR.rotation.z = -0.22;
-          const wing = new THREE.Mesh(new THREE.BoxGeometry(1.75, 0.1, 0.5), mainMat);
-          group.add(body, earL, earR, wing);
-        } else if (shapeId === 'UFO') {
-          const d = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.1, 0.24, 14), mainMat);
-          const dome = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 8, 0, Math.PI*2, 0, Math.PI/2), creamMat);
-          dome.position.y = 0.1;
-          group.add(d, dome);
-        } else if (shapeId === 'ROCKET') {
-          const cyl = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.44, 1.55, 12), mainMat);
-          cyl.rotation.x = Math.PI / 2;
-          const nose = new THREE.Mesh(new THREE.ConeGeometry(0.36, 0.55, 12), creamMat);
-          nose.rotation.x = -Math.PI / 2; nose.position.z = -1.05;
-          const fin = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.1, 0.45), sageMat);
-          fin.position.z = 0.45;
-          group.add(cyl, nose, fin);
+          const earL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.62, 0.22), creamMat);
+          earL.position.set(-0.22, 0.6, -0.15); earL.rotation.z = 0.2;
+          const earR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.62, 0.22), creamMat);
+          earR.position.set(0.22, 0.6, -0.15); earR.rotation.z = -0.2;
+          group.add(body, earL, earR);
+          wings.frontL = makeWingPivot(-1, 0.88, 0.45, 0.05, 0.05, mainMat, 1);
+          wings.frontR = makeWingPivot(1, 0.88, 0.45, 0.05, 0.05, mainMat, 1);
         } else if (shapeId === 'DRAGON') {
-          const g = new THREE.ConeGeometry(0.48, 1.95, 6); g.rotateX(-Math.PI/2);
-          const w1 = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.1, 0.55), mainMat); w1.position.set(-0.75,0.18,0.2); w1.rotation.z = 0.35;
-          const w2 = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.1, 0.55), mainMat); w2.position.set(0.75,0.18,0.2); w2.rotation.z = -0.35;
-          group.add(new THREE.Mesh(g, mainMat), w1, w2);
+          const g = new THREE.ConeGeometry(0.46, 1.9, 6); g.rotateX(-Math.PI/2);
+          group.add(new THREE.Mesh(g, mainMat));
+          wings.frontL = makeWingPivot(-1, 1.25, 0.56, 0.12, 0.12, mainMat, 1);
+          wings.frontR = makeWingPivot(1, 1.25, 0.56, 0.12, 0.12, mainMat, 1);
+        } else if (shapeId === 'DELTA') {
+          const g = new THREE.ConeGeometry(0.52, 1.75, 6); g.rotateX(-Math.PI/2);
+          group.add(new THREE.Mesh(g, mainMat));
+          wings.frontL = makeWingPivot(-1, 0.98, 0.58, 0.18, 0.0, sageMat, 1);
+          wings.frontR = makeWingPivot(1, 0.98, 0.58, 0.18, 0.0, sageMat, 1);
         } else {
-          const g = new THREE.ConeGeometry(0.55, 1.8, 6); g.rotateX(-Math.PI/2);
-          const w = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.1, 0.65), mainMat); w.position.set(0,-0.04,0.25);
-          group.add(new THREE.Mesh(g, mainMat), w);
+          // EGGPOD (default cute bird-egg pod with flapping wings)
+          const egg = new THREE.Mesh(new THREE.SphereGeometry(0.64, 14, 12), mainMat);
+          egg.scale.set(1.0, 0.86, 1.35);
+          const visor = new THREE.Mesh(new THREE.SphereGeometry(0.40, 12, 10), creamMat);
+          visor.position.set(0, 0.24, -0.35);
+          group.add(egg, visor);
+          wings.frontL = makeWingPivot(-1, 0.82, 0.46, 0.08, 0.06, sageMat, 1);
+          wings.frontR = makeWingPivot(1, 0.82, 0.46, 0.08, 0.06, sageMat, 1);
         }
 
         let shieldMesh = null;
@@ -1758,7 +1784,26 @@ const EMBEDDED_VOICES = {
         debuffRing.rotation.x = Math.PI/2; debuffRing.visible = false; group.add(debuffRing);
         const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.65, 12), new THREE.MeshBasicMaterial({ color: 0xEA580C, transparent: true, opacity: 0.2 }));
         shadow.rotation.x = -Math.PI/2; shadow.position.set(0,-1.2,0); group.add(shadow);
-        return { group, shadow, debuffRing, shieldMesh };
+        return { group, shadow, debuffRing, shieldMesh, wings };
+      },
+      animateBioWings(wings, flapPhase, vy, isBoosting, isHovering) {
+        if (!wings) return;
+        // 鳥・トンボの羽ばたき＆滑空制御：
+        // 上昇・加速時は力強く羽ばたき、下降時は翼を広げて滑空、ホバリング時はトンボのように細かく振動
+        const isGliding = (!isBoosting && vy < -0.35);
+        const amp = isGliding ? 0.08 : (isBoosting ? 0.68 : (isHovering ? 0.42 : 0.54));
+        const baseDihedral = isGliding ? 0.16 : 0.08;
+        const applyPair = (pivL, pivR, phaseOffset = 0) => {
+          if (!pivL || !pivR) return;
+          const wave = Math.sin(flapPhase + phaseOffset) * amp + baseDihedral;
+          pivL.rotation.z = -wave;
+          pivR.rotation.z = wave;
+          pivL.rotation.x = Math.cos(flapPhase + phaseOffset) * 0.12;
+          pivR.rotation.x = Math.cos(flapPhase + phaseOffset) * 0.12;
+        };
+        applyPair(wings.frontL, wings.frontR, 0);
+        // トンボの4枚羽は前翼と後翼が位相差（逆位相気味）で羽ばたく
+        applyPair(wings.rearL, wings.rearR, Math.PI * 0.65);
       },
       clearEntities() {
         if (!this.scene) return;
@@ -1813,28 +1858,28 @@ const EMBEDDED_VOICES = {
           const palIdx = mMode === 'ONLINE' ? (myEntry ? myEntry.colorIndex : app.custom.colorIndex) : app.custom.colorIndex;
           const pal = PLAYER_PALETTE[palIdx % PLAYER_PALETTE.length];
           const myPart = app.custom.partId || 'NONE';
-          const { group, shadow, debuffRing, shieldMesh } = this.createCraftMesh(pal.num, false, app.custom.shapeId, myPart);
+          const { group, shadow, debuffRing, shieldMesh, wings } = this.createCraftMesh(pal.num, false, app.custom.shapeId, myPart);
           group.position.set(0, 0, this.PLAYER_Z); this.scene.add(group);
-          this.crafts.push({ slotIndex: 0, slotId: pal.id, name: myEntry ? myEntry.name : 'YOU', colorHex: pal.hex, isBot: false, botProfile: null, partId: myPart, shieldCharges: myPart === 'SHIELD' ? 1 : 0, shieldMesh, mesh: group, shadow, debuffRing, x: 0, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: 1, jammerCharge: 35, debuffType: null, debuffTimer: 0, botTargetX: 0, botTargetY: 0, botThinkTimer: 0, botWobbleSeed: 1, botBoostTimer: 0, botJamWait: 1, botBoostActive: false });
+          this.crafts.push({ slotIndex: 0, wings, vx: 0, vy: 0, flapPhase: 0, slotId: pal.id, name: myEntry ? myEntry.name : 'YOU', colorHex: pal.hex, isBot: false, botProfile: null, partId: myPart, shieldCharges: myPart === 'SHIELD' ? 1 : 0, shieldMesh, mesh: group, shadow, debuffRing, x: 0, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: 1, jammerCharge: 35, debuffType: null, debuffTimer: 0, botTargetX: 0, botTargetY: 0, botThinkTimer: 0, botWobbleSeed: 1, botBoostTimer: 0, botJamWait: 1, botBoostActive: false });
 
           if (mMode === 'SOLO' && soloMode === 'VS_BOT') {
             for (let b = 1; b <= 5; b++) {
               const bPal = PLAYER_PALETTE[(app.custom.colorIndex + b * 3) % PLAYER_PALETTE.length];
               const prof = createBotProfile(app.getBotForcedLevel());
               const bSh = CRAFT_SHAPES[b % CRAFT_SHAPES.length].id;
-              const { group: bg, shadow: bs, debuffRing: bd } = this.createCraftMesh(bPal.num, false, bSh, 'NONE');
+              const { group: bg, shadow: bs, debuffRing: bd, wings: bw } = this.createCraftMesh(bPal.num, false, bSh, 'NONE');
               const sx = ((b / 5) - 0.5) * 6.5; bg.position.set(sx, 0, this.PLAYER_Z); this.scene.add(bg);
-              this.crafts.push({ slotIndex: b, slotId: bPal.id, name: `BOT-${b} Lv.${prof.level}`, colorHex: bPal.hex, isBot: true, botProfile: prof, partId: 'NONE', shieldCharges: 0, shieldMesh: null, mesh: bg, shadow: bs, debuffRing: bd, x: sx, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: b+1, jammerCharge: 30, debuffType: null, debuffTimer: 0, botTargetX: sx, botTargetY: 0, botThinkTimer: Math.random()*0.2, botWobbleSeed: b*17, botBoostTimer: 0, botJamWait: prof.jamDelay, botBoostActive: false });
+              this.crafts.push({ slotIndex: b, wings: bw, vx: 0, vy: 0, flapPhase: b * 1.1, slotId: bPal.id, name: `BOT-${b} Lv.${prof.level}`, colorHex: bPal.hex, isBot: true, botProfile: prof, partId: 'NONE', shieldCharges: 0, shieldMesh: null, mesh: bg, shadow: bs, debuffRing: bd, x: sx, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: b+1, jammerCharge: 30, debuffType: null, debuffTimer: 0, botTargetX: sx, botTargetY: 0, botThinkTimer: Math.random()*0.2, botWobbleSeed: b*17, botBoostTimer: 0, botJamWait: prof.jamDelay, botBoostActive: false });
             }
           }
         } else if (this.scene && mMode === 'HOST') {
           const active = hostNet.slots.filter(s => s !== null);
           active.forEach((slot, idx) => {
             const prof = slot.isBot ? (slot.botProfile || createBotProfile(app.getBotForcedLevel())) : null;
-            const { group, shadow, debuffRing } = this.createCraftMesh(slot.colorNum, false, slot.isBot ? CRAFT_SHAPES[idx%CRAFT_SHAPES.length].id : app.custom.shapeId, 'NONE');
+            const { group, shadow, debuffRing, wings } = this.createCraftMesh(slot.colorNum, false, slot.isBot ? CRAFT_SHAPES[idx%CRAFT_SHAPES.length].id : app.custom.shapeId, 'NONE');
             const sx = active.length > 1 ? ((idx / (active.length - 1)) - 0.5) * 6.0 : 0;
             group.position.set(sx, 0, this.PLAYER_Z); this.scene.add(group);
-            this.crafts.push({ slotIndex: slot.slotIndex, slotId: PLAYER_PALETTE[slot.slotIndex].id, name: slot.name, colorHex: slot.colorHex, isBot: slot.isBot, botProfile: prof, partId: 'NONE', shieldCharges: 0, shieldMesh: null, mesh: group, shadow, debuffRing, x: sx, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: idx+1, jammerCharge: 35, debuffType: null, debuffTimer: 0, botTargetX: sx, botTargetY: 0, botThinkTimer: Math.random()*0.2, botWobbleSeed: idx*11, botBoostTimer: 0, botJamWait: prof ? prof.jamDelay : 1, botBoostActive: false });
+            this.crafts.push({ slotIndex: slot.slotIndex, wings, vx: 0, vy: 0, flapPhase: idx * 0.9, slotId: PLAYER_PALETTE[slot.slotIndex].id, name: slot.name, colorHex: slot.colorHex, isBot: slot.isBot, botProfile: prof, partId: 'NONE', shieldCharges: 0, shieldMesh: null, mesh: group, shadow, debuffRing, x: sx, y: 0, alive: true, invuln: 0, score: 0, distance: 0, rank: idx+1, jammerCharge: 35, debuffType: null, debuffTimer: 0, botTargetX: sx, botTargetY: 0, botThinkTimer: Math.random()*0.2, botWobbleSeed: idx*11, botBoostTimer: 0, botJamWait: prof ? prof.jamDelay : 1, botBoostActive: false });
           });
         }
 
@@ -1940,35 +1985,75 @@ const EMBEDDED_VOICES = {
         targets.forEach(t => { t.debuffType = kind; t.debuffTimer = 3.8; });
         audio.playJammerLaunch(); this.showPopup(`${att.name} が【${kind}】発動！`, '#3E2723');
       },
+      getStageZoneInfo(dist) {
+        const cycle = Math.floor(dist / 100) % 4;
+        if (cycle === 0) return { id: 'GLIDE', name: '滑空ゾーン', ringBoost: 0.08, allowVerticalMove: false, chainChance: 0.25 };
+        if (cycle === 1) return { id: 'WAVE',  name: '気流ウェーブ', ringBoost: 0.12, allowVerticalMove: true,  chainChance: 0.35 };
+        if (cycle === 2) return { id: 'SPINNER', name: '旋回ゲート', ringBoost: 0.10, allowVerticalMove: true,  chainChance: 0.30 };
+        return { id: 'RUSH', name: 'リングラッシュ', ringBoost: 0.22, allowVerticalMove: true, chainChance: 0.50 };
+      },
       spawnWave() {
         if (!this.scene) return;
-        const curMap = MAPS[app.currentMapIndex], curDiff = DIFFICULTIES[app.currentDiffIndex], mMode = this.runMode, roll = Math.random();
+        const curMap = MAPS[app.currentMapIndex];
+        const curDiff = DIFFICULTIES[app.currentDiffIndex];
+        const mMode = this.runMode;
+        const zone = this.getStageZoneInfo(this.teamDistance);
+        const roll = Math.random();
+
         if (mMode === 'HOST' && hostNet.ruleMode === 'COOP' && this.crafts.some(c => !c.alive) && roll < 0.25) {
           const gx = (Math.random()-0.5)*7.5, gy = (Math.random()-0.5)*4.2;
           const m = new THREE.Mesh(new THREE.TorusGeometry(1.55,0.22,8,16), new THREE.MeshLambertMaterial({color:0x38BDF8,flatShading:true}));
           m.position.set(gx, gy, this.SPAWN_Z); this.scene.add(m);
           this.obstacles.push({ kind:'RESCUE', mesh:m, x:gx, y:gy, z:this.SPAWN_Z, radius:1.75, collectedBy:new Set() }); return;
         }
-        if ((curMap.hasSpinner || curDiff.id === 'EXTREME' || (mMode === 'SOLO' && this.speedLevel >= 6)) && roll > 0.72) {
-          const g = new THREE.Group(); g.add(new THREE.Mesh(new THREE.BoxGeometry(11.4,1.25,1.5), new THREE.MeshLambertMaterial({color:curMap.blockHex,flatShading:true})));
-          const ang = Math.random()*Math.PI; g.position.set(0,0,this.SPAWN_Z); g.rotation.z = ang; this.scene.add(g);
-          this.obstacles.push({ kind:'SPINNER', mesh:g, x:0, y:0, z:this.SPAWN_Z, angle:ang, rotSpeed:(Math.random()<0.5?1:-1)*1.4*curDiff.moveSpeedMult, halfLen:5.7, halfThick:0.62, hitBy:new Set(), nearMissedBy:new Set() }); return;
+
+        // 旋回ゲート（スピナー）出現
+        if ((curMap.hasSpinner || zone.id === 'SPINNER' || curDiff.id === 'EXTREME' || (mMode === 'SOLO' && this.speedLevel >= 5)) && roll > 0.70) {
+          const g = new THREE.Group();
+          g.add(new THREE.Mesh(new THREE.BoxGeometry(11.2,1.2,1.5), new THREE.MeshLambertMaterial({color:curMap.blockHex,flatShading:true})));
+          const ang = Math.random()*Math.PI;
+          g.position.set(0,0,this.SPAWN_Z); g.rotation.z = ang; this.scene.add(g);
+          this.obstacles.push({ kind:'SPINNER', mesh:g, x:0, y:0, z:this.SPAWN_Z, angle:ang, rotSpeed:(Math.random()<0.5?1:-1)*1.45*curDiff.moveSpeedMult, halfLen:5.6, halfThick:0.6, hitBy:new Set(), nearMissedBy:new Set() });
+          return;
         }
+
         const isRingMode = (mMode === 'SOLO' && app.currentSoloMode === 'RING_RUSH') || (mMode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE');
-        if (roll < (isRingMode ? 0.62 : (curMap.spawnPattern === 'RINGS_HEAVY' ? 0.36 : 0.22))) {
-          const gx = (Math.random()-0.5)*8, gy = (Math.random()-0.5)*4.5;
-          const m = new THREE.Mesh(new THREE.TorusGeometry(1.35,0.18,8,14), new THREE.MeshLambertMaterial({color:curMap.stripeHex,flatShading:true}));
-          m.position.set(gx, gy, this.SPAWN_Z); this.scene.add(m);
-          this.obstacles.push({ kind:'RING', mesh:m, x:gx, y:gy, z:this.SPAWN_Z, radius:1.55, collectedBy:new Set() });
+        const ringProb = (isRingMode ? 0.65 : (curMap.spawnPattern === 'RINGS_HEAVY' ? 0.38 : 0.24)) + zone.ringBoost;
+
+        if (roll < ringProb) {
+          // 連続リング（3連ウェーブまたは一直線）で鳥・トンボの滑空ルートを作る
+          const isChain = Math.random() < zone.chainChance;
+          const count = isChain ? 3 : 1;
+          const startX = (Math.random() - 0.5) * 6.5;
+          const startY = (Math.random() - 0.5) * 3.4;
+          const dirX = (Math.random() < 0.5 ? 1 : -1) * 1.4;
+          const dirY = (Math.random() < 0.5 ? 1 : -1) * 0.9;
+          for (let k = 0; k < count; k++) {
+            const gx = Math.max(-5.2, Math.min(5.2, startX + k * dirX));
+            const gy = Math.max(-3.1, Math.min(3.1, startY + Math.sin(k * 1.1) * dirY));
+            const gz = this.SPAWN_Z - k * 8.5;
+            const m = new THREE.Mesh(new THREE.TorusGeometry(1.38,0.18,8,14), new THREE.MeshLambertMaterial({color:curMap.stripeHex,flatShading:true}));
+            m.position.set(gx, gy, gz); this.scene.add(m);
+            this.obstacles.push({ kind:'RING', mesh:m, x:gx, y:gy, z:gz, radius:1.58, collectedBy:new Set() });
+          }
         } else {
           const cnt = (curMap.spawnPattern === 'DENSE_WALLS' || curDiff.id === 'HARD' || curDiff.id === 'EXTREME' || (mMode === 'SOLO' && this.speedLevel >= 4)) ? 2 : 1;
           for (let i = 0; i < cnt; i++) {
-            const w = 2.2 + Math.random()*1.8, h = 2.4 + Math.random()*2.4, d = 2.0;
-            const ox = (Math.random()-0.5)*9.4, oy = (Math.random()-0.5)*4.6;
+            const w = 2.1 + Math.random()*1.7, h = 2.3 + Math.random()*2.2, d = 2.0;
+            const ox = (Math.random()-0.5)*9.0, oy = (Math.random()-0.5)*4.2;
             const g = this.createStyledObstacleGroup(w, h, d, curMap);
-            const sz = this.SPAWN_Z - i*5.5; g.position.set(ox, oy, sz); this.scene.add(g);
-            const moving = curMap.hasMoving || curDiff.id === 'EXTREME' || (mMode === 'SOLO' && this.speedLevel >= 4 && Math.random() < 0.45);
-            this.obstacles.push({ kind:'BLOCK', mesh:g, baseX:ox, x:ox, y:oy, z:sz, halfW:w/2, halfH:h/2, moveAmpX:moving?2.6:0, moveSpeed:2.0*curDiff.moveSpeedMult, movePhase:Math.random()*6.28, hitBy:new Set(), nearMissedBy:new Set() });
+            const sz = this.SPAWN_Z - i*6.5; g.position.set(ox, oy, sz); this.scene.add(g);
+            const movingX = curMap.hasMoving || zone.id === 'WAVE' || curDiff.id === 'EXTREME' || (mMode === 'SOLO' && this.speedLevel >= 3 && Math.random() < 0.5);
+            const movingY = zone.allowVerticalMove && Math.random() < 0.42;
+            this.obstacles.push({
+              kind:'BLOCK', mesh:g, baseX:ox, baseY:oy, x:ox, y:oy, z:sz,
+              halfW:w/2, halfH:h/2,
+              moveAmpX: movingX ? 2.5 : 0,
+              moveAmpY: movingY ? 1.35 : 0,
+              moveSpeed: 2.05 * curDiff.moveSpeedMult,
+              movePhase: Math.random() * 6.28,
+              hitBy: new Set(), nearMissedBy: new Set()
+            });
           }
         }
       },
@@ -2008,16 +2093,26 @@ const EMBEDDED_VOICES = {
           if (this.scene && (!this.showcaseCraft || this.showcaseKey !== `${app.custom.colorIndex}_${app.custom.shapeId}_${app.custom.partId}`)) {
             if (this.showcaseCraft) this.scene.remove(this.showcaseCraft);
             const pal = PLAYER_PALETTE[app.custom.colorIndex % PLAYER_PALETTE.length];
-            this.showcaseCraft = this.createCraftMesh(pal.num, false, app.custom.shapeId, app.custom.partId).group;
+            const built = this.createCraftMesh(pal.num, false, app.custom.shapeId, app.custom.partId);
+            this.showcaseCraft = built.group;
+            this.showcaseWings = built.wings;
+            this.showcaseFlap = 0;
             this.scene.add(this.showcaseCraft);
             this.showcaseKey = `${app.custom.colorIndex}_${app.custom.shapeId}_${app.custom.partId}`;
           }
           if (this.showcaseCraft) {
             this.showcaseCraft.visible = onHome;
             const t = (this.lastTime || 0) * 0.0022;
-            this.showcaseCraft.position.set(Math.sin(t * 0.85) * 1.15, 1.05 + Math.sin(t * 1.35) * 0.42, 1.5);
-            this.showcaseCraft.rotation.z = -Math.cos(t) * 0.28;
-            this.showcaseCraft.rotation.y = Math.sin(t * 0.7) * 0.24;
+            // トンボのような軽快なホバリング＆スッと横移動する軌道
+            const dartX = Math.sin(t * 0.9) * 1.15 + Math.sin(t * 2.7) * 0.18;
+            const hoverY = 1.05 + Math.sin(t * 1.6) * 0.34;
+            const vySim = Math.cos(t * 1.6) * 0.55;
+            this.showcaseFlap = (this.showcaseFlap || 0) + dt * (this.showcaseWings?.isFourWing ? 28 : 20);
+            this.animateBioWings(this.showcaseWings, this.showcaseFlap, vySim, false, true);
+            this.showcaseCraft.position.set(dartX, hoverY + Math.sin(this.showcaseFlap) * 0.04, 1.5);
+            this.showcaseCraft.rotation.z = -Math.cos(t * 0.9) * 0.32;
+            this.showcaseCraft.rotation.x = vySim * 0.28;
+            this.showcaseCraft.rotation.y = -Math.cos(t * 0.9) * 0.18;
           }
           return;
         }
@@ -2075,11 +2170,28 @@ const EMBEDDED_VOICES = {
 
           const tx = Math.max(-this.BOUNDS_X, Math.min(this.BOUNDS_X, inX * this.BOUNDS_X));
           const ty = Math.max(-this.BOUNDS_Y, Math.min(this.BOUNDS_Y, inY * this.BOUNDS_Y));
-          const px = c.x;
-          c.x = Math.max(-this.BOUNDS_X, Math.min(this.BOUNDS_X, c.x + (tx - c.x)*Math.min(1, dt*lerp) + (this.windForce||0)*(hasStab?0.35:1)*dt));
-          c.y += (ty - c.y)*Math.min(1, dt*lerp);
-          c.mesh.position.set(c.x, c.y, this.PLAYER_Z);
-          c.mesh.rotation.z = -(c.x - px) * 2.4;
+          const isBioAgile = (app.custom.shapeId === 'DRAGONFLY' || app.custom.shapeId === 'BIRD');
+          const springStiff = lerp * (isBioAgile ? 1.28 : 1.05);
+          const damping = isBioAgile ? 0.72 : 0.78;
+          const ax = (tx - c.x) * springStiff + (this.windForce || 0) * (hasStab ? 0.35 : 1);
+          const ay = (ty - c.y) * springStiff;
+          c.vx = ((c.vx || 0) + ax * dt) * Math.pow(damping, dt * 16);
+          c.vy = ((c.vy || 0) + ay * dt) * Math.pow(damping, dt * 16);
+          c.x = Math.max(-this.BOUNDS_X, Math.min(this.BOUNDS_X, c.x + c.vx * dt));
+          c.y = Math.max(-this.BOUNDS_Y, Math.min(this.BOUNDS_Y, c.y + c.vy * dt));
+
+          const pbNow = c.isBot ? c.botBoostActive : ((mMode === 'SOLO' || mMode === 'ONLINE' || isStory) ? (this.directBoost || this.autoBoost) : hostNet.slots[c.slotIndex]?.boost);
+          const isHovering = (Math.abs(c.vx) < 0.45 && Math.abs(c.vy) < 0.45);
+          const flapSpeed = (c.wings?.isFourWing ? 30 : 21) * (pbNow ? 1.45 : (c.vy > 0.3 ? 1.25 : (c.vy < -0.35 ? 0.35 : 1.0)));
+          c.flapPhase = (c.flapPhase || 0) + dt * flapSpeed;
+          this.animateBioWings(c.wings, c.flapPhase, c.vy, pbNow, isHovering);
+
+          const wingLiftBob = (c.vy < -0.35 && !pbNow) ? 0 : Math.sin(c.flapPhase) * 0.048;
+          c.mesh.position.set(c.x, c.y + wingLiftBob, this.PLAYER_Z);
+          // 鳥・トンボの3軸姿勢連動（旋回ロール・上昇下降ピッチ・進行方向ヨー）
+          c.mesh.rotation.z = Math.max(-0.75, Math.min(0.75, -c.vx * 0.095));
+          c.mesh.rotation.x = Math.max(-0.48, Math.min(0.48, c.vy * 0.075 - (pbNow ? 0.08 : 0)));
+          c.mesh.rotation.y = Math.max(-0.35, Math.min(0.35, -c.vx * 0.042));
           c.shadow.position.y = -4.55 - c.y;
 
           if (this.state === 'PLAYING') {
@@ -2110,7 +2222,11 @@ const EMBEDDED_VOICES = {
         for (let i = this.obstacles.length - 1; i >= 0; i--) {
           const o = this.obstacles[i]; o.z += this.currentSpeed * dt; o.mesh.position.z = o.z;
           if (o.kind === 'RING' || o.kind === 'RESCUE') o.mesh.rotation.z += dt * 2.5;
-          else if (o.kind === 'BLOCK' && o.moveAmpX > 0) { o.movePhase += dt * o.moveSpeed; o.x = Math.max(-5.2, Math.min(5.2, o.baseX + Math.sin(o.movePhase)*o.moveAmpX)); o.mesh.position.x = o.x; }
+          else if (o.kind === 'BLOCK' && (o.moveAmpX > 0 || o.moveAmpY > 0)) {
+            o.movePhase += dt * o.moveSpeed;
+            if (o.moveAmpX > 0) { o.x = Math.max(-5.2, Math.min(5.2, o.baseX + Math.sin(o.movePhase)*o.moveAmpX)); o.mesh.position.x = o.x; }
+            if (o.moveAmpY > 0) { o.y = Math.max(-3.0, Math.min(3.0, (o.baseY ?? o.y) + Math.cos(o.movePhase * 0.85)*o.moveAmpY)); o.mesh.position.y = o.y; }
+          }
           else if (o.kind === 'SPINNER') { o.angle += o.rotSpeed * dt; o.mesh.rotation.z = o.angle; }
 
           if (o.z > -1.4 && o.z < 1.4) {
@@ -2243,6 +2359,8 @@ const EMBEDDED_VOICES = {
         document.getElementById('hudDistance').textContent = Math.floor(this.teamDistance).toLocaleString();
         document.getElementById('hudBestScore').textContent = Math.max(this.highScore, this.teamScore).toLocaleString();
         document.getElementById('hudSpeedLv').textContent = this.speedLevel;
+        const zEl = document.getElementById('hudZoneName');
+        if (zEl) zEl.textContent = this.getStageZoneInfo(this.teamDistance).name;
         document.getElementById('hudSpeed').textContent = Math.round(this.currentSpeed * 3.4);
         if ((this.runMode === 'SOLO' && (app.currentSoloMode === 'TIME_ATTACK' || app.currentSoloMode === 'RING_RUSH')) || (this.runMode === 'HOST' && hostNet.ruleMode === 'RING_BATTLE')) {
           document.getElementById('hudModeTimerLabel').textContent = app.currentSoloMode === 'RING_RUSH' ? `RUSH (${this.ringsCollected})` : 'TIME';
