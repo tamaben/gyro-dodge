@@ -462,7 +462,7 @@
           </button>
           <button id="btnOpenCustom" type="button" class="btn-peach py-3 px-2 flex flex-col items-center justify-center">
             <span class="text-xs font-black">きせかえ改造</span>
-            <span id="homeSlotShape" class="text-[10px] font-extrabold text-brand-600 truncate max-w-full mt-0.5">タマゴポッド</span>
+            <span id="homeSlotShape" class="text-[10px] font-extrabold text-brand-600 truncate max-w-full mt-0.5">飛行機</span>
           </button>
         </div>
       </div>
@@ -650,7 +650,7 @@
         <div id="customColorGrid" class="grid grid-cols-10 gap-1.5"></div>
       </div>
       <div class="bg-[#FBF7F2] rounded-2xl p-3 text-left">
-        <div class="text-xs font-extrabold mb-1.5">機体の形（6種類）</div>
+        <div class="text-xs font-extrabold mb-1.5">飛ぶ機体・生き物（全12種類）</div>
         <div id="customShapeGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5"></div>
       </div>
       <div class="bg-[#FBF7F2] rounded-2xl p-3 text-left">
@@ -1136,12 +1136,18 @@ const EMBEDDED_VOICES = {
     ];
 
     const CRAFT_SHAPES = [
-      { id: 'EGGPOD',    name: 'タマゴ・ポッド', desc: 'ぱたぱた羽ばたく丸型ポッド' },
-      { id: 'BIRD',      name: '小鳥グライダー', desc: '軽やかに滑空する小鳥フォルム' },
-      { id: 'DRAGONFLY', name: 'トンボ・ウィング', desc: '4枚羽でホバリング＆急旋回' },
-      { id: 'BUNNY',     name: 'クラウド・バニー', desc: 'うさ耳ウィングの軽快機' },
-      { id: 'DELTA',     name: 'リーフ・グライダー', desc: '安定バランス翼' },
-      { id: 'DRAGON',    name: 'ドラゴン・ウィング', desc: '大きなV字翼' }
+      { id: 'AIRPLANE',    name: '飛行機・ジェット', desc: '主翼と尾翼・プロペラを備えた王道飛行機' },
+      { id: 'PAPERPLANE',  name: 'かみひこうき',     desc: '折り目くっきりの軽快ペーパーグライダー' },
+      { id: 'HELICOPTER',  name: 'ヘリコプター',     desc: '頭上のメインローターが高速回転するヘリ' },
+      { id: 'UFO',         name: 'UFO・空飛ぶ円盤',  desc: 'ガラスドームと発光リングが回転する円盤' },
+      { id: 'ROCKET',      name: 'スペースロケット', desc: '噴射ノズルと3枚フィンで突き進む宇宙船' },
+      { id: 'BIRD',        name: '小鳥グライダー',   desc: '軽やかに羽ばたき滑空する小鳥フォルム' },
+      { id: 'OWL',         name: 'フクロウ・ウィング', desc: '大きな翼と耳羽で静かに舞う夜空の鳥' },
+      { id: 'DRAGONFLY',   name: 'トンボ・ウィング', desc: '4枚羽でホバリング＆急旋回' },
+      { id: 'BUTTERFLY',   name: 'ちょうちょウィング', desc: '大きな4枚羽を優雅にはためかせる蝶' },
+      { id: 'BAT',         name: 'コウモリ・ウィング', desc: 'ギザギザ翼で夜風を切り裂くコウモリ' },
+      { id: 'BALLOON',     name: 'ふうせん気球',     desc: '大きな気球バルーンとゴンドラでふわふわ飛行' },
+      { id: 'DRAGON',      name: 'ドラゴン・ウィング', desc: '大きなV字翼と角を持つ伝説のドラゴン' }
     ];
 
     const CRAFT_PARTS = [
@@ -2544,16 +2550,21 @@ const EMBEDDED_VOICES = {
         if (this.currentTunnelShape !== mapObj.tunnelShape) { this.currentTunnelShape = mapObj.tunnelShape; this.rebuildTunnelRings(mapObj.tunnelShape); }
       },
       onResize() { if (!this.renderer || !this.camera) return; this.camera.aspect = window.innerWidth / window.innerHeight; this.camera.updateProjectionMatrix(); this.renderer.setSize(window.innerWidth, window.innerHeight); },
-      createCraftMesh(colorNum, isGhost = false, shapeId = 'EGGPOD', partId = 'NONE') {
+      createCraftMesh(colorNum, isGhost = false, shapeId = 'AIRPLANE', partId = 'NONE') {
         const group = new THREE.Group();
         const mainMat = new THREE.MeshLambertMaterial({ color: colorNum, flatShading: true, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
         const creamMat = new THREE.MeshLambertMaterial({ color: 0xFFFDF9, flatShading: true, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
         const sageMat = new THREE.MeshLambertMaterial({ color: 0x93AB8A, flatShading: true, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
-        const wings = { frontL: null, frontR: null, rearL: null, rearR: null, isFourWing: false };
+        const darkMat = new THREE.MeshLambertMaterial({ color: 0x3E2723, flatShading: true, transparent: isGhost, opacity: isGhost ? 0.55 : 1 });
+        const wings = {
+          frontL: null, frontR: null, rearL: null, rearR: null,
+          isFourWing: false, isMechanical: false,
+          propeller: null, tailRotor: null, ufoRing: null, flameMesh: null
+        };
 
         const makeWingPivot = (side, wLen, wChord, zOff, yOff, mat, phaseSign = 1) => {
           const piv = new THREE.Group();
-          piv.position.set(side * 0.32, yOff, zOff);
+          piv.position.set(side * 0.30, yOff, zOff);
           const blade = new THREE.Mesh(new THREE.BoxGeometry(wLen, 0.08, wChord), mat);
           blade.position.set(side * (wLen * 0.5), 0, 0);
           piv.add(blade);
@@ -2563,7 +2574,79 @@ const EMBEDDED_VOICES = {
           return piv;
         };
 
-        if (shapeId === 'BIRD') {
+        if (shapeId === 'PAPERPLANE') {
+          wings.isMechanical = true;
+          const body = new THREE.Mesh(new THREE.ConeGeometry(0.45, 1.9, 3), creamMat);
+          body.rotation.x = -Math.PI / 2;
+          const wingL = new THREE.Mesh(new THREE.BoxGeometry(1.15, 0.05, 1.25), mainMat);
+          wingL.position.set(-0.52, 0.06, 0.15); wingL.rotation.set(0, -0.32, 0.18);
+          const wingR = new THREE.Mesh(new THREE.BoxGeometry(1.15, 0.05, 1.25), mainMat);
+          wingR.position.set(0.52, 0.06, 0.15); wingR.rotation.set(0, 0.32, -0.18);
+          const keel = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.34, 1.35), sageMat);
+          keel.position.set(0, -0.14, 0.15);
+          group.add(body, wingL, wingR, keel);
+        } else if (shapeId === 'HELICOPTER') {
+          wings.isMechanical = true;
+          const cabin = new THREE.Mesh(new THREE.SphereGeometry(0.56, 14, 12), mainMat);
+          cabin.scale.set(0.92, 0.92, 1.35);
+          const glass = new THREE.Mesh(new THREE.SphereGeometry(0.42, 12, 10), creamMat);
+          glass.position.set(0, 0.08, -0.36);
+          const boom = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.16, 1.25, 8), mainMat);
+          boom.rotation.x = Math.PI / 2; boom.position.set(0, 0.06, 0.95);
+          const tailFin = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.48, 0.28), sageMat);
+          tailFin.position.set(0, 0.24, 1.48);
+          const skidL = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 1.15), darkMat);
+          skidL.position.set(-0.34, -0.58, -0.05);
+          const skidR = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 1.15), darkMat);
+          skidR.position.set(0.34, -0.58, -0.05);
+          const rotorHub = new THREE.Group();
+          rotorHub.position.set(0, 0.64, -0.05);
+          const blade1 = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.05, 0.18), creamMat);
+          const blade2 = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.05, 2.5), darkMat);
+          rotorHub.add(blade1, blade2);
+          wings.propeller = rotorHub;
+          const tailRotor = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.56, 0.10), creamMat);
+          tailRotor.position.set(0.11, 0.24, 1.48);
+          wings.tailRotor = tailRotor;
+          group.add(cabin, glass, boom, tailFin, skidL, skidR, rotorHub, tailRotor);
+        } else if (shapeId === 'UFO') {
+          wings.isMechanical = true;
+          const saucer = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 1.22, 0.34, 18), mainMat);
+          const bottomDish = new THREE.Mesh(new THREE.CylinderGeometry(1.18, 0.52, 0.24, 18), sageMat);
+          bottomDish.position.y = -0.26;
+          const dome = new THREE.Mesh(new THREE.SphereGeometry(0.56, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.55), creamMat);
+          dome.position.y = 0.14;
+          const ringGroup = new THREE.Group();
+          for (let i = 0; i < 8; i++) {
+            const a = (i / 8) * Math.PI * 2;
+            const orb = new THREE.Mesh(new THREE.SphereGeometry(0.11, 8, 8), i % 2 === 0 ? creamMat : sageMat);
+            orb.position.set(Math.cos(a) * 1.16, -0.06, Math.sin(a) * 1.16);
+            ringGroup.add(orb);
+          }
+          wings.ufoRing = ringGroup;
+          group.add(saucer, bottomDish, dome, ringGroup);
+        } else if (shapeId === 'ROCKET') {
+          wings.isMechanical = true;
+          const hull = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 1.45, 14), creamMat);
+          hull.rotation.x = Math.PI / 2;
+          const nose = new THREE.Mesh(new THREE.ConeGeometry(0.38, 0.68, 14), mainMat);
+          nose.rotation.x = -Math.PI / 2; nose.position.z = -1.05;
+          const windowPorch = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 10), sageMat);
+          windowPorch.position.set(0, 0.32, -0.28);
+          const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.34, 0.28, 12), darkMat);
+          nozzle.rotation.x = Math.PI / 2; nozzle.position.z = 0.84;
+          const flame = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.72, 10), mainMat);
+          flame.rotation.x = Math.PI / 2; flame.position.z = 1.28;
+          wings.flameMesh = flame;
+          group.add(hull, nose, windowPorch, nozzle, flame);
+          for (let f = 0; f < 3; f++) {
+            const ang = (f / 3) * Math.PI * 2 - Math.PI / 2;
+            const fin = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.48, 0.46), mainMat);
+            fin.position.set(Math.cos(ang) * 0.48, Math.sin(ang) * 0.48, 0.48);
+            fin.rotation.z = ang + Math.PI / 2;
+            group.add(fin);
+          }
+        } else if (shapeId === 'BIRD') {
           const body = new THREE.Mesh(new THREE.SphereGeometry(0.55, 14, 12), mainMat);
           body.scale.set(0.9, 0.85, 1.45);
           const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 12, 10), creamMat);
@@ -2575,6 +2658,20 @@ const EMBEDDED_VOICES = {
           group.add(body, head, beak, tail);
           wings.frontL = makeWingPivot(-1, 1.05, 0.52, -0.05, 0.12, mainMat, 1);
           wings.frontR = makeWingPivot(1, 1.05, 0.52, -0.05, 0.12, mainMat, 1);
+        } else if (shapeId === 'OWL') {
+          const body = new THREE.Mesh(new THREE.SphereGeometry(0.62, 14, 12), mainMat);
+          body.scale.set(1.05, 0.92, 1.25);
+          const belly = new THREE.Mesh(new THREE.SphereGeometry(0.46, 12, 10), creamMat);
+          belly.position.set(0, -0.08, -0.25);
+          const earL = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.30, 5), sageMat);
+          earL.position.set(-0.26, 0.52, -0.35); earL.rotation.z = 0.25;
+          const earR = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.30, 5), sageMat);
+          earR.position.set(0.26, 0.52, -0.35); earR.rotation.z = -0.25;
+          const beak = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.24, 5), darkMat);
+          beak.rotation.x = -Math.PI / 2; beak.position.set(0, 0.14, -0.78);
+          group.add(body, belly, earL, earR, beak);
+          wings.frontL = makeWingPivot(-1, 1.18, 0.62, -0.04, 0.10, sageMat, 1);
+          wings.frontR = makeWingPivot(1, 1.18, 0.62, -0.04, 0.10, sageMat, 1);
         } else if (shapeId === 'DRAGONFLY') {
           const thorax = new THREE.Mesh(new THREE.SphereGeometry(0.36, 12, 10), mainMat);
           thorax.scale.set(0.95, 0.9, 1.25);
@@ -2588,35 +2685,77 @@ const EMBEDDED_VOICES = {
           wings.frontR = makeWingPivot(1, 1.25, 0.32, -0.18, 0.14, creamMat, 1);
           wings.rearL  = makeWingPivot(-1, 1.12, 0.30, 0.24, 0.10, mainMat, -1);
           wings.rearR  = makeWingPivot(1, 1.12, 0.30, 0.24, 0.10, mainMat, -1);
-        } else if (shapeId === 'BUNNY') {
-          const body = new THREE.Mesh(new THREE.SphereGeometry(0.58, 12, 10), mainMat);
-          body.scale.set(0.95, 0.85, 1.3);
-          const earL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.62, 0.22), creamMat);
-          earL.position.set(-0.22, 0.6, -0.15); earL.rotation.z = 0.2;
-          const earR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.62, 0.22), creamMat);
-          earR.position.set(0.22, 0.6, -0.15); earR.rotation.z = -0.2;
+        } else if (shapeId === 'BUTTERFLY') {
+          const body = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.10, 1.15, 8), darkMat);
+          body.rotation.x = Math.PI / 2;
+          const antL = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.42, 6), darkMat);
+          antL.position.set(-0.12, 0.24, -0.65); antL.rotation.set(-0.4, 0, 0.25);
+          const antR = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.42, 6), darkMat);
+          antR.position.set(0.12, 0.24, -0.65); antR.rotation.set(-0.4, 0, -0.25);
+          group.add(body, antL, antR);
+          wings.isFourWing = true;
+          wings.frontL = makeWingPivot(-1, 1.15, 0.72, -0.16, 0.08, mainMat, 1);
+          wings.frontR = makeWingPivot(1, 1.15, 0.72, -0.16, 0.08, mainMat, 1);
+          wings.rearL  = makeWingPivot(-1, 0.88, 0.56, 0.32, 0.04, creamMat, 1);
+          wings.rearR  = makeWingPivot(1, 0.88, 0.56, 0.32, 0.04, creamMat, 1);
+        } else if (shapeId === 'BAT') {
+          const body = new THREE.Mesh(new THREE.SphereGeometry(0.46, 12, 10), darkMat);
+          body.scale.set(0.95, 0.88, 1.25);
+          const earL = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.36, 4), mainMat);
+          earL.position.set(-0.20, 0.48, -0.25);
+          const earR = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.36, 4), mainMat);
+          earR.position.set(0.20, 0.48, -0.25);
           group.add(body, earL, earR);
-          wings.frontL = makeWingPivot(-1, 0.88, 0.45, 0.05, 0.05, mainMat, 1);
-          wings.frontR = makeWingPivot(1, 0.88, 0.45, 0.05, 0.05, mainMat, 1);
+          wings.frontL = makeWingPivot(-1, 1.25, 0.56, 0.0, 0.08, mainMat, 1);
+          wings.frontR = makeWingPivot(1, 1.25, 0.56, 0.0, 0.08, mainMat, 1);
+        } else if (shapeId === 'BALLOON') {
+          wings.isMechanical = true;
+          const env = new THREE.Mesh(new THREE.SphereGeometry(0.84, 16, 14), mainMat);
+          env.scale.set(1.0, 1.16, 1.0); env.position.y = 0.52;
+          const stripe = new THREE.Mesh(new THREE.TorusGeometry(0.82, 0.09, 8, 20), creamMat);
+          stripe.rotation.x = Math.PI / 2; stripe.position.y = 0.52;
+          const basket = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.34, 0.48), sageMat);
+          basket.position.y = -0.58;
+          const ropeL = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.55, 6), darkMat);
+          ropeL.position.set(-0.18, -0.22, 0);
+          const ropeR = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.55, 6), darkMat);
+          ropeR.position.set(0.18, -0.22, 0);
+          group.add(env, stripe, basket, ropeL, ropeR);
         } else if (shapeId === 'DRAGON') {
-          const g = new THREE.ConeGeometry(0.46, 1.9, 6); g.rotateX(-Math.PI/2);
-          group.add(new THREE.Mesh(g, mainMat));
+          const g = new THREE.ConeGeometry(0.46, 1.9, 6); g.rotateX(-Math.PI / 2);
+          const hornL = new THREE.Mesh(new THREE.ConeGeometry(0.10, 0.42, 5), creamMat);
+          hornL.position.set(-0.18, 0.34, -0.45); hornL.rotation.x = -0.5;
+          const hornR = new THREE.Mesh(new THREE.ConeGeometry(0.10, 0.42, 5), creamMat);
+          hornR.position.set(0.18, 0.34, -0.45); hornR.rotation.x = -0.5;
+          group.add(new THREE.Mesh(g, mainMat), hornL, hornR);
           wings.frontL = makeWingPivot(-1, 1.25, 0.56, 0.12, 0.12, mainMat, 1);
           wings.frontR = makeWingPivot(1, 1.25, 0.56, 0.12, 0.12, mainMat, 1);
-        } else if (shapeId === 'DELTA') {
-          const g = new THREE.ConeGeometry(0.52, 1.75, 6); g.rotateX(-Math.PI/2);
-          group.add(new THREE.Mesh(g, mainMat));
-          wings.frontL = makeWingPivot(-1, 0.98, 0.58, 0.18, 0.0, sageMat, 1);
-          wings.frontR = makeWingPivot(1, 0.98, 0.58, 0.18, 0.0, sageMat, 1);
         } else {
-          // EGGPOD (default cute bird-egg pod with flapping wings)
-          const egg = new THREE.Mesh(new THREE.SphereGeometry(0.64, 14, 12), mainMat);
-          egg.scale.set(1.0, 0.86, 1.35);
-          const visor = new THREE.Mesh(new THREE.SphereGeometry(0.40, 12, 10), creamMat);
-          visor.position.set(0, 0.24, -0.35);
-          group.add(egg, visor);
-          wings.frontL = makeWingPivot(-1, 0.82, 0.46, 0.08, 0.06, sageMat, 1);
-          wings.frontR = makeWingPivot(1, 0.82, 0.46, 0.08, 0.06, sageMat, 1);
+          // AIRPLANE (default first flying craft: fuselage, cockpit, main wings, tailplane, vertical fin & spinning propeller)
+          wings.isMechanical = true;
+          const fuselage = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.22, 1.85, 14), mainMat);
+          fuselage.rotation.x = Math.PI / 2;
+          const noseCone = new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.52, 14), creamMat);
+          noseCone.rotation.x = -Math.PI / 2; noseCone.position.z = -1.16;
+          const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 10), creamMat);
+          canopy.scale.set(0.92, 0.78, 1.45); canopy.position.set(0, 0.24, -0.25);
+          const mainWing = new THREE.Mesh(new THREE.BoxGeometry(2.65, 0.08, 0.56), creamMat);
+          mainWing.position.set(0, 0.02, -0.12);
+          const wingTipL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.58), sageMat);
+          wingTipL.position.set(-1.35, 0.05, -0.12);
+          const wingTipR = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.58), sageMat);
+          wingTipR.position.set(1.35, 0.05, -0.12);
+          const hStab = new THREE.Mesh(new THREE.BoxGeometry(0.98, 0.06, 0.30), sageMat);
+          hStab.position.set(0, 0.06, 0.78);
+          const vStab = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.48, 0.34), mainMat);
+          vStab.position.set(0, 0.26, 0.76);
+          const propGroup = new THREE.Group();
+          propGroup.position.set(0, 0, -1.44);
+          const propBlade1 = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.10, 0.04), darkMat);
+          const propBlade2 = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.92, 0.04), darkMat);
+          propGroup.add(propBlade1, propBlade2);
+          wings.propeller = propGroup;
+          group.add(fuselage, noseCone, canopy, mainWing, wingTipL, wingTipR, hStab, vStab, propGroup);
         }
 
         let shieldMesh = null;
@@ -2629,8 +2768,19 @@ const EMBEDDED_VOICES = {
       },
       animateBioWings(wings, flapPhase, vy, isBoosting, isHovering) {
         if (!wings) return;
-        // 鳥・トンボの羽ばたき＆滑空制御：
-        // 上昇・加速時は力強く羽ばたき、下降時は翼を広げて滑空、ホバリング時はトンボのように細かく振動
+        // 機械機体（飛行機・ヘリ・UFO・ロケット）のローター／プロペラ回転アニメーション
+        if (wings.propeller) {
+          wings.propeller.rotation.z += isBoosting ? 0.85 : 0.55;
+          if (wings.tailRotor) wings.tailRotor.rotation.x += 0.95;
+        }
+        if (wings.ufoRing) {
+          wings.ufoRing.rotation.y += isBoosting ? 0.16 : 0.08;
+        }
+        if (wings.flameMesh) {
+          const s = (isBoosting ? 1.45 : 0.92) + Math.sin(flapPhase * 1.5) * 0.22;
+          wings.flameMesh.scale.set(1, s, 1);
+        }
+        // 鳥・トンボ・蝶・コウモリ・ドラゴンの羽ばたき＆滑空制御
         const isGliding = (!isBoosting && vy < -0.35);
         const amp = isGliding ? 0.08 : (isBoosting ? 0.68 : (isHovering ? 0.42 : 0.54));
         const baseDihedral = isGliding ? 0.16 : 0.08;
@@ -2643,7 +2793,6 @@ const EMBEDDED_VOICES = {
           pivR.rotation.x = Math.cos(flapPhase + phaseOffset) * 0.12;
         };
         applyPair(wings.frontL, wings.frontR, 0);
-        // トンボの4枚羽は前翼と後翼が位相差（逆位相気味）で羽ばたく
         applyPair(wings.rearL, wings.rearR, Math.PI * 0.65);
       },
       clearEntities() {
@@ -3745,7 +3894,7 @@ const EMBEDDED_VOICES = {
           c.flapPhase = (c.flapPhase || 0) + dt * flapSpeed;
           this.animateBioWings(c.wings, c.flapPhase, c.vy, pbNow, isHovering);
 
-          const wingLiftBob = (c.vy < -0.35 && !pbNow) ? 0 : Math.sin(c.flapPhase) * 0.048;
+          const wingLiftBob = (c.wings?.isMechanical || (c.vy < -0.35 && !pbNow)) ? 0 : Math.sin(c.flapPhase) * 0.048;
           const zLane = c.isBot ? (this.PLAYER_Z - 1.2 - (c.slotIndex % 3) * 0.45) : this.PLAYER_Z;
           c.mesh.position.set(c.x, c.y + wingLiftBob, zLane);
           // 鳥・トンボの3軸姿勢連動（旋回ロール・上昇下降ピッチ・進行方向ヨー）
@@ -4237,7 +4386,7 @@ const EMBEDDED_VOICES = {
     const app = {
       currentScreen: 'screenHome', mode: 'NONE', currentMapIndex: 0, currentDiffIndex: 1,
       currentSoloMode: 'SURVIVAL', botLevelSetting: 'RANDOM',
-      custom: { colorIndex: 0, shapeId: 'EGGPOD', partId: 'NONE' },
+      custom: { colorIndex: 0, shapeId: 'AIRPLANE', partId: 'NONE' },
       clearedStages: {}, storyClearedMax: 0, pendingStoryChapterIndex: 0,
       coins: 500, ownedIds: ['OUTFIT_001', 'ITEM_001', 'COLL_001'],
       equippedOutfitId: 'OUTFIT_001', equippedItemId: 'ITEM_001',
@@ -4420,7 +4569,15 @@ const EMBEDDED_VOICES = {
         document.getElementById('customPreviewColorName').textContent = pal.name;
         document.getElementById('customPreviewPartDesc').textContent = `${pt.name}：${pt.effect}`;
         document.getElementById('customColorIndexLabel').textContent = `${this.custom.colorIndex+1} / 20`;
-        document.getElementById('customPreviewSvgBox').innerHTML = `<svg viewBox="0 0 80 80" class="w-14 h-14"><ellipse cx="40" cy="42" rx="22" ry="25" fill="${pal.hex}"/><circle cx="34" cy="34" r="5" fill="#FFFDF9"/></svg>`;
+        const previewMap = {
+          AIRPLANE: `<svg viewBox="0 0 80 80" class="w-14 h-14"><path d="M40 12 L48 32 L72 44 L72 52 L48 46 L46 62 L56 68 L56 72 L40 68 L24 72 L24 68 L34 62 L32 46 L8 52 L8 44 L32 32 Z" fill="${pal.hex}"/><ellipse cx="40" cy="30" rx="5" ry="10" fill="#FFFDF9"/></svg>`,
+          PAPERPLANE: `<svg viewBox="0 0 80 80" class="w-14 h-14"><polygon points="40,12 70,64 40,52 10,64" fill="${pal.hex}"/><polygon points="40,12 40,52 28,60" fill="#FFFDF9" opacity="0.85"/></svg>`,
+          HELICOPTER: `<svg viewBox="0 0 80 80" class="w-14 h-14"><rect x="14" y="18" width="52" height="5" rx="2.5" fill="#3E2723"/><rect x="37" y="22" width="6" height="8" fill="#93AB8A"/><ellipse cx="40" cy="44" rx="20" ry="15" fill="${pal.hex}"/><circle cx="34" cy="42" r="8" fill="#FFFDF9"/><rect x="24" y="63" width="32" height="4" rx="2" fill="#3E2723"/></svg>`,
+          UFO: `<svg viewBox="0 0 80 80" class="w-14 h-14"><path d="M24 38 A16 16 0 0 1 56 38 Z" fill="#FFFDF9"/><ellipse cx="40" cy="44" rx="30" ry="11" fill="${pal.hex}"/><circle cx="24" cy="44" r="3" fill="#FFFDF9"/><circle cx="40" cy="46" r="3" fill="#93AB8A"/><circle cx="56" cy="44" r="3" fill="#FFFDF9"/></svg>`,
+          ROCKET: `<svg viewBox="0 0 80 80" class="w-14 h-14"><path d="M40 12 C52 26 52 50 48 60 L32 60 C28 50 28 26 40 12 Z" fill="#FFFDF9"/><path d="M40 12 C46 20 48 26 48 28 L32 28 C32 26 34 20 40 12 Z" fill="${pal.hex}"/><polygon points="30,48 18,62 32,58" fill="${pal.hex}"/><polygon points="50,48 62,62 48,58" fill="${pal.hex}"/><circle cx="40" cy="39" r="6" fill="#93AB8A"/></svg>`,
+          BALLOON: `<svg viewBox="0 0 80 80" class="w-14 h-14"><circle cx="40" cy="34" r="22" fill="${pal.hex}"/><rect x="33" y="60" width="14" height="10" rx="3" fill="#93AB8A"/><line x1="34" y1="54" x2="35" y2="60" stroke="#3E2723" stroke-width="2"/><line x1="46" y1="54" x2="45" y2="60" stroke="#3E2723" stroke-width="2"/></svg>`
+        };
+        document.getElementById('customPreviewSvgBox').innerHTML = previewMap[sh.id] || `<svg viewBox="0 0 80 80" class="w-14 h-14"><ellipse cx="40" cy="42" rx="22" ry="18" fill="${pal.hex}"/><path d="M10 36 Q24 24 32 40 Z" fill="#FFFDF9"/><path d="M70 36 Q56 24 48 40 Z" fill="#FFFDF9"/><circle cx="35" cy="38" r="4" fill="#FFFDF9"/></svg>`;
         document.getElementById('customColorGrid').innerHTML = PLAYER_PALETTE.map((p, i) => `<button type="button" onclick="app.custom.colorIndex=${i};app.saveEconomy();app.renderCustomGarage();" class="w-full aspect-square rounded-full ${i===this.custom.colorIndex?'scale-110 ring-2 ring-cocoa-800':''}" style="background:${p.hex}"></button>`).join('');
         document.getElementById('customShapeGrid').innerHTML = CRAFT_SHAPES.map(s => `<button type="button" onclick="app.custom.shapeId='${s.id}';app.saveEconomy();app.renderCustomGarage();" class="p-2.5 rounded-2xl text-left ${s.id===this.custom.shapeId?'bg-brand-500 text-white':'bg-cream-200'}"><div class="text-xs font-extrabold truncate">${s.name}</div></button>`).join('');
         document.getElementById('customPartGrid').innerHTML = CRAFT_PARTS.map(p => `<button type="button" onclick="app.custom.partId='${p.id}';app.saveEconomy();app.renderCustomGarage();" class="p-2.5 rounded-2xl text-left ${p.id===this.custom.partId?'bg-sage-500 text-white':'bg-cream-200'}"><div class="text-xs font-extrabold truncate">${p.name}</div><div class="text-[10px] opacity-90 truncate">${p.effect}</div></button>`).join('');
@@ -4642,7 +4799,7 @@ const EMBEDDED_VOICES = {
         if (name.length < 2) { fb.textContent = '2文字以上で入力してください'; return; }
         const tag = 'GR-' + String(Math.floor(1000 + Math.random()*9000));
         const id = 'acct_' + Date.now();
-        this.accounts.unshift({ id, name, tag, pin, data: carry ? this.snapshot() : { coins: 500, ownedIds: ['OUTFIT_001','ITEM_001','COLL_001'], custom: { colorIndex: 0, shapeId: 'EGGPOD', partId: 'NONE' }, storyClearedMax: 0 } });
+        this.accounts.unshift({ id, name, tag, pin, data: carry ? this.snapshot() : { coins: 500, ownedIds: ['OUTFIT_001','ITEM_001','COLL_001'], custom: { colorIndex: 0, shapeId: 'AIRPLANE', partId: 'NONE' }, storyClearedMax: 0 } });
         this.activeId = id; localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.accounts)); localStorage.setItem(this.ACTIVE_KEY, id);
         document.getElementById('acctInputName').value = ''; document.getElementById('acctInputPin').value = '';
         this.applyCurrentProfileToApp(); this.renderSavedList(); this.updateUI(); audio.playRingCollect(); fb.textContent = `「${name}」を登録しました！`;
