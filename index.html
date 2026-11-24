@@ -1856,27 +1856,64 @@ const EMBEDDED_VOICES = {
           });
         });
       },
-      joinRoom(prefill = '') {
-        const code = (prefill || document.getElementById('onlineJoinCodeInput').value).trim();
-        if (!/^\d{4}$/.test(code)) return;
-        this.destroy(); this.isHost = false; this.roomCode = code; this.myName = this.getMyName();
-        this.peer = new Peer();
-        this.peer.on('open', id => {
-          this.myId = id; this.hostConn = this.peer.connect('tenkyuu-online-' + code);
-          this.hostConn.on('open', () => {
-            this.hostConn.send({ type: 'HELLO', name: this.myName });
-            document.getElementById('onlineEntryTabs').classList.add('hidden');
-            document.getElementById('onlineRoomBox').classList.remove('hidden'); document.getElementById('onlineRoomBox').classList.add('flex');
-            document.getElementById('onlineDisplayCode').textContent = code;
-            document.getElementById('btnOnlineStart').classList.add('hidden');
+      joinRoom(prefill = '', targetPrefix = 'gyrododge-rm-') {
+        const rawInput = prefill || document.getElementById('onlineJoinCodeInput')?.value || '';
+        const code = String(rawInput).replace(/[^0-9]/g, '').slice(0, 4);
+        const stEl = document.getElementById('onlineStatusMsg');
+        if (!/^\d{4}$/.test(code)) {
+          if (stEl) stEl.textContent = '4桁のルームコードを入力してください';
+          return;
+        }
+        if (targetPrefix === 'gyrododge-rm-') {
+          this.destroy();
+          this.isHost = false;
+          this.roomCode = code;
+          this.myName = this.getMyName();
+        }
+        if (stEl) stEl.textContent = `ルーム「${code}」へ接続中...`;
+
+        if (typeof Peer === 'undefined') {
+          if (stEl) stEl.textContent = '通信ライブラリを読み込み中です。少し待ってからもう一度お試しください';
+          return;
+        }
+
+        const rtcConfig = {
+          config: {
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              { urls: 'stun:stun1.l.google.com:19302' }
+            ]
+          }
+        };
+
+        let connected = false;
+        const bindConn = (conn) => {
+          if (!conn) return;
+          this.hostConn = conn;
+          conn.on('open', () => {
+            connected = true;
+            if (stEl) stEl.textContent = `ルーム「${code}」に参加しました！`;
+            conn.send({ type: 'HELLO', name: this.myName });
+            document.getElementById('onlineEntryTabs')?.classList.add('hidden');
+            const box = document.getElementById('onlineRoomBox');
+            if (box) { box.classList.remove('hidden'); box.classList.add('flex'); }
+            const disp = document.getElementById('onlineDisplayCode');
+            if (disp) disp.textContent = code;
+            document.getElementById('btnOnlineStart')?.classList.add('hidden');
             audio.playHello();
           });
-          this.hostConn.on('data', data => {
+          conn.on('data', data => {
+            if (!data) return;
+            if (data.type === 'FULL') {
+              if (stEl) stEl.textContent = 'ルームが満員（最大8人）です';
+              return;
+            }
             if (data.type === 'ROSTER') {
               this.roster = data.roster || [];
               if (typeof data.mapIndex === 'number') app.setMapIndex(data.mapIndex);
               if (typeof data.diffIndex === 'number') app.setDifficultyIndex(data.diffIndex);
-              this.renderRoster(); game3d.syncOnlineRivals(this.roster, this.myId);
+              this.renderRoster();
+              game3d.syncOnlineRivals(this.roster, this.myId);
             } else if (data.type === 'START_MATCH') {
               if (typeof data.mapIndex === 'number') app.setMapIndex(data.mapIndex);
               if (typeof data.diffIndex === 'number') app.setDifficultyIndex(data.diffIndex);
@@ -1886,6 +1923,55 @@ const EMBEDDED_VOICES = {
               game3d.applyDirectDebuff(data.kind, data.from);
             }
           });
+          conn.on('error', () => {
+            if (!connected && targetPrefix === 'gyrododge-rm-') {
+              try { this.peer?.destroy(); } catch (e) {}
+              this.joinRoom(code, 'tenkyuu-online-');
+            } else if (!connected && stEl) {
+              stEl.textContent = `ルーム「${code}」が見つかりません。コードを確認してください`;
+            }
+          });
+        };
+
+        try {
+          this.peer = new Peer(undefined, rtcConfig);
+        } catch (err) {
+          if (stEl) stEl.textContent = '通信の初期化に失敗しました';
+          return;
+        }
+
+        const connTimeout = setTimeout(() => {
+          if (!connected && targetPrefix === 'gyrododge-rm-') {
+            try { this.peer?.destroy(); } catch (e) {}
+            this.joinRoom(code, 'tenkyuu-online-');
+          } else if (!connected && stEl) {
+            stEl.textContent = `ルーム「${code}」に接続できませんでした。ホストが開いているか確認してください`;
+          }
+        }, 4500);
+
+        this.peer.on('open', id => {
+          this.myId = id;
+          try {
+            const c = this.peer.connect(targetPrefix + code, { reliable: true });
+            bindConn(c);
+          } catch (err) {
+            clearTimeout(connTimeout);
+            if (stEl) stEl.textContent = 'ルームへの接続に失敗しました';
+          }
+        });
+
+        this.peer.on('error', err => {
+          if (connected) return;
+          clearTimeout(connTimeout);
+          if (targetPrefix === 'gyrododge-rm-') {
+            try { this.peer?.destroy(); } catch (e) {}
+            this.joinRoom(code, 'tenkyuu-online-');
+          } else if (stEl) {
+            const msg = err?.type === 'peer-unavailable'
+              ? `ルーム「${code}」が見つかりません`
+              : `接続エラー（${err?.type || '通信失敗'}）`;
+            stEl.textContent = msg;
+          }
         });
       },
       cycleHostMap() { if (this.isHost) { app.cycleMap(); this.broadcastRoster(); } },
@@ -2079,6 +2165,10 @@ const EMBEDDED_VOICES = {
           g.add(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m1));
           g.add(new THREE.Mesh(new THREE.BoxGeometry(w+0.08, 0.35, d+0.08), m2));
         }
+        // 障害物の輪郭をくっきり見せるエッジ線を追加
+        const baseGeo = new THREE.BoxGeometry(w, h, d);
+        const edges = new THREE.EdgesGeometry(baseGeo);
+        g.add(new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x3E2723 })));
         return g;
       },
       applyMapTheme(mapObj) {
@@ -2433,16 +2523,29 @@ const EMBEDDED_VOICES = {
 
         this.updateHud(); this.spawnTimer = 0.1;
         // スタート直後からコース上にリング・障害物・BOTがしっかり見えるよう初期ウェーブを配置
-        for (let w = 0; w < 3; w++) {
+        // スタート直後から障害物・リングが画面内にハッキリ見えるよう前方に配置
+        const presetZs = [-28, -54, -82];
+        for (let w = 0; w < presetZs.length; w++) {
+          const prevLen = this.obstacles.length;
           this.spawnWave();
-          if (this.obstacles.length > 0) {
-            const offsetZ = w * 30;
-            for (let k = this.obstacles.length - 1; k >= 0; k--) {
+          // 確実に障害物（BLOCK）も混ぜて見やすくする
+          if (w === 1) {
+            const bw = 2.6, bh = 2.8, bd = 2.2;
+            const bx = -2.2, by = 0.2;
+            const bg = this.createStyledObstacleGroup(bw, bh, bd, curMap);
+            bg.position.set(bx, by, presetZs[w]);
+            this.scene.add(bg);
+            this.obstacles.push({
+              kind: 'BLOCK', mesh: bg, baseX: bx, baseY: by, x: bx, y: by, z: presetZs[w],
+              halfW: bw / 2, halfH: bh / 2, moveAmpX: 0, moveAmpY: 0, moveSpeed: 0, movePhase: 0,
+              hitBy: new Set(), nearMissedBy: new Set()
+            });
+          } else {
+            for (let k = prevLen; k < this.obstacles.length; k++) {
               const ob = this.obstacles[k];
-              if (ob.z <= this.SPAWN_Z + 5) {
-                ob.z += offsetZ;
-                ob.mesh.position.z = ob.z;
-              }
+              const rel = ob.z - this.SPAWN_Z;
+              ob.z = presetZs[w] + rel;
+              ob.mesh.position.z = ob.z;
             }
           }
         }
