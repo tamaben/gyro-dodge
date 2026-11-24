@@ -1,6 +1,6 @@
 {
-  "name": "天穹のグラビティ・ランナー",
-  "short_name": "グラビティ・ランナー",
+  "name": "GYRO DODGE",
+  "short_name": "GYRO DODGE",
   "description": "画面の向きに自動追従するジャイロ＆方角コンパスと全12マップ・全126コレクションで遊ぶ3D次元回避アクション＆バトルゲーム",
   "start_url": "./index.html",
   "scope": "./",
