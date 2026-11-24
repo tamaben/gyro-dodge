@@ -2,731 +2,296 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>GYRO DODGE（ジャイロドッジ）</title>
-  <style>
-    :root {
-      --ad-height: 60px;
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --safe-top: env(safe-area-inset-top, 0px);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: "Hiragino Maru Gothic ProN", "Rounded Mplus 1c", "Yu Gothic", sans-serif;
-      background: #0b2545;
-      color: #ffffff;
-    }
-
-    /* 背景（浮遊島・空・リング風のレイヤー） */
-    .sky-backdrop {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      background:
-        radial-gradient(circle at 75% 22%, rgba(255, 255, 255, 0.45), transparent 35%),
-        radial-gradient(circle at 20% 70%, rgba(125, 211, 252, 0.35), transparent 45%),
-        linear-gradient(180deg, #1d8fe1 0%, #67c3f8 48%, #bce6ff 78%, #e0f4ff 100%);
-      overflow: hidden;
-    }
-
-    .floating-island {
-      position: absolute;
-      border-radius: 28% 28% 55% 55% / 22% 22% 75% 75%;
-      background: linear-gradient(180deg, #38b000 0%, #2b9348 26%, #7f5539 28%, #4a2c18 100%);
-      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.28);
-      opacity: 0.92;
-    }
-
-    .island-left {
-      width: 150px;
-      height: 130px;
-      left: -24px;
-      top: 31%;
-      transform: rotate(-6deg);
-    }
-
-    .island-right {
-      width: 210px;
-      height: 175px;
-      right: -30px;
-      top: 24%;
-      transform: rotate(5deg);
-    }
-
-    .energy-ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 6px solid rgba(255, 214, 10, 0.88);
-      box-shadow: 0 0 18px rgba(255, 195, 0, 0.75), inset 0 0 12px rgba(255, 255, 255, 0.7);
-      pointer-events: none;
-    }
-
-    .ring-1 { width: 74px; height: 74px; left: 26%; top: 30%; transform: rotate(24deg); }
-    .ring-2 { width: 92px; height: 92px; right: 14%; top: 36%; transform: rotate(-18deg); }
-
-    /* アプリ全体のレイアウト */
-    .app-shell {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding-top: calc(10px + var(--safe-top));
-      /* メニュー表示時は広告高さ＋セーフエリア分の余白を確保して被りを防止 */
-      padding-bottom: calc(var(--ad-height) + var(--safe-bottom) + 10px);
-      transition: padding-bottom 0.2s ease;
-    }
-
-    /* プレイ中は広告を完全非表示にするため下部余白を最小化 */
-    body.is-playing .app-shell {
-      padding-bottom: calc(12px + var(--safe-bottom));
-    }
-
-    /* 上部ステータスバー */
-    .top-hud {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 0 14px;
-      z-index: 10;
-    }
-
-    .hud-left, .hud-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .level-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: linear-gradient(180deg, rgba(15, 52, 96, 0.88), rgba(9, 30, 58, 0.92));
-      border: 2px solid rgba(147, 197, 253, 0.7);
-      border-radius: 999px;
-      padding: 4px 12px 4px 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-    }
-
-    .level-bar-wrap {
-      display: flex;
-      flex-direction: column;
-      min-width: 66px;
-    }
-
-    .level-text {
-      font-size: 13px;
-      font-weight: 900;
-      line-height: 1.1;
-    }
-
-    .level-gauge {
-      width: 100%;
-      height: 5px;
-      margin-top: 3px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.2);
-      overflow: hidden;
-    }
-
-    .level-gauge > span {
-      display: block;
-      width: 68%;
-      height: 100%;
-      background: linear-gradient(90deg, #38bdf8, #facc15);
-    }
-
-    .currency-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: linear-gradient(180deg, rgba(15, 52, 96, 0.88), rgba(9, 30, 58, 0.92));
-      border: 2px solid rgba(147, 197, 253, 0.65);
-      border-radius: 999px;
-      padding: 4px 6px 4px 10px;
-      font-size: 13px;
-      font-weight: 800;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-    }
-
-    .plus-btn {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: none;
-      background: linear-gradient(180deg, #38bdf8, #0284c7);
-      color: #fff;
-      font-weight: 900;
-      font-size: 14px;
-      line-height: 1;
-      cursor: pointer;
-    }
-
-    .icon-circle-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      border: 2px solid rgba(191, 219, 254, 0.8);
-      background: linear-gradient(180deg, #2563eb, #1d4ed8);
-      color: #fff;
-      font-size: 17px;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-    }
-
-    .landscape-only-btn {
-      display: none;
-    }
-
-    /* タイトル画面メイン領域 */
-    .title-screen {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 16px 6px;
-      min-height: 0;
-    }
-
-    .logo-block {
-      text-align: center;
-      margin-top: 2px;
-    }
-
-    .logo-main {
-      font-size: clamp(34px, 7.5vw, 56px);
-      font-weight: 900;
-      font-style: italic;
-      letter-spacing: 1px;
-      line-height: 0.96;
-      background: linear-gradient(180deg, #ffffff 0%, #fde047 48%, #f97316 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 4px 0 #0f172a) drop-shadow(0 8px 14px rgba(15, 23, 42, 0.45));
-    }
-
-    .logo-sub {
-      display: inline-block;
-      margin-top: 4px;
-      padding: 2px 14px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #0369a1, #1d4ed8, #0369a1);
-      border: 2px solid #93c5fd;
-      font-size: clamp(12px, 2.4vw, 15px);
-      font-weight: 800;
-      letter-spacing: 2px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    /* 機体ビジュアル */
-    .craft-showcase {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 4px 0;
-    }
-
-    .craft-body {
-      width: clamp(150px, 34vw, 220px);
-      height: clamp(76px, 16vw, 110px);
-      border-radius: 40% 60% 45% 55% / 55% 45% 55% 45%;
-      background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 45%, #3b82f6 78%, #f97316 100%);
-      border: 3px solid #ffffff;
-      box-shadow: 0 14px 26px rgba(15, 23, 42, 0.35), 0 0 24px rgba(56, 189, 248, 0.55);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      animation: hoverCraft 2.6s ease-in-out infinite;
-    }
-
-    .craft-cockpit {
-      width: 44%;
-      height: 42%;
-      border-radius: 999px;
-      background: linear-gradient(180deg, #bae6fd, #0284c7);
-      border: 2px solid #e0f2fe;
-    }
-
-    .craft-thruster {
-      position: absolute;
-      left: -26px;
-      width: 34px;
-      height: 16px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, transparent, #38bdf8, #ffffff);
-      filter: blur(1px);
-    }
-
-    @keyframes hoverCraft {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-6px); }
-    }
-
-    /* アクションボタン群 */
-    .menu-controls {
-      width: 100%;
-      max-width: 920px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .start-btn {
-      width: 100%;
-      max-width: 440px;
-      align-self: center;
-      padding: 13px 24px;
-      border-radius: 20px;
-      border: 3px solid #fef08a;
-      background: linear-gradient(180deg, #fbbf24 0%, #f97316 58%, #ea580c 100%);
-      color: #ffffff;
-      font-size: clamp(22px, 4.5vw, 28px);
-      font-weight: 900;
-      letter-spacing: 2px;
-      text-shadow: 0 3px 0 rgba(124, 45, 18, 0.85);
-      box-shadow: 0 7px 0 #9a3412, 0 14px 24px rgba(0, 0, 0, 0.35);
-      cursor: pointer;
-      transition: transform 0.08s ease;
-    }
-
-    .start-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 3px 0 #9a3412, 0 6px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    .mode-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 9px;
-    }
-
-    .mode-btn {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px;
-      border-radius: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.72);
-      color: #ffffff;
-      text-align: left;
-      cursor: pointer;
-      box-shadow: 0 5px 0 rgba(15, 23, 42, 0.35), 0 8px 14px rgba(0, 0, 0, 0.22);
-      transition: transform 0.08s ease;
-    }
-
-    .mode-btn:active {
-      transform: translateY(3px);
-    }
-
-    .mode-btn-left {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      min-width: 0;
-    }
-
-    .mode-icon {
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-
-    .mode-title {
-      font-size: 14px;
-      font-weight: 900;
-      line-height: 1.15;
-      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
-    }
-
-    .mode-sub {
-      font-size: 11px;
-      font-weight: 700;
-      opacity: 0.95;
-      line-height: 1.2;
-      margin-top: 2px;
-    }
-
-    .mode-adventure { background: linear-gradient(180deg, #38bdf8, #2563eb); }
-    .mode-online    { background: linear-gradient(180deg, #c084fc, #7e22ce); }
-    .mode-customize { background: linear-gradient(180deg, #4ade80, #15803d); }
-    .mode-collection{ background: linear-gradient(180deg, #facc15, #d97706); }
-
-    .zukan-bar {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 9px 14px;
-      border-radius: 14px;
-      border: 2px solid rgba(186, 230, 253, 0.75);
-      background: linear-gradient(180deg, rgba(14, 116, 144, 0.9), rgba(15, 23, 42, 0.92));
-      color: #ffffff;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
-    }
-
-    .zukan-bar-main {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    /* 横画面レイアウト（デザイン例2枚目のように横並び・コンパクト化） */
-    @media (orientation: landscape) and (max-height: 560px) {
-      .landscape-only-btn {
-        display: grid;
-      }
-
-      .title-screen {
-        justify-content: center;
-        gap: 10px;
-      }
-
-      .title-center-row {
-        width: 100%;
-        max-width: 920px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-      }
-
-      .logo-block {
-        text-align: left;
-      }
-
-      .start-btn {
-        max-width: 300px;
-        width: auto;
-        padding: 12px 28px;
-      }
-
-      .mode-grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 8px;
-      }
-
-      .mode-btn {
-        flex-direction: column;
-        justify-content: center;
-        text-align: center;
-        padding: 8px 6px;
-      }
-
-      .mode-btn-left {
-        flex-direction: column;
-        gap: 4px;
-      }
-
-      .mode-arrow, .zukan-bar {
-        display: none;
-      }
-    }
-
-    /* プレイ中画面（操作・ボタンを最優先し広告は完全非表示） */
-    .play-screen {
-      display: none;
-      flex: 1;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 10px 16px;
-      z-index: 5;
-    }
-
-    body.is-playing .title-screen {
-      display: none;
-    }
-
-    body.is-playing .play-screen {
-      display: flex;
-    }
-
-    .play-status-banner {
-      align-self: center;
-      background: rgba(15, 23, 42, 0.72);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      border-radius: 999px;
-      padding: 6px 16px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .play-controls {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-    }
-
-    .steer-btn {
-      flex: 1;
-      max-width: 180px;
-      height: 68px;
-      border-radius: 18px;
-      border: 2px solid rgba(255, 255, 255, 0.75);
-      background: rgba(15, 23, 42, 0.65);
-      color: #ffffff;
-      font-size: 20px;
-      font-weight: 900;
-      cursor: pointer;
-    }
-
-    .quit-play-btn {
-      padding: 12px 18px;
-      border-radius: 16px;
-      border: 2px solid #fca5a5;
-      background: rgba(185, 28, 28, 0.88);
-      color: #ffffff;
-      font-size: 13px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    /* 下部バナー広告枠：メニュー時のみ表示、プレイ中は完全非表示 */
-    .bottom-ad-bar {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: calc(var(--ad-height) + var(--safe-bottom));
-      padding-bottom: var(--safe-bottom);
-      background: rgba(248, 250, 252, 0.96);
-      border-top: 1px solid #cbd5e1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-    }
-
-    body.is-playing .bottom-ad-bar {
-      display: none !important;
-    }
-
-    .ad-placeholder-box {
-      width: 100%;
-      max-width: 468px;
-      height: var(--ad-height);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 12px;
-      color: #1e293b;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .ad-badge {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: #e2e8f0;
-      color: #475569;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>GYRO DODGE - ジャイロドッジ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&family=Montserrat:ital,wght@1,900&display=swap" rel="stylesheet">
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-  <div class="sky-backdrop" aria-hidden="true">
-    <div class="floating-island island-left"></div>
-    <div class="floating-island island-right"></div>
-    <div class="energy-ring ring-1"></div>
-    <div class="energy-ring ring-2"></div>
-  </div>
+  <canvas id="gameCanvas"></canvas>
 
-  <div class="app-shell">
-    <!-- 上部HUD -->
-    <header class="top-hud">
-      <div class="hud-left">
-        <div class="level-pill">
-          <span>👑</span>
-          <div class="level-bar-wrap">
-            <span class="level-text">Lv.12</span>
-            <div class="level-gauge"><span></span></div>
+  <div id="homeOverlay" class="home-overlay">
+    <header class="top-status-bar">
+      <div class="status-left">
+        <div class="level-badge">
+          <div class="crown-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <path d="M2 18L4 7L9 11L12 5L15 11L20 7L22 18H2Z" fill="url(#crownGrad)" stroke="#FFF3B0" stroke-width="1.5" stroke-linejoin="round"/>
+              <rect x="3" y="19" width="18" height="2.5" rx="1.2" fill="#F59E0B"/>
+              <defs>
+                <linearGradient id="crownGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#FEF08A"/>
+                  <stop offset="100%" stop-color="#F59E0B"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="level-info">
+            <span class="level-label">Lv.<span id="playerLevel">12</span></span>
+            <div class="exp-track">
+              <div class="exp-fill" id="expFill" style="width: 68%;"></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="hud-right">
-        <div class="currency-pill">
-          <span>🪙</span>
-          <span id="coinCount">12,840</span>
-          <button class="plus-btn" type="button" aria-label="コイン追加">+</button>
+      <div class="status-right">
+        <div class="resource-pill">
+          <span class="coin-disc">$</span>
+          <span class="resource-val" id="coinVal">12,840</span>
+          <button class="plus-circle" type="button" id="addCoinBtn" aria-label="コイン獲得">+</button>
         </div>
-        <div class="currency-pill">
-          <span>💎</span>
-          <span id="gemCount">320</span>
-          <button class="plus-btn" type="button" aria-label="ジェム追加">+</button>
+
+        <div class="resource-pill">
+          <span class="gem-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="19" height="19">
+              <polygon points="6,3 18,3 22,9 12,21 2,9" fill="url(#gemGrad)" stroke="#E0F2FE" stroke-width="1.4"/>
+              <polyline points="2,9 22,9" stroke="#BAE6FD" stroke-width="1.2" fill="none"/>
+              <polyline points="6,3 9,9 12,21 15,9 18,3" stroke="#BAE6FD" stroke-width="1.1" fill="none"/>
+              <defs>
+                <linearGradient id="gemGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#E0F2FE"/>
+                  <stop offset="45%" stop-color="#38BDF8"/>
+                  <stop offset="100%" stop-color="#2563EB"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </span>
+          <span class="resource-val" id="gemVal">320</span>
+          <button class="plus-circle" type="button" id="addGemBtn" aria-label="ジェム獲得">+</button>
         </div>
-        <button class="icon-circle-btn landscape-only-btn" type="button" aria-label="ギフト">🎁</button>
-        <button class="icon-circle-btn landscape-only-btn" type="button" aria-label="ランキング">🏆</button>
-        <button class="icon-circle-btn" type="button" aria-label="設定">⚙️</button>
+
+        <button class="circle-icon-btn landscape-only" type="button" id="giftBtn" title="プレゼント">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="8" width="18" height="4" rx="1"/>
+            <path d="M12 8v13"/>
+            <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/>
+            <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>
+          </svg>
+        </button>
+
+        <button class="circle-icon-btn landscape-only" type="button" id="trophyBtn" title="記録">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+            <path d="M4 22h16"/>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+          </svg>
+        </button>
+
+        <button class="circle-icon-btn" type="button" id="settingsBtn" title="設定・収録ボイス">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="#FFFFFF">
+            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+          </svg>
+        </button>
       </div>
     </header>
 
-    <!-- タイトル／メニュー画面 -->
-    <main class="title-screen" id="titleScreen">
-      <div class="title-center-row">
-        <div class="logo-block">
-          <h1 class="logo-main">GYRO<br />DODGE</h1>
-          <div class="logo-sub">ジャイロドッジ</div>
-        </div>
+    <div class="hero-stage">
+      <div class="title-logo-wrap">
+        <svg class="logo-orbit-svg" viewBox="0 0 520 235" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="ringGold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFF59D"/>
+              <stop offset="50%" stop-color="#FBBF24"/>
+              <stop offset="100%" stop-color="#EA580C"/>
+            </linearGradient>
+            <linearGradient id="ringBlue" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#38BDF8"/>
+              <stop offset="50%" stop-color="#0284C7"/>
+              <stop offset="100%" stop-color="#93C5FD"/>
+            </linearGradient>
+            <linearGradient id="gyroTextGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#FFFFFF"/>
+              <stop offset="62%" stop-color="#F1F5F9"/>
+              <stop offset="100%" stop-color="#BAE6FD"/>
+            </linearGradient>
+            <linearGradient id="dodgeTextGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#FEF08A"/>
+              <stop offset="48%" stop-color="#FBBF24"/>
+              <stop offset="100%" stop-color="#EA580C"/>
+            </linearGradient>
+            <filter id="logoShadow" x="-15%" y="-15%" width="130%" height="135%">
+              <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#0A2540" flood-opacity="0.72"/>
+            </filter>
+          </defs>
 
-        <div class="craft-showcase" aria-hidden="true">
-          <div class="craft-thruster"></div>
-          <div class="craft-body">
-            <div class="craft-cockpit"></div>
-          </div>
-        </div>
+          <ellipse cx="260" cy="112" rx="228" ry="62" transform="rotate(-14 260 112)" fill="none" stroke="url(#ringBlue)" stroke-width="11" opacity="0.9"/>
+          <ellipse cx="260" cy="112" rx="192" ry="82" transform="rotate(-24 260 112)" fill="none" stroke="url(#ringGold)" stroke-width="14"/>
 
-        <button class="start-btn" id="startGameBtn" type="button">スタート ▶</button>
+          <g filter="url(#logoShadow)" transform="skewX(-10)">
+            <text x="275" y="96" text-anchor="middle" font-family="'Montserrat', sans-serif" font-weight="900" font-style="italic" font-size="78" fill="#0B2948" stroke="#0B2948" stroke-width="14" stroke-linejoin="round">GYRO</text>
+            <text x="275" y="96" text-anchor="middle" font-family="'Montserrat', sans-serif" font-weight="900" font-style="italic" font-size="78" fill="url(#gyroTextGrad)" stroke="#1E3A8A" stroke-width="3">GYRO</text>
+
+            <text x="295" y="162" text-anchor="middle" font-family="'Montserrat', sans-serif" font-weight="900" font-style="italic" font-size="76" fill="#0B2948" stroke="#0B2948" stroke-width="14" stroke-linejoin="round">DODGE</text>
+            <text x="295" y="162" text-anchor="middle" font-family="'Montserrat', sans-serif" font-weight="900" font-style="italic" font-size="76" fill="url(#dodgeTextGrad)" stroke="#7C2D12" stroke-width="3">DODGE</text>
+          </g>
+
+          <path d="M 48 148 C 110 198, 325 182, 466 86" fill="none" stroke="url(#ringGold)" stroke-width="12" stroke-linecap="round"/>
+
+          <g filter="url(#logoShadow)" transform="rotate(-6 275 194)">
+            <polygon points="155,176 395,176 382,210 142,210" fill="#0C2D57" stroke="#38BDF8" stroke-width="2.5"/>
+            <text x="268" y="200" text-anchor="middle" font-family="'M PLUS Rounded 1c', sans-serif" font-weight="900" font-size="21" fill="#FFFFFF" letter-spacing="2">ジャイロドッジ</text>
+          </g>
+        </svg>
       </div>
 
-      <div class="menu-controls">
-        <div class="mode-grid">
-          <button class="mode-btn mode-adventure" type="button" data-mode="冒険モード">
-            <div class="mode-btn-left">
-              <span class="mode-icon">📖</span>
-              <div>
-                <div class="mode-title">冒険モード</div>
-                <div class="mode-sub">全18章</div>
-              </div>
-            </div>
-            <span class="mode-arrow">›</span>
-          </button>
+      <div class="craft-spacer" aria-hidden="true"></div>
 
-          <button class="mode-btn mode-online" type="button" data-mode="オンライン">
-            <div class="mode-btn-left">
-              <span class="mode-icon">⚔️</span>
-              <div>
-                <div class="mode-title">オンライン</div>
-                <div class="mode-sub">対戦・協力</div>
-              </div>
-            </div>
-            <span class="mode-arrow">›</span>
+      <div class="start-section">
+        <div class="env-switch-bar" role="group" aria-label="3Dステージ環境選択">
+          <button type="button" class="env-pill active" id="envOutdoorBtn" data-env="outdoor">
+            <span class="env-dot outdoor-dot"></span>
+            <span>外ステージ（天空エリア）</span>
           </button>
-
-          <button class="mode-btn mode-customize" type="button" data-mode="カスタマイズ">
-            <div class="mode-btn-left">
-              <span class="mode-icon">🧥</span>
-              <div>
-                <div class="mode-title">カスタマイズ</div>
-                <div class="mode-sub">機体を変えよう！</div>
-              </div>
-            </div>
-            <span class="mode-arrow">›</span>
-          </button>
-
-          <button class="mode-btn mode-collection" type="button" data-mode="コレクション">
-            <div class="mode-btn-left">
-              <span class="mode-icon">🖼️</span>
-              <div>
-                <div class="mode-title">コレクション</div>
-                <div class="mode-sub">全126種</div>
-              </div>
-            </div>
-            <span class="mode-arrow">›</span>
-          </button>
-
-          <!-- 横画面時に5列目に並ぶ図鑑ボタン -->
-          <button class="mode-btn mode-adventure landscape-only-btn" type="button" data-mode="図鑑">
-            <div class="mode-btn-left">
-              <span class="mode-icon">⭐</span>
-              <div>
-                <div class="mode-title">図鑑</div>
-                <div class="mode-sub">仲間を集めよう！</div>
-              </div>
-            </div>
+          <button type="button" class="env-pill" id="envIndoorBtn" data-env="indoor">
+            <span class="env-dot indoor-dot"></span>
+            <span>室内ステージ（全12回廊）</span>
           </button>
         </div>
 
-        <!-- 縦画面時に表示する図鑑バー -->
-        <button class="zukan-bar" type="button" data-mode="図鑑">
-          <div class="zukan-bar-main">
-            <span>⭐</span>
-            <span>図鑑</span>
-            <span>|</span>
-            <span>仲間を集めよう！</span>
+        <div class="start-cta-wrap">
+          <div class="start-orbit-ring" aria-hidden="true"></div>
+          <button class="start-cta-btn" id="startBtn" type="button">
+            <span class="start-cta-label">スタート</span>
+            <span class="start-play-triangle" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="bottom-menu-dock" aria-label="ゲームメニュー">
+      <div class="menu-grid">
+        <button class="glossy-btn btn-blue" type="button" data-panel="adventure">
+          <div class="glossy-inner">
+            <svg class="menu-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+            <div class="menu-text-col">
+              <span class="menu-title">冒険モード</span>
+              <span class="menu-sub">全12章（外・室内）</span>
+            </div>
           </div>
-          <span>›</span>
+          <span class="chevron-icon">›</span>
+        </button>
+
+        <button class="glossy-btn btn-purple" type="button" data-panel="online">
+          <div class="glossy-inner">
+            <svg class="menu-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/>
+              <line x1="13" y1="19" x2="19" y2="13"/>
+              <line x1="16" y1="16" x2="20" y2="20"/>
+              <polyline points="9.5 17.5 21 6 21 3 18 3 6.5 14.5"/>
+              <line x1="11" y1="19" x2="5" y2="13"/>
+              <line x1="8" y1="16" x2="4" y2="20"/>
+            </svg>
+            <div class="menu-text-col">
+              <span class="menu-title">オンライン</span>
+              <span class="menu-sub">対戦・協力</span>
+            </div>
+          </div>
+          <span class="chevron-icon">›</span>
+        </button>
+
+        <button class="glossy-btn btn-green" type="button" data-panel="customize">
+          <div class="glossy-inner">
+            <svg class="menu-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6a2 2 0 1 0-2-2"/>
+              <path d="M12 6v2l8 5.5a1.5 1.5 0 0 1-.85 2.75H4.85A1.5 1.5 0 0 1 4 13.5L12 8z"/>
+            </svg>
+            <div class="menu-text-col">
+              <span class="menu-title">カスタマイズ</span>
+              <span class="menu-sub">機体を変えよう！</span>
+            </div>
+          </div>
+          <span class="chevron-icon">›</span>
+        </button>
+
+        <button class="glossy-btn btn-gold" type="button" data-panel="collection">
+          <div class="glossy-inner">
+            <svg class="menu-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5" width="14" height="12" rx="2"/>
+              <path d="M7 19h12a2 2 0 0 0 2-2V8"/>
+              <circle cx="8" cy="10" r="1.2" fill="#FFFFFF"/>
+              <polyline points="4 15 8 11 12 14 14 12 17 15"/>
+            </svg>
+            <div class="menu-text-col">
+              <span class="menu-title">コレクション</span>
+              <span class="menu-sub">全126種</span>
+            </div>
+          </div>
+          <span class="chevron-icon">›</span>
+        </button>
+
+        <button class="glossy-btn btn-cyan landscape-only-flex" type="button" data-panel="zukan">
+          <div class="glossy-inner">
+            <svg class="menu-svg-icon" viewBox="0 0 24 24" fill="#BAE6FD" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <div class="menu-text-col">
+              <span class="menu-title">図鑑</span>
+              <span class="menu-sub">仲間を集めよう！</span>
+            </div>
+          </div>
         </button>
       </div>
-    </main>
 
-    <!-- プレイ中画面（広告は非表示・操作ボタンの干渉なし） -->
-    <section class="play-screen" id="playScreen" aria-label="プレイ画面">
-      <div class="play-status-banner">プレイ中（広告非表示・操作エリア保護）</div>
-
-      <div class="play-controls">
-        <button class="steer-btn" type="button">◀ 左旋回</button>
-        <button class="quit-play-btn" id="quitGameBtn" type="button">メニューへ戻る</button>
-        <button class="steer-btn" type="button">右旋回 ▶</button>
-      </div>
-    </section>
+      <button class="zukan-wide-bar portrait-only-flex" type="button" data-panel="zukan">
+        <div class="zukan-wide-left">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="#7DD3FC" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          <span class="zukan-wide-title">図鑑</span>
+          <span class="zukan-wide-divider"></span>
+          <span class="zukan-wide-sub">仲間を集めよう！</span>
+        </div>
+        <span class="chevron-icon">›</span>
+      </button>
+    </nav>
   </div>
 
-  <!-- メニュー画面のみ表示される下部広告エリア -->
-  <aside class="bottom-ad-bar" id="bottomAdBar" aria-label="広告">
-    <div class="ad-placeholder-box" id="adSlot">
-      <span>メニュー下部バナー広告枠（プレイ中は非表示）</span>
-      <span class="ad-badge">PR</span>
+  <div id="playHud" class="play-hud hidden">
+    <div class="play-top-bar">
+      <div class="play-stat-chip">SCORE <strong id="scoreDisplay">0</strong></div>
+      <div class="play-stat-chip">RING <strong id="ringDisplay">0</strong></div>
+      <div class="play-stat-chip" id="stageChip">外ステージ CH.1</div>
+      <button class="pause-btn" id="pauseBtn" type="button">ホームへ戻る</button>
     </div>
-  </aside>
 
-  <script>
-    const body = document.body;
-    const startGameBtn = document.getElementById("startGameBtn");
-    const quitGameBtn = document.getElementById("quitGameBtn");
+    <div id="countdownBanner" class="countdown-banner hidden">3</div>
 
-    function setPlayingState(playing) {
-      body.classList.toggle("is-playing", playing);
-      // 既存の広告スクリプトがある場合は、プレイ中に広告コンテナを非表示制御
-      if (playing) {
-        const adSlot = document.getElementById("adSlot");
-        if (adSlot) adSlot.innerHTML = "";
-      } else {
-        const adSlot = document.getElementById("adSlot");
-        if (adSlot && !adSlot.innerHTML) {
-          adSlot.innerHTML = `
-            <span>メニュー下部バナー広告枠（プレイ中は非表示）</span>
-            <span class="ad-badge">PR</span>
-          `;
-        }
-      }
-    }
+    <div class="touch-control-zones">
+      <button class="touch-pad left-pad" id="leftSteerBtn" type="button" aria-label="左へ移動">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="#FFFFFF"><polygon points="16,4 6,12 16,20"/></svg>
+      </button>
+      <button class="touch-pad right-pad" id="rightSteerBtn" type="button" aria-label="右へ移動">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="#FFFFFF"><polygon points="8,4 18,12 8,20"/></svg>
+      </button>
+    </div>
+  </div>
 
-    startGameBtn.addEventListener("click", () => {
-      setPlayingState(true);
-    });
+  <div id="modalBackdrop" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modalTitle">メニュー</h2>
+        <button class="modal-close" id="modalCloseBtn" type="button" aria-label="閉じる">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round">
+            <line x1="6" y1="6" x2="18" y2="18"/>
+            <line x1="18" y1="6" x2="6" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
 
-    quitGameBtn.addEventListener("click", () => {
-      setPlayingState(false);
-    });
-
-    document.querySelectorAll("[data-mode]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const modeName = btn.getAttribute("data-mode");
-        console.log("選択されたモード:", modeName);
-      });
-    });
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="./game.js"></script>
 </body>
 </html>
