@@ -801,16 +801,23 @@
       </div>
     </div>
 
-        <!-- 復活チャンスモーダル（1回限りのコンティニュー） -->
+        <!-- 復活チャンスモーダル（広告を15秒視聴で1回限りのコンティニュー可能） -->
     <div id="reviveChanceModal" class="hidden fixed inset-0 z-50 bg-cocoa-800/60 backdrop-blur-xs items-center justify-center p-4 pointer-events-auto">
-      <div class="soft-card w-full max-w-sm p-6 text-center flex flex-col items-center gap-3.5">
+      <div class="soft-card w-full max-w-sm p-6 text-center flex flex-col items-center gap-3">
         <span class="px-3 py-0.5 rounded-full bg-brand-500 text-white text-xs font-black">REVIVE CHANCE</span>
-        <h2 class="text-xl font-black text-cocoa-800">復活チャンス！</h2>
+        <h2 class="text-xl font-black text-cocoa-800">広告を見て復活！</h2>
         <p class="text-xs font-bold text-cocoa-600 leading-relaxed">
-          3.5秒間の無敵＆シールド付きで、そのままの地点からフライトを続けられます！
+          広告を15秒見ると、終わったその場から3.5秒間の無敵＆シールド付きで復活できます！
         </p>
+        <div id="reviveAdWatchBox" class="w-full bg-[#FBF7F2] rounded-2xl p-3.5 flex flex-col items-center gap-1.5">
+          <div id="reviveAdCountdownText" class="text-sm font-black text-brand-600 tabular-nums">広告視聴中：あと 15秒</div>
+          <div class="w-full h-2.5 rounded-full bg-cream-200 overflow-hidden">
+            <div id="reviveAdProgressBar" class="h-full bg-brand-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <div class="text-[10px] font-bold text-cocoa-600">SPONSORED · GYRO DODGE</div>
+        </div>
         <div class="w-full flex flex-col gap-2 pt-1">
-          <button id="btnConfirmRevive" type="button" class="btn-orange w-full py-3.5 text-base font-black">復活して続ける！</button>
+          <button id="btnConfirmRevive" type="button" disabled class="btn-peach w-full py-3.5 text-base font-black opacity-60 cursor-not-allowed">広告視聴中（あと15秒）</button>
           <button id="btnDeclineRevive" type="button" class="btn-peach w-full py-2.5 text-xs font-extrabold">あきらめて結果へ</button>
         </div>
       </div>
@@ -1808,11 +1815,14 @@ const EMBEDDED_VOICES = {
         this.myId = id || ('local-' + this.roomCode);
         this.roster = [{ id: this.myId, name: this.myName, colorIndex: app.custom.colorIndex, score: 0, distance: 0, alive: true, rank: 1, x: 0, y: 0 }];
         const stEl = document.getElementById('onlineStatusMsg');
-        if (stEl) stEl.textContent = `ルーム「${this.roomCode}」を作成しました！`;
-        document.getElementById('onlineEntryTabs').classList.add('hidden');
-        document.getElementById('onlineRoomBox').classList.remove('hidden');
-        document.getElementById('onlineRoomBox').classList.add('flex');
-        document.getElementById('onlineDisplayCode').textContent = this.roomCode;
+        if (stEl) stEl.textContent = `ルーム「${this.roomCode}」を作成しました！仲間を待っています`;
+        document.getElementById('onlineEntryTabs')?.classList.add('hidden');
+        const box = document.getElementById('onlineRoomBox');
+        if (box) { box.classList.remove('hidden'); box.classList.add('flex'); }
+        const disp = document.getElementById('onlineDisplayCode');
+        if (disp) disp.textContent = this.roomCode;
+        const startBtn = document.getElementById('btnOnlineStart');
+        if (startBtn) { startBtn.classList.remove('hidden'); startBtn.disabled = false; }
         this.renderRoster();
         audio.playHello();
       },
@@ -1886,10 +1896,10 @@ const EMBEDDED_VOICES = {
           conn.on('data', data => {
             const m = this.roster.find(r => r.id === conn.peer); if (!m) return;
             if (data.type === 'HELLO') { m.name = (data.name || m.name).slice(0, 10); this.broadcastRoster(); this.renderRoster(); }
-            else if (data.type === 'STATE') { m.score = data.score; m.distance = data.distance; m.alive = data.alive; m.x = data.x; m.y = data.y; m.roll = data.roll || 0; this.recalcRanks(); const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, ruleMode: this.ruleMode, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length }; Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); }); game3d.syncOnlineRivals(this.roster, this.myId); }
+            else if (data.type === 'STATE') { m.score = data.score; m.distance = data.distance; m.alive = data.alive; m.x = data.x; m.y = data.y; m.roll = data.roll || 0; this.recalcRanks(); const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, ruleMode: this.ruleMode, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: (game3d.onlineStageChunks || []).length }; Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); }); game3d.syncOnlineRivals(this.roster, this.myId); }
             else if (data.type === 'REQ_CHUNKS') {
               const startIdx = Math.max(0, parseInt(data.haveCount, 10) || 0);
-              for (let ci = startIdx; ci < game3d.onlineStageChunks.length; ci++) {
+              for (let ci = startIdx; ci < (game3d.onlineStageChunks || []).length; ci++) {
                 if (conn.open) conn.send({ type: 'STAGE_CHUNK', chunkIdx: ci, items: game3d.onlineStageChunks[ci] });
               }
             }
@@ -1968,10 +1978,10 @@ const EMBEDDED_VOICES = {
               if (typeof data.matchTime === 'number' && game3d.runMode === 'ONLINE') {
                 game3d.sharedMatchTime += (data.matchTime - game3d.sharedMatchTime) * 0.35;
               }
-              if (typeof data.chunkCount === 'number' && game3d.runMode === 'ONLINE' && data.chunkCount > game3d.onlineStageChunks.length) {
+              if (typeof data.chunkCount === 'number' && game3d.runMode === 'ONLINE' && data.chunkCount > (game3d.onlineStageChunks || []).length) {
                 if (!this._lastChunkReqAt || Date.now() - this._lastChunkReqAt > 400) {
                   this._lastChunkReqAt = Date.now();
-                  if (this.hostConn?.open) this.hostConn.send({ type: 'REQ_CHUNKS', haveCount: game3d.onlineStageChunks.length });
+                  if (this.hostConn?.open) this.hostConn.send({ type: 'REQ_CHUNKS', haveCount: (game3d.onlineStageChunks || []).length });
                 }
               }
               this.renderRoster();
@@ -2050,7 +2060,7 @@ const EMBEDDED_VOICES = {
       recalcRanks() { const s = [...this.roster].sort((a,b) => (a.alive !== b.alive ? (a.alive ? -1 : 1) : b.score - a.score)); s.forEach((r,i) => r.rank = i+1); },
       broadcastRoster() {
         if (!this.isHost) return; this.recalcRanks();
-        const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, ruleMode: this.ruleMode, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length };
+        const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, ruleMode: this.ruleMode, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: (game3d.onlineStageChunks || []).length };
         Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); });
         game3d.syncOnlineRivals(this.roster, this.myId);
       },
@@ -2074,7 +2084,7 @@ const EMBEDDED_VOICES = {
           trEl.textContent = traits.join(' · ');
         }
         if (!list) return;
-        list.innerHTML = this.roster.map((r, i) => `<div class="bg-cream-200 rounded-xl px-2.5 py-1 text-xs font-extrabold truncate">#${i+1} ${r.name}</div>`).join('');
+        list.innerHTML = this.roster.map((r, i) => `<div class="bg-cream-200 rounded-xl px-2.5 py-1.5 text-xs font-black truncate flex items-center justify-between gap-1"><span>#${i+1} ${r.name}</span><span class="text-[10px] text-brand-600">${i===0?'HOST':'P'+(i+1)}</span></div>`).join('');
       },
       broadcastStageChunk(items, chunkIdx = 0) {
         if (!this.isHost || !items || !items.length) return;
@@ -2110,7 +2120,7 @@ const EMBEDDED_VOICES = {
             const me = this.roster.find(r => r.id === this.myId);
             if (me) { me.score = game3d.teamScore; me.distance = Math.floor(game3d.teamDistance); me.alive = mc.alive; me.x = mc.x; me.y = mc.y; me.roll = rollVal; }
             this.recalcRanks();
-            const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, ruleMode: this.ruleMode, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length };
+            const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, ruleMode: this.ruleMode, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: (game3d.onlineStageChunks || []).length };
             Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); });
             game3d.syncOnlineRivals(this.roster, this.myId);
           } else if (this.hostConn?.open) {
@@ -2126,7 +2136,7 @@ const EMBEDDED_VOICES = {
           const me = this.roster.find(r => r.id === this.myId);
           if (me) { me.score = game3d.teamScore; me.distance = Math.floor(game3d.teamDistance); me.alive = mc.alive; me.x = mc.x; me.y = mc.y; me.roll = rollVal; }
           this.recalcRanks();
-          const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, ruleMode: this.ruleMode, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: game3d.onlineStageChunks.length };
+          const p = { type: 'ROSTER', roster: this.roster, mapIndex: app.currentMapIndex, diffIndex: app.currentDiffIndex, ruleMode: this.ruleMode, trackZ: game3d.sharedTrackZ, matchTime: game3d.sharedMatchTime, chunkCount: (game3d.onlineStageChunks || []).length };
           Object.values(this.guestConns).forEach(c => { if (c.open) c.send(p); });
         } else if (this.hostConn?.open) {
           this.hostConn.send({ type: 'STATE', score: game3d.teamScore, distance: Math.floor(game3d.teamDistance), alive: mc.alive, x: mc.x, y: mc.y, roll: rollVal });
@@ -2447,7 +2457,7 @@ const EMBEDDED_VOICES = {
             };
           }
           const entry = this.rivalMeshes[r.id];
-          entry.alive = Boolean(r.alive);
+          entry.alive = (r.alive !== false);
           entry.group.visible = entry.alive;
           entry.targetX = typeof r.x === 'number' ? r.x : entry.targetX;
           entry.targetY = typeof r.y === 'number' ? r.y : entry.targetY;
@@ -2500,18 +2510,70 @@ const EMBEDDED_VOICES = {
         return list;
       },
       reviveUsed: false,
+      reviveAdTimer: null,
+      reviveAdRemaining: 15,
+      reviveAdReady: false,
+      clearReviveTimer() {
+        if (this.reviveAdTimer) {
+          clearInterval(this.reviveAdTimer);
+          this.reviveAdTimer = null;
+        }
+      },
+      syncReviveAdUi() {
+        const totalSec = 15;
+        const rem = Math.max(0, this.reviveAdRemaining);
+        const pct = Math.min(100, Math.max(0, ((totalSec - rem) / totalSec) * 100));
+        const cdEl = document.getElementById('reviveAdCountdownText');
+        const barEl = document.getElementById('reviveAdProgressBar');
+        const btnEl = document.getElementById('btnConfirmRevive');
+        if (barEl) barEl.style.width = `${pct.toFixed(1)}%`;
+        if (this.reviveAdReady || rem <= 0) {
+          this.reviveAdReady = true;
+          if (cdEl) cdEl.textContent = '広告視聴完了！復活できます！';
+          if (btnEl) {
+            btnEl.disabled = false;
+            btnEl.textContent = '復活して続ける！';
+            btnEl.className = 'btn-orange w-full py-3.5 text-base font-black anim-breathe-soft';
+          }
+        } else {
+          if (cdEl) cdEl.textContent = `広告視聴中：あと ${rem}秒`;
+          if (btnEl) {
+            btnEl.disabled = true;
+            btnEl.textContent = `広告視聴中（あと${rem}秒）`;
+            btnEl.className = 'btn-peach w-full py-3.5 text-base font-black opacity-60 cursor-not-allowed';
+          }
+        }
+      },
       offerReviveChance() {
+        this.clearReviveTimer();
+        this.reviveAdRemaining = 15;
+        this.reviveAdReady = false;
         this.state = 'REVIVE_PROMPT';
         const modal = document.getElementById('reviveChanceModal');
         if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); modal.style.display = 'flex'; }
+        this.syncReviveAdUi();
+        this.reviveAdTimer = setInterval(() => {
+          if (this.state !== 'REVIVE_PROMPT') {
+            this.clearReviveTimer();
+            return;
+          }
+          this.reviveAdRemaining = Math.max(0, this.reviveAdRemaining - 1);
+          this.syncReviveAdUi();
+          if (this.reviveAdRemaining <= 0) {
+            this.clearReviveTimer();
+          }
+        }, 1000);
       },
       hideReviveModal() {
+        this.clearReviveTimer();
         const modal = document.getElementById('reviveChanceModal');
         if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); modal.style.display = 'none'; }
       },
       confirmRevive() {
+        if (!this.reviveAdReady) return;
         if (this.reviveUsed) { this.declineRevive(); return; }
         this.reviveUsed = true;
+        this.reviveAdReady = false;
         this.hideReviveModal();
         const c = this.crafts[0];
         if (c) {
