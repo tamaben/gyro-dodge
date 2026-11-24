@@ -801,6 +801,21 @@
       </div>
     </div>
 
+        <!-- 復活チャンスモーダル（1回限りのコンティニュー） -->
+    <div id="reviveChanceModal" class="hidden fixed inset-0 z-50 bg-cocoa-800/60 backdrop-blur-xs items-center justify-center p-4 pointer-events-auto">
+      <div class="soft-card w-full max-w-sm p-6 text-center flex flex-col items-center gap-3.5">
+        <span class="px-3 py-0.5 rounded-full bg-brand-500 text-white text-xs font-black">REVIVE CHANCE</span>
+        <h2 class="text-xl font-black text-cocoa-800">復活チャンス！</h2>
+        <p class="text-xs font-bold text-cocoa-600 leading-relaxed">
+          3.5秒間の無敵＆シールド付きで、そのままの地点からフライトを続けられます！
+        </p>
+        <div class="w-full flex flex-col gap-2 pt-1">
+          <button id="btnConfirmRevive" type="button" class="btn-orange w-full py-3.5 text-base font-black">復活して続ける！</button>
+          <button id="btnDeclineRevive" type="button" class="btn-peach w-full py-2.5 text-xs font-extrabold">あきらめて結果へ</button>
+        </div>
+      </div>
+    </div>
+
     <div id="gameOverModal" class="hidden fixed inset-0 z-40 bg-cocoa-800/45 backdrop-blur-xs items-center justify-center p-4 pointer-events-auto">
       <div class="soft-card w-full max-w-md p-5 text-center flex flex-col items-center gap-3">
         <span id="resultBadge" class="px-3 py-0.5 rounded-full bg-sage-500 text-white text-xs font-extrabold">RESULT</span>
@@ -2105,13 +2120,10 @@ const EMBEDDED_VOICES = {
       },
       sendJammer() {
         const mc = game3d.crafts[0];
-        if (!mc?.alive) return;
-        const hasHeld = Boolean(mc.heldSabotageItem);
-        if (!hasHeld && mc.jammerCharge < 100) return;
-        const chosenId = hasHeld ? mc.heldSabotageItem : SABOTAGE_ITEMS[Math.floor(this.nextMatchRand() * SABOTAGE_ITEMS.length)].id;
+        if (!mc?.alive || !mc.heldSabotageItem) return;
+        const chosenId = mc.heldSabotageItem;
         const meta = getSabotageMeta(chosenId);
-        if (hasHeld) mc.heldSabotageItem = null;
-        else mc.jammerCharge = 0;
+        mc.heldSabotageItem = null;
         if (meta.category === 'SUPPORT') {
           game3d.applySupportItemToCraft(mc, meta);
           mc.score += 200;
@@ -2473,6 +2485,50 @@ const EMBEDDED_VOICES = {
         }
         return list;
       },
+      reviveUsed: false,
+      offerReviveChance() {
+        this.state = 'REVIVE_PROMPT';
+        const modal = document.getElementById('reviveChanceModal');
+        if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); modal.style.display = 'flex'; }
+      },
+      hideReviveModal() {
+        const modal = document.getElementById('reviveChanceModal');
+        if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); modal.style.display = 'none'; }
+      },
+      confirmRevive() {
+        if (this.reviveUsed) { this.declineRevive(); return; }
+        this.reviveUsed = true;
+        this.hideReviveModal();
+        const c = this.crafts[0];
+        if (c) {
+          c.alive = true;
+          c.invuln = 3.5;
+          c.shieldCharges = Math.max(1, c.shieldCharges || 0);
+          if (c.shieldMesh) c.shieldMesh.visible = true;
+          c.debuffType = null;
+          c.debuffTimer = 0;
+          c.y = Math.max(-2.2, Math.min(2.2, c.y));
+          c.vy = 0;
+          c.mesh.visible = true;
+        }
+        this.obstacles.forEach(o => {
+          if (o.kind === 'BLOCK' || o.kind === 'SPINNER') {
+            if (o.z > -32 && o.z < 12) {
+              o.z -= 42;
+              if (typeof o.worldZ === 'number') o.worldZ -= 42;
+              o.mesh.position.z = o.z;
+            }
+          }
+        });
+        this.state = 'PLAYING';
+        audio.playRingCollect();
+        this.showPopup('復活！3.5秒無敵＆シールド！', '#93AB8A');
+      },
+      declineRevive() {
+        this.hideReviveModal();
+        this.triggerGameOver(false);
+      },
+
       enterSpectateMode() {
         const targets = this.getAliveSpectateTargets();
         if (!targets.length) {
@@ -2533,7 +2589,7 @@ const EMBEDDED_VOICES = {
         this.state = 'COUNTDOWN'; this.teamScore = 0; this.teamDistance = 0; this.teamEnergy = 100;
         this.nearMissCount = 0; this.comboCount = 0; this.maxComboMult = 1.0; this.comboDecayTimer = 0;
         this.windForce = 0; this.windTimer = 3.0; this.speedLevel = 1; this.lastRandomWarp = 0;
-        this.spectateTargetId = null; const sbInit = document.getElementById('spectateBannerBar'); if (sbInit) { sbInit.classList.add('hidden'); sbInit.style.display = 'none'; } this.directBoost = false; this.autoBoost = !!gyro.defaultAutoBoost; this.shakeTime = 0; this.spawnTimer = 0.25; this.ringsCollected = 0; this.modeTimer = 0; this.storyItemsCollected = 0; this.mathSolvedCount = 0; this.mathStreak = 0;  if (this.flashTimer) clearInterval(this.flashTimer); document.getElementById('hudMathPromptBar')?.classList.add('hidden'); const scEl = document.getElementById('hudMathSolvedCount'); if (scEl) scEl.textContent = '0';
+        this.reviveUsed = false; this.hideReviveModal(); this.spectateTargetId = null; const sbInit = document.getElementById('spectateBannerBar'); if (sbInit) { sbInit.classList.add('hidden'); sbInit.style.display = 'none'; } this.directBoost = false; this.autoBoost = !!gyro.defaultAutoBoost; this.shakeTime = 0; this.spawnTimer = 0.25; this.ringsCollected = 0; this.modeTimer = 0; this.storyItemsCollected = 0; this.mathSolvedCount = 0; this.mathStreak = 0;  if (this.flashTimer) clearInterval(this.flashTimer); document.getElementById('hudMathPromptBar')?.classList.add('hidden'); const scEl = document.getElementById('hudMathSolvedCount'); if (scEl) scEl.textContent = '0';
 
         if (mMode === 'SOLO') {
           if (soloMode === 'TIME_ATTACK') this.modeTimer = 60.0;
@@ -2807,12 +2863,10 @@ const EMBEDDED_VOICES = {
       activateJammer(attackerSlot) {
         const att = this.crafts.find(c => c.slotIndex === attackerSlot && c.alive);
         if (!att) return;
-        const hasHeldItem = Boolean(att.heldSabotageItem);
-        if (!hasHeldItem && att.jammerCharge < 100) return;
-        const chosenId = hasHeldItem ? att.heldSabotageItem : SABOTAGE_ITEMS[Math.floor(this.nextMatchRand() * SABOTAGE_ITEMS.length)].id;
+        if (!att.isBot && !att.heldSabotageItem) return;
+        const chosenId = att.heldSabotageItem || SABOTAGE_ITEMS[Math.floor(this.nextMatchRand() * SABOTAGE_ITEMS.length)].id;
         const meta = getSabotageMeta(chosenId);
-        if (hasHeldItem) att.heldSabotageItem = null;
-        else att.jammerCharge = 0;
+        att.heldSabotageItem = null;
 
         if (meta.category === 'SUPPORT') {
           this.applySupportItemToCraft(att, meta);
@@ -3659,6 +3713,7 @@ const EMBEDDED_VOICES = {
           c.alive = false; audio.playHit();
           const alive = this.crafts.filter(x => x.alive);
           if (c.slotIndex === 0) {
+            if (!this.reviveUsed) { this.offerReviveChance(); return; }
             if (alive.length > 0) this.enterSpectateMode();
             else this.triggerGameOver(false);
           } else if (alive.length <= 1) {
@@ -3679,6 +3734,10 @@ const EMBEDDED_VOICES = {
         }
         if (mMode === 'ONLINE') {
           c.alive = false; audio.playHit();
+          if (!this.reviveUsed) {
+            this.offerReviveChance();
+            return;
+          }
           const aliveRivals = (onlineNet.roster || []).filter(r => r.id !== onlineNet.myId && r.alive);
           if (aliveRivals.length > 0) {
             this.enterSpectateMode();
@@ -3689,7 +3748,12 @@ const EMBEDDED_VOICES = {
           return;
         }
         if (mMode === 'SOLO') {
-          c.alive = false; const ok = this.teamDistance >= DIFFICULTIES[app.currentDiffIndex].goalDist;
+          c.alive = false;
+          const ok = this.teamDistance >= DIFFICULTIES[app.currentDiffIndex].goalDist;
+          if (!ok && !this.reviveUsed) {
+            this.offerReviveChance();
+            return;
+          }
           if (ok) app.markStageCleared(MAPS[app.currentMapIndex].id, DIFFICULTIES[app.currentDiffIndex].id);
           this.triggerGameOver(ok); return;
         }
@@ -3834,13 +3898,15 @@ const EMBEDDED_VOICES = {
         }
         if (['SOLO', 'ONLINE', 'STORY'].includes(this.runMode) && this.crafts[0]) {
           const mc = this.crafts[0], pct = Math.floor(mc.jammerCharge), jb = document.getElementById('btnDirectJammer');
-          if (mc.heldSabotageItem) {
+          if (mc.heldSabotageItem && mc.alive) {
             const meta = getSabotageMeta(mc.heldSabotageItem);
+            jb.disabled = false;
             jb.textContent = `【${meta.name}】を使う！`;
-            jb.className = mc.alive ? 'min-w-[164px] min-h-[64px] px-6 py-4 rounded-3xl bg-brand-500 text-white font-black text-sm sm:text-base anim-breathe-soft flex items-center justify-center' : 'min-w-[148px] min-h-[56px] px-5 py-3.5 rounded-3xl bg-cocoa-800/85 text-cream-50 font-black text-xs sm:text-sm flex items-center justify-center';
+            jb.className = 'min-w-[164px] min-h-[64px] px-6 py-4 rounded-3xl bg-brand-500 text-white font-black text-sm sm:text-base anim-breathe-soft flex items-center justify-center';
           } else {
-            jb.textContent = pct >= 100 ? 'お邪魔発動！' : `お邪魔 (${pct}%)`;
-            jb.className = pct >= 100 && mc.alive ? 'min-w-[164px] min-h-[64px] px-6 py-4 rounded-3xl bg-brand-500 text-white font-black text-sm sm:text-base anim-breathe-soft flex items-center justify-center' : 'min-w-[148px] min-h-[56px] px-5 py-3.5 rounded-3xl bg-cocoa-800/85 text-cream-50 font-black text-xs sm:text-sm flex items-center justify-center';
+            jb.disabled = true;
+            jb.textContent = 'アイテムなし';
+            jb.className = 'min-w-[148px] min-h-[56px] px-5 py-3.5 rounded-3xl bg-cream-200 text-cocoa-400 font-black text-xs sm:text-sm flex items-center justify-center opacity-60 cursor-not-allowed';
           }
           if (isVsBot) {
             document.getElementById('hudPlayerChips').innerHTML = this.crafts.map(c => `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-cream-50 ${c.alive?'':'opacity-40 line-through'}">${c.name}</span>`).join('');
@@ -4431,6 +4497,8 @@ const EMBEDDED_VOICES = {
       btnIngameAutoBoost: () => game3d.toggleAutoBoost(),
       btnIngameReset: () => gyro.calibrate(),
       btnDirectJammer: () => game3d.triggerDirectJammer(),
+      btnConfirmRevive: () => game3d.confirmRevive(),
+      btnDeclineRevive: () => game3d.declineRevive(),
 
       btnSpectateNext: () => game3d.cycleSpectateTarget(),
       btnSpectateFinish: () => game3d.exitSpectateToResult(),
