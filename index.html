@@ -158,7 +158,7 @@
 
 
   <!-- SPオーバーレイ広告（320x100・邪魔にならない控えめ表示＋閉じる対応） -->
-  <div id="spOverlayAd320x100" class="hidden fixed bottom-16 left-1/2 -translate-x-1/2 z-40 w-[320px] h-[100px] rounded-2xl bg-[#FFFDF9]/95 overflow-hidden flex flex-col justify-between p-1.5" style="box-shadow: 0 8px 24px rgba(62,39,35,0.12);">
+  <div id="spOverlayAd320x100" class="hidden fixed top-14 left-1/2 -translate-x-1/2 z-40 w-[320px] h-[100px] rounded-2xl bg-[#FFFDF9]/95 overflow-hidden flex flex-col justify-between p-1.5" style="box-shadow: 0 8px 24px rgba(62,39,35,0.12);">
     <div class="flex items-center justify-between px-1 text-[9px] font-bold text-[#A1887F]">
       <span>SP OVERLAY · 320×100</span>
       <button id="btnCloseSpOverlayAd" type="button" class="px-2 py-0.5 rounded-full bg-[#F7EAE0] text-[#3E2723] font-extrabold text-[10px]">✕</button>
@@ -174,12 +174,15 @@
       ← もどる
     </button>
     <div class="flex-1"></div>
-    <div class="pointer-events-auto flex items-center gap-2">
-      <button id="btnOpenVoice" type="button" class="soft-pill px-3.5 py-2 text-cocoa-800 font-extrabold text-xs flex items-center gap-1.5">
-        <span class="w-2 h-2 rounded-full bg-brand-500"></span>
-        <span>ボイス (<span id="headerVoiceCount">7</span>/7)</span>
+    <div class="pointer-events-auto flex items-center gap-1.5">
+      <button id="btnOpenSettings" type="button" class="soft-pill px-3.5 py-2 text-cocoa-800 font-extrabold text-xs flex items-center gap-1">
+        <span class="w-2 h-2 rounded-full bg-sage-500"></span>
+        <span>ジャイロ・設定</span>
       </button>
-      <button id="btnToggleSound" type="button" class="soft-pill px-3.5 py-2 text-cocoa-800 font-extrabold text-xs">
+      <button id="btnOpenVoice" type="button" class="soft-pill px-3 py-2 text-cocoa-800 font-extrabold text-xs">
+        <span>ボイス(<span id="headerVoiceCount">7</span>)</span>
+      </button>
+      <button id="btnToggleSound" type="button" class="soft-pill px-3 py-2 text-cocoa-800 font-extrabold text-xs">
         <span id="labelSound">音: ON</span>
       </button>
     </div>
@@ -515,44 +518,86 @@
     </div>
   </section>
 
-  <!-- 操作＆ルール設定 -->
-  <section id="screenSoloSetup" class="screen items-center justify-center px-4 pt-14 bg-[#FBF7F2]/90 backdrop-blur-md">
-    <div class="soft-card w-full max-w-md p-5 flex flex-col items-center gap-3.5 my-auto">
-      <div class="text-center">
-        <h2 class="text-lg font-black">あそび方・操作せってい</h2>
-        <p class="text-[11px] font-bold text-cocoa-600 mt-0.5">画面をなぞるだけでも、スマホを傾けても操作できます</p>
+  <!-- ジャイロ・操作＆ルール設定 -->
+  <section id="screenSoloSetup" class="screen items-center justify-start px-4 pt-14 bg-[#FBF7F2]/95 backdrop-blur-md">
+    <div class="soft-card w-full max-w-md p-5 flex flex-col items-center gap-3 my-auto">
+      <div class="w-full flex items-center justify-between">
+        <div class="text-left">
+          <h2 class="text-lg font-black">ジャイロ・操作設定</h2>
+          <p class="text-[11px] font-bold text-cocoa-600">iPad・スマホの傾き感度や向き・反転を細かく調整できます</p>
+        </div>
+        <button id="btnResetGyroSettings" type="button" class="btn-peach px-3 py-1.5 text-xs font-extrabold shrink-0">初期値に戻す</button>
       </div>
+
+      <!-- 1. ルール（6種類） -->
       <div class="w-full text-left">
-        <div class="text-[11px] font-extrabold text-cocoa-600 mb-1 px-1">1. ルール（6種類）</div>
+        <div class="text-[11px] font-extrabold text-cocoa-600 mb-1 px-1">1. ゲームルール（6種類）</div>
         <div class="w-full bg-[#FBF7F2] p-1.5 rounded-2xl grid grid-cols-3 gap-1.5" id="homeSoloModeGrid"></div>
       </div>
+
+      <!-- 2. 操作方法 -->
       <div class="w-full text-left">
         <div class="text-[11px] font-extrabold text-cocoa-600 mb-1 px-1">2. 操作方法</div>
         <div class="w-full bg-[#FBF7F2] p-1.5 rounded-2xl grid grid-cols-3 gap-1.5">
           <button id="btnCtrlModeHybrid" type="button" class="py-2.5 px-1 rounded-xl bg-brand-500 text-white font-extrabold text-xs">おまかせ両対応</button>
           <button id="btnCtrlModeTouch" type="button" class="py-2.5 px-1 rounded-xl text-cocoa-800 font-extrabold text-xs">指スライドのみ</button>
-          <button id="btnCtrlModeGyro" type="button" class="py-2.5 px-1 rounded-xl text-cocoa-800 font-extrabold text-xs">傾き・方角のみ</button>
+          <button id="btnCtrlModeGyro" type="button" class="py-2.5 px-1 rounded-xl text-cocoa-800 font-extrabold text-xs">傾き・ジャイロのみ</button>
         </div>
       </div>
-      <div class="w-full bg-[#FBF7F2] rounded-2xl p-3.5 flex flex-col gap-2.5">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
+
+      <!-- 3. ジャイロセンサー診断＆iPad/スマホ向き設定 -->
+      <div class="w-full bg-[#FBF7F2] rounded-2xl p-3.5 flex flex-col gap-3">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5 min-w-0">
             <div class="relative w-12 h-12 rounded-full bg-cream-200 flex items-center justify-center shrink-0">
               <div id="soloRadarDot" class="w-4 h-4 rounded-full bg-brand-500 transition-transform duration-75"></div>
             </div>
-            <div class="text-left">
-              <div class="text-xs font-extrabold">センサー: <span id="soloGyroStatus" class="text-brand-600">自動待機</span></div>
-              <div id="soloCompassReadout" class="text-[10px] font-bold text-cocoa-600">構えた角度が自動で正面になります</div>
+            <div class="text-left min-w-0">
+              <div class="text-xs font-extrabold">ジャイロ: <span id="soloGyroStatus" class="text-brand-600">自動待機中</span></div>
+              <div id="soloCompassReadout" class="text-[10px] font-bold text-cocoa-600 truncate">構えた角度が自動で正面になります</div>
             </div>
           </div>
-          <button id="btnCalibSolo" type="button" class="btn-peach px-3 py-1.5 text-xs font-extrabold shrink-0">正面リセット</button>
+          <div class="flex flex-col gap-1 shrink-0">
+            <button id="btnEnableGyroSolo" type="button" class="btn-sage px-3 py-1.5 text-[11px] font-extrabold">センサー許可</button>
+            <button id="btnCalibSolo" type="button" class="btn-peach px-3 py-1.5 text-[11px] font-extrabold">正面リセット</button>
+          </div>
         </div>
-        <div class="flex items-center justify-between text-xs font-extrabold pt-1">
-          <span>うごきやすさ（感度）: <span id="soloSensLabel" class="text-brand-600">68</span></span>
-          <input id="soloSensSlider" type="range" min="20" max="100" value="68" class="w-36">
+
+        <!-- 画面向き基準（iPad / 横持ち / 縦持ち） -->
+        <div class="text-left">
+          <div class="text-[11px] font-extrabold text-cocoa-600 mb-1">画面向き基準（iPad・タブレット対応）</div>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button id="btnOrientAuto" type="button" class="py-2 rounded-xl bg-brand-500 text-white font-extrabold text-xs">自動判定</button>
+            <button id="btnOrientLandscape" type="button" class="py-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold text-xs">横向き固定</button>
+            <button id="btnOrientPortrait" type="button" class="py-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold text-xs">縦向き固定</button>
+          </div>
+        </div>
+
+        <!-- 感度＆デッドゾーン（遊び）スライダー -->
+        <div class="flex flex-col gap-2 pt-0.5">
+          <div class="flex items-center justify-between text-xs font-extrabold">
+            <span>傾き感度（うごきやすさ）: <span id="soloSensLabel" class="text-brand-600">68</span></span>
+            <input id="soloSensSlider" type="range" min="20" max="100" value="68" class="w-36 accent-brand-500">
+          </div>
+          <div class="flex items-center justify-between text-xs font-extrabold">
+            <span>遊び（手ブレ防止）: <span id="soloDeadzoneLabel" class="text-brand-600">1.2°</span></span>
+            <input id="soloDeadzoneSlider" type="range" min="0" max="10" step="0.5" value="1.2" class="w-36 accent-brand-500">
+          </div>
+        </div>
+
+        <!-- 左右反転・上下反転・スティック・自動加速 -->
+        <div class="grid grid-cols-2 gap-1.5 pt-0.5">
+          <button id="btnToggleInvertX" type="button" class="py-2.5 px-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold text-xs">左右反転: OFF</button>
+          <button id="btnToggleInvertY" type="button" class="py-2.5 px-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold text-xs">上下反転: OFF</button>
+          <button id="btnToggleStickShow" type="button" class="py-2.5 px-2 rounded-xl bg-sage-500 text-white font-extrabold text-xs">画面スティック: ON</button>
+          <button id="btnToggleDefaultAutoBoost" type="button" class="py-2.5 px-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold text-xs">開始時自動加速: OFF</button>
         </div>
       </div>
-      <button id="btnLaunchSolo" type="button" class="btn-orange w-full py-4 text-lg font-black">しゅつげき！</button>
+
+      <div class="w-full flex gap-2">
+        <button id="btnSaveSettingsHome" type="button" class="btn-peach flex-1 py-3.5 text-sm font-extrabold">保存して戻る</button>
+        <button id="btnLaunchSolo" type="button" class="btn-orange flex-[2] py-3.5 text-base font-black">しゅつげき！</button>
+      </div>
     </div>
   </section>
 
@@ -1238,35 +1283,160 @@ const EMBEDDED_VOICES = {
     };
 
     const gyro = {
-      controlMode: 'HYBRID', gyroAxisMode: 'MIX', active: false, hasZero: false,
+      controlMode: 'HYBRID',
+      orientationPref: 'AUTO', // 'AUTO' | 'LANDSCAPE' | 'PORTRAIT'
+      active: false, hasZero: false,
       rawScreenX: 0, rawScreenY: 0, baseScreenX: 0, baseScreenY: 0,
       rawHeading: null, baseHeading: null, headingDelta: 0,
       smoothX: 0, smoothY: 0, stickX: 0, stickY: 0, stickDragging: false,
-      normX: 0, normY: 0, sensitivity: 68, invertX: false, invertY: false,
+      normX: 0, normY: 0,
+      sensitivity: 68,
+      deadzoneDeg: 1.2,
+      invertX: false,
+      invertY: false,
+      showVirtualStick: true,
+      defaultAutoBoost: false,
       keys: { left: false, right: false, up: false, down: false },
 
-      setControlMode(m) {
-        this.controlMode = m;
+      loadSettings() {
+        try {
+          const saved = JSON.parse(localStorage.getItem('gyrododge_gyro_cfg_v1') || 'null');
+          if (saved) {
+            if (saved.controlMode) this.controlMode = saved.controlMode;
+            if (saved.orientationPref) this.orientationPref = saved.orientationPref;
+            if (typeof saved.sensitivity === 'number') this.sensitivity = saved.sensitivity;
+            if (typeof saved.deadzoneDeg === 'number') this.deadzoneDeg = saved.deadzoneDeg;
+            this.invertX = !!saved.invertX;
+            this.invertY = !!saved.invertY;
+            this.showVirtualStick = saved.showVirtualStick !== false;
+            this.defaultAutoBoost = !!saved.defaultAutoBoost;
+          }
+        } catch (e) {}
+        this.syncSettingsUI();
+      },
+      saveSettings() {
+        try {
+          localStorage.setItem('gyrododge_gyro_cfg_v1', JSON.stringify({
+            controlMode: this.controlMode,
+            orientationPref: this.orientationPref,
+            sensitivity: this.sensitivity,
+            deadzoneDeg: this.deadzoneDeg,
+            invertX: this.invertX,
+            invertY: this.invertY,
+            showVirtualStick: this.showVirtualStick,
+            defaultAutoBoost: this.defaultAutoBoost
+          }));
+        } catch (e) {}
+        this.syncSettingsUI();
+      },
+      resetSettings() {
+        this.controlMode = 'HYBRID';
+        this.orientationPref = 'AUTO';
+        this.sensitivity = 68;
+        this.deadzoneDeg = 1.2;
+        this.invertX = false;
+        this.invertY = false;
+        this.showVirtualStick = true;
+        this.defaultAutoBoost = false;
+        this.calibrate();
+        this.saveSettings();
+      },
+      syncSettingsUI() {
         ['HYBRID', 'TOUCH', 'GYRO'].forEach(k => {
           const el = document.getElementById(k === 'HYBRID' ? 'btnCtrlModeHybrid' : k === 'TOUCH' ? 'btnCtrlModeTouch' : 'btnCtrlModeGyro');
-          if (el) el.className = k === m ? 'py-2.5 px-1 rounded-xl bg-brand-500 text-white font-extrabold text-xs' : 'py-2.5 px-1 rounded-xl text-cocoa-800 font-extrabold text-xs';
+          if (el) el.className = k === this.controlMode ? 'py-2.5 px-1 rounded-xl bg-brand-500 text-white font-extrabold text-xs' : 'py-2.5 px-1 rounded-xl text-cocoa-800 font-extrabold text-xs';
         });
+        ['AUTO', 'LANDSCAPE', 'PORTRAIT'].forEach(o => {
+          const el = document.getElementById(o === 'AUTO' ? 'btnOrientAuto' : o === 'LANDSCAPE' ? 'btnOrientLandscape' : 'btnOrientPortrait');
+          if (el) el.className = o === this.orientationPref ? 'py-2 rounded-xl bg-brand-500 text-white font-extrabold text-xs' : 'py-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold text-xs';
+        });
+        const sl = document.getElementById('soloSensSlider'); if (sl) sl.value = String(this.sensitivity);
+        const sLbl = document.getElementById('soloSensLabel'); if (sLbl) sLbl.textContent = String(this.sensitivity);
+        const dz = document.getElementById('soloDeadzoneSlider'); if (dz) dz.value = String(this.deadzoneDeg);
+        const dzLbl = document.getElementById('soloDeadzoneLabel'); if (dzLbl) dzLbl.textContent = `${this.deadzoneDeg.toFixed(1)}°`;
+
+        const ixBtn = document.getElementById('btnToggleInvertX');
+        if (ixBtn) {
+          ixBtn.textContent = `左右反転: ${this.invertX ? 'ON' : 'OFF'}`;
+          ixBtn.className = this.invertX ? 'py-2.5 px-2 rounded-xl bg-brand-500 text-white font-extrabold text-xs' : 'py-2.5 px-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold text-xs';
+        }
+        const iyBtn = document.getElementById('btnToggleInvertY');
+        if (iyBtn) {
+          iyBtn.textContent = `上下反転: ${this.invertY ? 'ON' : 'OFF'}`;
+          iyBtn.className = this.invertY ? 'py-2.5 px-2 rounded-xl bg-brand-500 text-white font-extrabold text-xs' : 'py-2.5 px-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold text-xs';
+        }
+        const stBtn = document.getElementById('btnToggleStickShow');
+        if (stBtn) {
+          stBtn.textContent = `画面スティック: ${this.showVirtualStick ? 'ON' : 'OFF'}`;
+          stBtn.className = this.showVirtualStick ? 'py-2.5 px-2 rounded-xl bg-sage-500 text-white font-extrabold text-xs' : 'py-2.5 px-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold text-xs';
+        }
+        const vz = document.getElementById('virtualStickZone');
+        if (vz) vz.style.visibility = this.showVirtualStick ? 'visible' : 'hidden';
+
+        const abBtn = document.getElementById('btnToggleDefaultAutoBoost');
+        if (abBtn) {
+          abBtn.textContent = `開始時自動加速: ${this.defaultAutoBoost ? 'ON' : 'OFF'}`;
+          abBtn.className = this.defaultAutoBoost ? 'py-2.5 px-2 rounded-xl bg-brand-500 text-white font-extrabold text-xs' : 'py-2.5 px-2 rounded-xl bg-cream-200 text-cocoa-800 font-extrabold text-xs';
+        }
+      },
+      setControlMode(m) {
+        this.controlMode = m;
+        this.saveSettings();
+      },
+      setOrientationPref(o) {
+        this.orientationPref = o;
+        this.calibrate();
+        this.saveSettings();
+      },
+      setDeadzone(v) {
+        this.deadzoneDeg = Math.max(0, Math.min(10, parseFloat(v) || 0));
+        this.saveSettings();
+      },
+      toggleInvertX() { this.invertX = !this.invertX; this.saveSettings(); },
+      toggleInvertY() { this.invertY = !this.invertY; this.saveSettings(); },
+      toggleShowStick() { this.showVirtualStick = !this.showVirtualStick; this.saveSettings(); },
+      toggleDefaultAutoBoost() {
+        this.defaultAutoBoost = !this.defaultAutoBoost;
+        game3d.autoBoost = this.defaultAutoBoost;
+        this.saveSettings();
       },
       getScreenAngle() {
-        if (screen.orientation && typeof screen.orientation.angle === 'number') return ((screen.orientation.angle % 360) + 360) % 360;
-        if (typeof window.orientation === 'number') return ((window.orientation % 360) + 360) % 360;
-        return window.innerWidth > window.innerHeight * 1.15 ? 90 : 0;
+        if (this.orientationPref === 'LANDSCAPE') return 90;
+        if (this.orientationPref === 'PORTRAIT') return 0;
+        if (screen.orientation && typeof screen.orientation.angle === 'number') {
+          return ((screen.orientation.angle % 360) + 360) % 360;
+        }
+        if (typeof window.orientation === 'number') {
+          return ((window.orientation % 360) + 360) % 360;
+        }
+        return window.innerWidth > window.innerHeight * 1.08 ? 90 : 0;
+      },
+      isTabletDevice() {
+        const ua = navigator.userAgent || '';
+        return /iPad/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
       },
       mapScreenTilt(beta, gamma) {
-        const a = this.getScreenAngle();
-        if (a === 90) return { sx: beta, sy: -gamma };
-        if (a === 270) return { sx: -beta, sy: gamma };
-        if (a === 180) return { sx: -gamma, sy: -beta };
-        return { sx: gamma, sy: beta };
+        const b = typeof beta === 'number' ? beta : 0;
+        const g = typeof gamma === 'number' ? gamma : 0;
+        const angle = this.getScreenAngle();
+        const isLandscape = this.orientationPref === 'LANDSCAPE' || (this.orientationPref === 'AUTO' && window.innerWidth > window.innerHeight * 1.08);
+
+        if (this.isTabletDevice() && this.orientationPref === 'AUTO') {
+          if (angle === 90 || (angle === 0 && isLandscape)) return { sx: b, sy: -g };
+          if (angle === 270 || (angle === 180 && isLandscape)) return { sx: -b, sy: g };
+          if (angle === 180) return { sx: -g, sy: -b };
+          return { sx: g, sy: b };
+        }
+
+        if (angle === 90) return { sx: b, sy: -g };
+        if (angle === 270) return { sx: -b, sy: g };
+        if (angle === 180) return { sx: -g, sy: -b };
+        return { sx: g, sy: b };
       },
       init() {
+        this.loadSettings();
         window.addEventListener('deviceorientation', e => this.handleOrientation(e));
-        const onRot = () => { this.hasZero = false; this.smoothX = 0; this.smoothY = 0; this.updateDiagnostics(); };
+        const onRot = () => { setTimeout(() => { this.hasZero = false; this.baseHeading = this.rawHeading; this.smoothX = 0; this.smoothY = 0; this.normX = 0; this.normY = 0; this.updateDiagnostics(); }, 120); };
         window.addEventListener('orientationchange', onRot);
         window.addEventListener('resize', onRot);
         if (screen.orientation?.addEventListener) screen.orientation.addEventListener('change', onRot);
@@ -1350,16 +1520,32 @@ const EMBEDDED_VOICES = {
         });
         window.addEventListener('pointerup', () => { if (padDrag) { padDrag = false; this.stickDragging = false; this.stickX = 0; this.stickY = 0; this.recomputeCombinedInput(); } });
       },
-      setSensitivity(v) { this.sensitivity = parseInt(v, 10) || 68; const l = document.getElementById('soloSensLabel'); if (l) l.textContent = this.sensitivity; },
+      setSensitivity(v) { this.sensitivity = parseInt(v, 10) || 68; this.saveSettings(); },
       async requestPermission(ctx) {
         audio.init();
+        const stEl = document.getElementById('soloGyroStatus');
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-          try { const res = await DeviceOrientationEvent.requestPermission(); if (res === 'granted') { this.active = true; this.hasZero = false; if (ctx === 'solo') document.getElementById('soloGyroStatus').textContent = '有効'; } } catch (e) {}
-        } else { this.active = true; this.hasZero = false; if (ctx === 'solo') document.getElementById('soloGyroStatus').textContent = '有効'; }
+          try {
+            const res = await DeviceOrientationEvent.requestPermission();
+            if (res === 'granted') {
+              this.active = true; this.hasZero = false;
+              if (stEl) stEl.textContent = '有効（OK）';
+            } else if (stEl) {
+              stEl.textContent = '未許可（タッチ可）';
+            }
+          } catch (e) {
+            if (stEl) stEl.textContent = 'ボタンで許可してください';
+          }
+        } else {
+          this.active = true; this.hasZero = false;
+          if (stEl) stEl.textContent = '有効（自動検出）';
+        }
       },
       handleOrientation(e) {
         if (e.gamma === null || e.beta === null) return;
         this.active = true;
+        const stEl = document.getElementById('soloGyroStatus');
+        if (stEl && stEl.textContent === '自動待機中') stEl.textContent = '受信中（OK）';
         const { sx, sy } = this.mapScreenTilt(e.beta, e.gamma);
         this.rawScreenX = sx; this.rawScreenY = sy;
         let heading = null;
@@ -1373,12 +1559,18 @@ const EMBEDDED_VOICES = {
         let dYaw = 0;
         if (heading !== null && this.baseHeading !== null) { dYaw = heading - this.baseHeading; if (dYaw > 180) dYaw -= 360; if (dYaw < -180) dYaw += 360; }
         this.headingDelta = dYaw;
-        const maxTilt = 38 - (this.sensitivity * 0.24), maxYaw = 48 - (this.sensitivity * 0.28);
-        const tx = Math.abs(dx) < 1.2 ? 0 : Math.max(-1, Math.min(1, dx / maxTilt));
-        const yx = Math.abs(dYaw) < 1.5 ? 0 : Math.max(-1, Math.min(1, dYaw / maxYaw));
-        let rx = Math.max(-1, Math.min(1, tx * 0.75 + yx * 0.65));
-        let ry = Math.abs(dy) < 1.2 ? 0 : Math.max(-1, Math.min(1, dy / maxTilt));
-        if (this.invertX) rx = -rx; if (this.invertY) ry = -ry;
+
+        const tabletScale = this.isTabletDevice() ? 0.82 : 1.0;
+        const maxTilt = (36 - (this.sensitivity * 0.22)) * tabletScale;
+        const maxYaw = 55 - (this.sensitivity * 0.25);
+        const dz = this.deadzoneDeg;
+        const tx = Math.abs(dx) < dz ? 0 : Math.max(-1, Math.min(1, dx / Math.max(8, maxTilt)));
+        const yx = Math.abs(dYaw) < Math.max(2.5, dz * 1.5) ? 0 : Math.max(-1, Math.min(1, dYaw / Math.max(12, maxYaw)));
+        const yawWeight = this.isTabletDevice() ? 0.15 : 0.35;
+        let rx = Math.max(-1, Math.min(1, tx + yx * yawWeight));
+        let ry = Math.abs(dy) < dz ? 0 : Math.max(-1, Math.min(1, dy / Math.max(8, maxTilt)));
+        if (this.invertX) rx = -rx;
+        if (this.invertY) ry = -ry;
         this.smoothX += (rx - this.smoothX) * 0.42; this.smoothY += (ry - this.smoothY) * 0.42;
         this.recomputeCombinedInput();
       },
@@ -1406,8 +1598,10 @@ const EMBEDDED_VOICES = {
         if (this.rawHeading !== null) {
           const deg = Math.round(this.rawHeading) % 360;
           const card = ['N','NE','E','SE','S','SW','W','NW'][Math.round(deg / 45) % 8];
-          if (cEl) cEl.textContent = `方角: ${card} ${deg}° (差 ${Math.round(this.headingDelta)}°)`;
+          if (cEl) cEl.textContent = `傾き X:${this.normX.toFixed(2)} Y:${this.normY.toFixed(2)} · 方角:${card}${deg}°`;
           if (hEl) hEl.textContent = `${card} ${deg}°`;
+        } else if (cEl && this.active) {
+          cEl.textContent = `傾き X:${this.normX.toFixed(2)} Y:${this.normY.toFixed(2)}`;
         }
         const cDot = document.getElementById('ctrlRadarDot');
         if (cDot) cDot.style.transform = `translate(${this.normX * 48}px, ${this.normY * 48}px)`;
@@ -1885,7 +2079,7 @@ const EMBEDDED_VOICES = {
         this.state = 'COUNTDOWN'; this.teamScore = 0; this.teamDistance = 0; this.teamEnergy = 100;
         this.nearMissCount = 0; this.comboCount = 0; this.maxComboMult = 1.0; this.comboDecayTimer = 0;
         this.windForce = 0; this.windTimer = 3.0; this.speedLevel = 1; this.lastRandomWarp = 0;
-        this.directBoost = false; this.shakeTime = 0; this.spawnTimer = 0.25; this.ringsCollected = 0; this.modeTimer = 0; this.storyItemsCollected = 0; this.mathSolvedCount = 0; this.mathStreak = 0; this.activeMathChallenge = null; this.memorySequence = []; this.memoryStepIdx = 0; if (this.flashTimer) clearInterval(this.flashTimer); document.getElementById('hudMathPromptBar')?.classList.add('hidden'); const scEl = document.getElementById('hudMathSolvedCount'); if (scEl) scEl.textContent = '0';
+        this.directBoost = false; this.autoBoost = !!gyro.defaultAutoBoost; this.shakeTime = 0; this.spawnTimer = 0.25; this.ringsCollected = 0; this.modeTimer = 0; this.storyItemsCollected = 0; this.mathSolvedCount = 0; this.mathStreak = 0; this.activeMathChallenge = null; this.memorySequence = []; this.memoryStepIdx = 0; if (this.flashTimer) clearInterval(this.flashTimer); document.getElementById('hudMathPromptBar')?.classList.add('hidden'); const scEl = document.getElementById('hudMathSolvedCount'); if (scEl) scEl.textContent = '0';
 
         if (mMode === 'SOLO') {
           if (soloMode === 'TIME_ATTACK') this.modeTimer = 60.0;
@@ -3192,25 +3386,14 @@ const EMBEDDED_VOICES = {
     const adManager = {
       bannerHidden: false,
       overlayDismissed: false,
-      overlayTimer: null,
       init() {
-        try {
-          this.bannerHidden = localStorage.getItem('gyrododge_ad320x50_hidden') === '1';
-        } catch (e) {}
+        this.bannerHidden = false;
+        this.overlayDismissed = false;
+        try { localStorage.setItem('gyrododge_ad320x50_hidden', '0'); } catch (e) {}
         this.applyState();
-        this.scheduleOverlayAutoHide();
-      },
-      scheduleOverlayAutoHide() {
-        if (this.overlayTimer) clearTimeout(this.overlayTimer);
-        if (this.overlayDismissed || !navigator.onLine) return;
-        this.overlayTimer = setTimeout(() => {
-          this.overlayDismissed = true;
-          this.applyState();
-        }, 12000);
       },
       closeOverlay() {
         this.overlayDismissed = true;
-        if (this.overlayTimer) clearTimeout(this.overlayTimer);
         this.applyState();
       },
       toggleBanner() {
@@ -3219,16 +3402,14 @@ const EMBEDDED_VOICES = {
         this.applyState();
       },
       applyState() {
-        const isOnline = navigator.onLine !== false;
         const bBox = document.getElementById('admaxBanner320x50Box');
         if (bBox) {
-          const hideBanner = this.bannerHidden || !isOnline;
-          bBox.classList.toggle('hidden', hideBanner);
-          bBox.style.display = hideBanner ? 'none' : 'flex';
+          bBox.classList.toggle('hidden', this.bannerHidden);
+          bBox.style.display = this.bannerHidden ? 'none' : 'flex';
         }
         const ovBox = document.getElementById('spOverlayAd320x100');
         if (ovBox) {
-          const showOv = isOnline && !this.overlayDismissed && (typeof app === 'undefined' || app.currentScreen === 'screenHome');
+          const showOv = !this.overlayDismissed && (typeof app === 'undefined' || app.currentScreen === 'screenHome');
           ovBox.classList.toggle('hidden', !showOv);
           ovBox.style.display = showOv ? 'flex' : 'none';
         }
@@ -3239,6 +3420,17 @@ const EMBEDDED_VOICES = {
       btnCloseSpOverlayAd: () => adManager.closeOverlay(),
       btnToggleAd320x50: () => adManager.toggleBanner(),
       btnBackHome: () => app.goHome(),
+      btnOpenSettings: () => app.startSoloSetup(),
+      btnSaveSettingsHome: () => { gyro.saveSettings(); app.goHome(); },
+      btnResetGyroSettings: () => gyro.resetSettings(),
+      btnEnableGyroSolo: () => gyro.requestPermission('solo'),
+      btnOrientAuto: () => gyro.setOrientationPref('AUTO'),
+      btnOrientLandscape: () => gyro.setOrientationPref('LANDSCAPE'),
+      btnOrientPortrait: () => gyro.setOrientationPref('PORTRAIT'),
+      btnToggleInvertX: () => gyro.toggleInvertX(),
+      btnToggleInvertY: () => gyro.toggleInvertY(),
+      btnToggleStickShow: () => gyro.toggleShowStick(),
+      btnToggleDefaultAutoBoost: () => gyro.toggleDefaultAutoBoost(),
       btnOpenVoice: () => app.openVoiceStudio(),
       btnToggleSound: () => audio.toggleMute(),
       btnOpenAccount: () => accountMgr.openModal(),
@@ -3326,6 +3518,8 @@ const EMBEDDED_VOICES = {
       if (ownedChk) ownedChk.onchange = () => app.renderEncyclopedia();
       const sens = document.getElementById('soloSensSlider');
       if (sens) sens.oninput = e => gyro.setSensitivity(e.target.value);
+      const dzSl = document.getElementById('soloDeadzoneSlider');
+      if (dzSl) dzSl.oninput = e => gyro.setDeadzone(e.target.value);
       const mapSel = document.getElementById('quickMapSelect');
       if (mapSel) mapSel.onchange = e => app.setMapIndex(parseInt(e.target.value, 10));
       const diffSel = document.getElementById('quickDiffSelect');
