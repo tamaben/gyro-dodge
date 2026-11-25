@@ -1359,16 +1359,15 @@
     const diff = DIFFICULTIES[saveData.diffIdx];
     const lvl = Math.floor(saveData.xp / 500) + 1;
 
-    document.getElementById("ui-pilot-lvl").textContent = `LV.${lvl}`;
-    document.getElementById("ui-credits").textContent = saveData.credits.toLocaleString();
-    document.getElementById("ui-best-score").textContent = saveData.bestScore.toLocaleString();
-    document.getElementById("ui-best-dist").textContent = `${saveData.bestDist.toLocaleString()}m`;
+    document.getElementById("ui-best-inline").textContent =
+      `BEST ${saveData.bestScore.toLocaleString()}`;
+    document.getElementById("ui-hangar-credits").textContent =
+      `CREDITS: ${saveData.credits.toLocaleString()}  |  LV.${lvl}`;
 
     document.getElementById("btn-lang-toggle").textContent = isEn ? "日本語" : "EN";
-    document.getElementById("ui-audio-label").textContent = saveData.soundOn ? "ON" : "OFF";
     document.getElementById("audio-wave-path").style.display = saveData.soundOn ? "" : "none";
 
-    document.getElementById("spec-code").textContent = `${craftMeta.code} ${craftMeta.name}`;
+    document.getElementById("spec-code").textContent = craftMeta.code;
     document.getElementById("spec-name").textContent = isEn ? craftMeta.enName : craftMeta.jpName;
     document.getElementById("bar-speed").style.width = `${craftMeta.speedStat}%`;
     document.getElementById("bar-agility").style.width = `${craftMeta.agilityStat}%`;
@@ -1986,18 +1985,18 @@
     }
 
     if (!isPlaying) {
-      if (!showcaseDragging) orbitYaw += dt * 0.26;
+      if (!showcaseDragging) orbitYaw += dt * 0.24;
       showcaseAnchor.position.set(
-        Math.sin(t * 1.1) * 0.18,
-        (hangarOpen ? 1.5 : 1.05) + Math.sin(t * 2.0) * 0.1,
+        Math.sin(t * 1.05) * 0.16,
+        (hangarOpen ? 1.65 : 1.18) + Math.sin(t * 1.9) * 0.09,
         2.0
       );
-      showcaseAnchor.rotation.z = Math.cos(t * 1.1) * 0.07;
+      showcaseAnchor.rotation.z = Math.cos(t * 1.05) * 0.065;
       animateAircraftDetails(showcaseCraft, 1.05, t, dt);
 
-      const radius = hangarOpen ? 5.1 : 6.1;
+      const radius = hangarOpen ? 5.6 : 6.8;
       const targetCamX = showcaseAnchor.position.x + Math.sin(orbitYaw) * Math.cos(orbitPitch) * radius;
-      const targetCamY = showcaseAnchor.position.y + Math.sin(orbitPitch) * radius + (hangarOpen ? 0.55 : 0.85);
+      const targetCamY = showcaseAnchor.position.y + Math.sin(orbitPitch) * radius + (hangarOpen ? 0.6 : 0.9);
       const targetCamZ = showcaseAnchor.position.z + Math.cos(orbitYaw) * Math.cos(orbitPitch) * radius;
 
       camera.position.x += (targetCamX - camera.position.x) * Math.min(1, dt * 6);
@@ -2005,7 +2004,7 @@
       camera.position.z += (targetCamZ - camera.position.z) * Math.min(1, dt * 6);
       camera.fov += (56 - camera.fov) * Math.min(1, dt * 6);
       camera.updateProjectionMatrix();
-      camera.lookAt(showcaseAnchor.position.x, showcaseAnchor.position.y - (hangarOpen ? 0.5 : 0.05), showcaseAnchor.position.z);
+      camera.lookAt(showcaseAnchor.position.x, showcaseAnchor.position.y - (hangarOpen ? 0.55 : 0.22), showcaseAnchor.position.z);
 
       skyDome.mesh.position.copy(camera.position);
       burnerLight.position.set(showcaseAnchor.position.x, showcaseAnchor.position.y, showcaseAnchor.position.z + 2.2);
@@ -2050,7 +2049,7 @@
     document.getElementById("screen-fx").classList.toggle("boost-active", activeBoost);
     document.getElementById("btn-boost-hold").classList.toggle("active", activeBoost);
 
-    const arcOffset = 264 * (1 - boostEnergy / 100);
+    const arcOffset = 239 * (1 - boostEnergy / 100);
     document.getElementById("boost-meter-arc").style.strokeDashoffset = String(arcOffset);
     document.getElementById("boost-pct-label").textContent = `${Math.round(boostEnergy)}%`;
 

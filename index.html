@@ -31,8 +31,8 @@
   <!-- Smoke Attack Overlay -->
   <div id="blind-overlay">
     <div class="blind-alert-card">
-      <div class="blind-alert-title" data-i18n="smokeTitle">スモーク妨害中</div>
-      <div class="blind-alert-sub" data-i18n="smokeSub">計器を見ながら回避を続けてください</div>
+      <div class="blind-alert-title" data-i18n="smokeTitle">スモーク視界妨害中</div>
+      <div class="blind-alert-sub" data-i18n="smokeSub">計器と動きで障害物を回避してください</div>
     </div>
   </div>
 
@@ -44,7 +44,7 @@
   </div>
 
   <!-- =====================================================================
-       HOME SCREEN
+       SPACIOUS HOME SCREEN (OPEN 3D SKY + COMPACT BOTTOM DECK)
        ===================================================================== -->
   <div id="home-shell" class="ui-shell">
     <header class="top-bar pointer-auto">
@@ -52,26 +52,21 @@
         <img src="logo.svg" alt="GYRO DODGE 3D" class="brand-logo" />
         <div class="brand-meta">
           <h1 class="brand-title">GYRO DODGE</h1>
-          <span class="brand-sub" id="ui-pilot-lvl">LV.1</span>
+          <span class="brand-best" id="ui-best-inline">BEST 0</span>
         </div>
       </div>
 
       <div class="top-telemetry-right">
-        <div class="currency-chip matte-panel" title="Credits">
-          <span class="credit-dot"></span>
-          <span id="ui-credits">2,500</span>
-        </div>
         <button id="btn-lang-toggle" type="button" class="top-btn" aria-label="Language">
           EN
         </button>
-        <button id="btn-audio-toggle" type="button" class="top-btn" aria-label="Audio">
+        <button id="btn-audio-toggle" type="button" class="top-btn icon-only" aria-label="Audio">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
             <path id="audio-wave-path" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
           </svg>
-          <span id="ui-audio-label">ON</span>
         </button>
-        <button id="btn-open-settings" type="button" class="top-btn" aria-label="Settings">
+        <button id="btn-open-settings" type="button" class="top-btn icon-only" aria-label="Settings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -81,60 +76,32 @@
     </header>
 
     <main id="home-view">
-      <!-- 3D Aircraft Showcase -->
+      <!-- Wide-Open Unobstructed 3D Aircraft Showcase -->
       <section id="showcase-drag-area" class="showcase-viewport" aria-label="3D Aircraft Showcase">
-        <div class="pilot-summary-row">
-          <div class="spec-callout matte-panel">
-            <div class="spec-kicker" id="spec-code">VX-01 FALCON</div>
-            <div class="spec-craft-name" id="spec-name">ファルコン迎撃機</div>
-            <div class="spec-bars">
-              <span>SPD</span>
-              <div class="mini-bar-track"><div id="bar-speed" class="mini-bar-fill" style="width:92%"></div></div>
-              <span>TURN</span>
-              <div class="mini-bar-track"><div id="bar-agility" class="mini-bar-fill" style="width:86%"></div></div>
-              <span>HULL</span>
-              <div class="mini-bar-track"><div id="bar-armor" class="mini-bar-fill" style="width:80%"></div></div>
-            </div>
-          </div>
-
-          <div class="best-record-box matte-panel">
-            <div class="record-label" data-i18n="bestRecord">BEST RECORD</div>
-            <div class="record-val" id="ui-best-score">0</div>
-            <div class="record-sub" id="ui-best-dist">0m</div>
-          </div>
+        <div class="craft-caption-pill">
+          <span class="craft-caption-code" id="spec-code">VX-01</span>
+          <span id="spec-name">ファルコン迎撃機</span>
         </div>
       </section>
 
-      <!-- Bottom Launch Controls -->
+      <!-- Spacious, Compact Launch Deck -->
       <section class="home-deck pointer-auto">
-        <div class="config-strip matte-panel">
+        <div class="config-strip">
           <div class="env-seg" role="group">
             <button id="btn-env-outdoor" type="button" data-env="outdoor" class="env-seg-btn active" data-i18n="envOutdoor">空域</button>
             <button id="btn-env-indoor" type="button" data-env="indoor" class="env-seg-btn" data-i18n="envIndoor">回廊</button>
           </div>
           <button id="btn-stage-picker" type="button" class="stage-select-trigger">
             <span id="ui-stage-label" class="stage-trigger-text">CH.1 サンセット・キャニオン</span>
-            <span style="font-size:11px; color:#38bdf8; font-weight:800;" data-i18n="changeBtn">選択 ▾</span>
+            <span style="font-size:10.5px; color:#38bdf8; font-weight:800;">▾</span>
           </button>
         </div>
 
         <div id="diff-bar" class="diff-bar matte-panel" role="group">
-          <button type="button" data-diff="0" class="diff-pill">
-            <span class="diff-pill-name" data-i18n="diff0">かんたん</span>
-            <span class="diff-pill-dist">25,000m</span>
-          </button>
-          <button type="button" data-diff="1" class="diff-pill active">
-            <span class="diff-pill-name" data-i18n="diff1">ふつう</span>
-            <span class="diff-pill-dist">15,000m</span>
-          </button>
-          <button type="button" data-diff="2" class="diff-pill">
-            <span class="diff-pill-name" data-i18n="diff2">むずかしい</span>
-            <span class="diff-pill-dist">8,000m</span>
-          </button>
-          <button type="button" data-diff="3" class="diff-pill">
-            <span class="diff-pill-name" data-i18n="diff3">げきむず</span>
-            <span class="diff-pill-dist">5,000m</span>
-          </button>
+          <button type="button" data-diff="0" class="diff-pill" data-i18n="diff0">かんたん</button>
+          <button type="button" data-diff="1" class="diff-pill active" data-i18n="diff1">ふつう</button>
+          <button type="button" data-diff="2" class="diff-pill" data-i18n="diff2">むずかしい</button>
+          <button type="button" data-diff="3" class="diff-pill" data-i18n="diff3">げきむず</button>
         </div>
 
         <button id="btn-sortie" type="button" class="sortie-cta-btn">
@@ -178,14 +145,11 @@
           </button>
         </nav>
 
-        <!-- Home Bottom Slim Sponsored Slot (Separated safely below buttons) -->
+        <!-- Clean Frameless 320x50 Slot Safely Separated Below Dock -->
         <div id="home-ad-slot" class="ad-slim-slot">
-          <div class="ad-slim-header">SPONSORED</div>
-          <div class="ad-slim-body">
-            <!-- admax -->
-            <script src="https://adm.shinobi.jp/s/232ea9edd775ef7eee19594e2da5102b"></script>
-            <!-- admax -->
-          </div>
+          <!-- admax -->
+          <script src="https://adm.shinobi.jp/s/232ea9edd775ef7eee19594e2da5102b"></script>
+          <!-- admax -->
         </div>
       </section>
     </main>
@@ -257,9 +221,9 @@
         </button>
 
         <div class="boost-btn-wrap">
-          <svg class="boost-ring-svg" viewBox="0 0 92 92">
-            <circle class="boost-ring-bg" cx="46" cy="46" r="42"></circle>
-            <circle id="boost-meter-arc" class="boost-ring-meter" cx="46" cy="46" r="42"></circle>
+          <svg class="boost-ring-svg" viewBox="0 0 82 82">
+            <circle class="boost-ring-bg" cx="41" cy="41" r="38"></circle>
+            <circle id="boost-meter-arc" class="boost-ring-meter" cx="41" cy="41" r="38"></circle>
           </svg>
           <button id="btn-boost-hold" type="button" class="boost-trigger-btn">
             <span class="boost-label-main">BOOST</span>
@@ -270,7 +234,7 @@
     </div>
   </div>
 
-  <!-- Wide-Screen Outer Margin Sponsored Slots (PC/Tablet landscape only, hidden in flight) -->
+  <!-- Wide-Screen Outer Margin Slots (Desktop/Large Tablet only) -->
   <aside id="side-rail-left" class="wide-side-rail left">
     <div class="ad-slim-header">SPONSORED</div>
     <iframe class="ad-iframe" src="ad_slot_b.html" title="Sponsored Left" loading="lazy" scrolling="no"></iframe>
@@ -281,33 +245,42 @@
   </aside>
 
   <!-- =====================================================================
-       MODAL 1: HANGAR
+       MODAL 1: HANGAR (SPECS DISPLAYED HERE CLEANLY)
        ===================================================================== -->
   <div id="modal-hangar" class="modal-layer hangar-mode hidden">
     <div class="dialog-card">
       <div class="dialog-header">
         <div class="dialog-title-group">
           <h2 data-i18n="hangarTitle">格納庫・機体選択</h2>
-          <p data-i18n="hangarSub">3種の機体形状とメタリック塗装を切り替え</p>
+          <p id="ui-hangar-credits">CREDITS: 2,500</p>
         </div>
         <button type="button" data-close-modal="modal-hangar" class="close-circle-btn">✕</button>
       </div>
       <div class="dialog-body">
-        <div>
-          <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-bottom:6px;" data-i18n="airframeLabel">機体モデル</div>
-          <div id="hangar-craft-grid" class="craft-selector-grid"></div>
+        <div class="hangar-specs-bar">
+          <div class="hangar-spec-item">
+            <span>SPEED</span>
+            <div class="mini-bar-track"><div id="bar-speed" class="mini-bar-fill" style="width:92%"></div></div>
+          </div>
+          <div class="hangar-spec-item">
+            <span>TURN</span>
+            <div class="mini-bar-track"><div id="bar-agility" class="mini-bar-fill" style="width:86%"></div></div>
+          </div>
+          <div class="hangar-spec-item">
+            <span>ARMOR</span>
+            <div class="mini-bar-track"><div id="bar-armor" class="mini-bar-fill" style="width:80%"></div></div>
+          </div>
         </div>
-        <div>
-          <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-bottom:6px;" data-i18n="paintLabel">機体カラー</div>
-          <div id="hangar-livery-row" class="livery-swatch-row"></div>
-        </div>
-        <button type="button" data-close-modal="modal-hangar" class="btn-action-amber" data-i18n="confirmCraftBtn">この機体にする</button>
+
+        <div id="hangar-craft-grid" class="craft-selector-grid"></div>
+        <div id="hangar-livery-row" class="livery-swatch-row"></div>
+
+        <button type="button" data-close-modal="modal-hangar" class="btn-action-amber" data-i18n="confirmCraftBtn">この機体で決定</button>
 
         <div id="hangar-ad-slot" class="ad-slim-slot">
-          <div class="ad-slim-header">SPONSORED</div>
-          <div class="ad-slim-body">
-            <iframe class="ad-iframe" src="ad_slot_b.html" title="Sponsored Hangar" loading="lazy" scrolling="no"></iframe>
-          </div>
+          <!-- admax -->
+          <script src="https://adm.shinobi.jp/s/6deabf2adba66b7bba510d1b374de414"></script>
+          <!-- admax -->
         </div>
       </div>
     </div>
@@ -328,7 +301,6 @@
       <div class="dialog-body">
         <div id="chapter-list-grid" class="chapter-grid"></div>
 
-        <!-- Exact 300x250 Rectangle at bottom of Stage Scroll -->
         <div class="ad-rect-slot">
           <div class="ad-slim-header">SPONSORED</div>
           <div class="ad-rect-body">
@@ -346,7 +318,7 @@
     <div class="dialog-card wide">
       <div class="dialog-header">
         <div class="dialog-title-group">
-          <h2 data-i18n="multiTitle">通信対戦・モニター・スマホリモコン</h2>
+          <h2 data-i18n="multiTitle">通信対戦・モニター・リモコン</h2>
           <p data-i18n="multiSub">4桁コードで友達やBOTとリアルタイム対戦</p>
         </div>
         <button type="button" data-close-modal="modal-multi" class="close-circle-btn">✕</button>
@@ -426,8 +398,8 @@
             </div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-              <button id="btn-remote-boost" type="button" class="btn-action-amber" style="padding:16px 10px;">BOOST</button>
-              <button id="btn-remote-attack" type="button" class="btn-action-slate" style="padding:16px 10px;">
+              <button id="btn-remote-boost" type="button" class="btn-action-amber" style="padding:15px 10px;">BOOST</button>
+              <button id="btn-remote-attack" type="button" class="btn-action-slate" style="padding:15px 10px;">
                 ITEM: <span id="remote-item-label">---</span>
               </button>
             </div>
@@ -435,7 +407,6 @@
           </div>
         </div>
 
-        <!-- Exact 300x250 Rectangle inside Lobby Scroll -->
         <div class="ad-rect-slot">
           <div class="ad-slim-header">SPONSORED</div>
           <div class="ad-rect-body">
@@ -454,7 +425,7 @@
       <div class="dialog-header">
         <div class="dialog-title-group">
           <h2 data-i18n="settingsTitle">設定・センサー調整</h2>
-          <p data-i18n="settingsSub">言語切替・ジャイロ調整・収録ボイスの確認</p>
+          <p data-i18n="settingsSub">言語切替・ジャイロ調整・収録ボイスの試聴</p>
         </div>
         <button type="button" data-close-modal="modal-settings" class="close-circle-btn">✕</button>
       </div>
@@ -467,7 +438,7 @@
         <div class="setting-row">
           <div>
             <div style="font-weight:800; font-size:13px;" data-i18n="gyroSettingLabel">ジャイロセンサー</div>
-            <div style="font-size:11px; color:#94a3b8;" data-i18n="gyroSettingSub">傾き権限の許可と現在角度のリセット</div>
+            <div style="font-size:11px; color:#94a3b8;" data-i18n="gyroSettingSub">傾き権限の許可と水平角度のリセット</div>
           </div>
           <div style="display:flex; gap:6px;">
             <button id="btn-settings-gyro" type="button" class="btn-secondary-sm" data-i18n="allowGyroBtn">ジャイロ許可</button>
@@ -475,28 +446,25 @@
           </div>
         </div>
 
-        <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-top:2px;" data-i18n="voiceListLabel">収録ボイス試聴（7種）</div>
-        <div id="voice-test-list" style="display:grid; grid-template-columns:1fr 1fr; gap:7px;"></div>
+        <div style="font-size:11px; font-weight:800; color:#94a3b8;" data-i18n="voiceListLabel">収録ボイス試聴（7種）</div>
+        <div id="voice-test-list" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"></div>
 
         <div id="settings-ad-slot" class="ad-slim-slot">
-          <div class="ad-slim-header">SPONSORED</div>
-          <div class="ad-slim-body">
-            <iframe class="ad-iframe" src="ad_slot_a.html" title="Sponsored Settings" loading="lazy" scrolling="no"></iframe>
-          </div>
+          <iframe class="ad-iframe" src="ad_slot_a.html" title="Sponsored Settings" loading="lazy" scrolling="no"></iframe>
         </div>
       </div>
     </div>
   </div>
 
   <!-- =====================================================================
-       MODAL 5: RESULT SCREEN (BUTTONS ABOVE, EXACT 300x250 RECTANGLE BELOW)
+       MODAL 5: RESULT SCREEN (SINGLE CLEAN 300x250 RECTANGLE, UNCLUTTERED)
        ===================================================================== -->
   <div id="modal-result" class="modal-layer modal-offscreen">
     <div class="dialog-card">
       <div class="dialog-header">
         <div class="dialog-title-group">
           <div id="res-kicker" style="font-size:10.5px; font-weight:800; color:#38bdf8;">RESULT</div>
-          <h2 id="res-title" style="font-size:20px; margin-top:2px;">フライト終了</h2>
+          <h2 id="res-title" style="font-size:19px; margin-top:2px;">フライト終了</h2>
         </div>
       </div>
       <div class="dialog-body">
@@ -515,10 +483,9 @@
           </div>
         </div>
 
-        <div id="res-bonus" style="font-size:12px; color:#cbd5e1; text-align:center; font-weight:700;"></div>
+        <div id="res-bonus" style="font-size:11.5px; color:#cbd5e1; text-align:center; font-weight:700;"></div>
         <div id="res-ranking" class="hidden" style="display:flex; flex-direction:column; gap:6px;"></div>
 
-        <!-- Primary Action Buttons Placed Safely ABOVE Ads (Never Hidden!) -->
         <div style="display:grid; grid-template-columns:1fr 2fr; gap:8px;">
           <button id="btn-res-home" type="button" class="btn-action-slate" data-i18n="backHomeBtn">ホームへ</button>
           <button id="btn-res-retry" type="button" class="btn-action-amber" data-i18n="retryBtn">もう一度出撃</button>
@@ -535,16 +502,6 @@
           <div class="ad-rect-body">
             <!-- admax -->
             <script src="https://adm.shinobi.jp/s/87fa901da9b109d36175d5520669b54a"></script>
-            <!-- admax -->
-          </div>
-        </div>
-
-        <!-- Secondary 320x50 Banner Slot at Bottom of Result Scroll -->
-        <div id="result-ad-slot" class="ad-slim-slot">
-          <div class="ad-slim-header">SPONSORED</div>
-          <div class="ad-slim-body">
-            <!-- admax -->
-            <script src="https://adm.shinobi.jp/s/6deabf2adba66b7bba510d1b374de414"></script>
             <!-- admax -->
           </div>
         </div>
