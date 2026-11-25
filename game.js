@@ -72,10 +72,10 @@
       voiceListLabel: "収録ボイス試聴（7種）",
       backHomeBtn: "ホームへ",
       retryBtn: "もう一度出撃",
-      shareXBtn: "Xでスコア投稿",
-      shareUrlBtn: "招待URLをコピー",
-      stageClearTitle: "目標達成・ステージクリア！",
-      gameOverTitle: "機体大破・フライト終了",
+      shareXBtn: "X投稿",
+      shareUrlBtn: "URL",
+      stageClearTitle: "ステージクリア！",
+      gameOverTitle: "フライト終了",
       ringBonusMsg: "リング通過！",
       nearMissMsg: "ニアミス回避！",
       shieldHitMsg: "シールド被弾！",
@@ -139,10 +139,10 @@
       voiceListLabel: "VOICE SAMPLES (7 CLIPS)",
       backHomeBtn: "HOME",
       retryBtn: "PLAY AGAIN",
-      shareXBtn: "SHARE ON X",
-      shareUrlBtn: "COPY LINK",
-      stageClearTitle: "TARGET REACHED - STAGE CLEAR!",
-      gameOverTitle: "AIRCRAFT DESTROYED",
+      shareXBtn: "POST X",
+      shareUrlBtn: "LINK",
+      stageClearTitle: "STAGE CLEAR!",
+      gameOverTitle: "FLIGHT ENDED",
       ringBonusMsg: "RING BONUS!",
       nearMissMsg: "NEAR MISS!",
       shieldHitMsg: "SHIELD HIT!",
@@ -1099,9 +1099,9 @@
   }
 
   // =========================================================================
-  // 9. DYNAMIC EXTERNAL AD OVERLAY GUARD (BUTTONS NEVER COVERED!)
+  // 9. DYNAMIC EXTERNAL AD OVERLAY GUARD (DETECTS NESTED FIXED OVERLAYS TOO!)
   // =========================================================================
-  const KNOWN_BODY_IDS = new Set([
+  const OWN_FIXED_IDS = new Set([
     "game-canvas", "screen-fx", "voice-banner-container", "blind-overlay",
     "body-preview-wrap", "home-shell", "flight-hud", "side-rail-left", "side-rail-right",
     "modal-hangar", "modal-stages", "modal-multi", "modal-settings", "modal-result"
@@ -1109,24 +1109,78 @@
 
   function syncExternalAdProtection() {
     let bottomOverlayH = 0;
-    Array.from(document.body.children).forEach((el) => {
-      if (el.tagName === "SCRIPT" || KNOWN_BODY_IDS.has(el.id)) return;
+    let topOverlayH = 0;
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+
+    // 1) Scan all elements so nested position:fixed Shinobi AdMax overlays are always caught
+    const allNodes = document.body.querySelectorAll("*");
+    for (let i = 0; i < allNodes.length; i++) {
+      const el = allNodes[i];
+      if (el.tagName === "SCRIPT" || el.tagName === "STYLE" || OWN_FIXED_IDS.has(el.id)) continue;
+
       if (isPlaying) {
-        el.classList.add("admax-ext-hidden");
-      } else {
+        if (el.dataset.admaxFixed === "1") {
+          el.classList.add("admax-ext-hidden");
+        } else if (!el.classList.contains("admax-ext-hidden") && window.getComputedStyle(el).position === "fixed") {
+          el.dataset.admaxFixed = "1";
+          el.classList.add("admax-ext-hidden");
+        }
+        continue;
+      }
+
+      if (el.classList.contains("admax-ext-hidden")) {
         el.classList.remove("admax-ext-hidden");
-        const st = window.getComputedStyle(el);
-        if (st.position === "fixed" && st.display !== "none") {
-          const rect = el.getBoundingClientRect();
-          if (rect.height > 10 && rect.height < 160 && rect.bottom >= window.innerHeight - 24) {
-            bottomOverlayH = Math.max(bottomOverlayH, rect.height + 6);
+      }
+
+      const st = window.getComputedStyle(el);
+      if (st.position === "fixed" && st.display !== "none" && st.visibility !== "hidden") {
+        el.dataset.admaxFixed = "1";
+        const rect = el.getBoundingClientRect();
+        if (rect.width >= 120 && rect.height >= 18 && rect.height <= 240) {
+          if (rect.bottom >= vh - 56 && rect.top > vh * 0.45) {
+            bottomOverlayH = Math.max(bottomOverlayH, Math.ceil(vh - rect.top) + 8);
+          } else if (rect.top <= 48 && rect.bottom < vh * 0.45) {
+            topOverlayH = Math.max(topOverlayH, Math.ceil(rect.bottom) + 8);
           }
         }
       }
-    });
+    }
+
+    // 2) Collapse inline slim slots if the ad script rendered as a fixed overlay instead of inline 320x50
+    if (!isPlaying && performance.now() > 1600) {
+      ["home-ad-slot", "hangar-ad-slot"].forEach((slotId) => {
+        const slot = document.getElementById(slotId);
+        if (!slot) return;
+        let hasInlineCreative = false;
+        const kids = slot.querySelectorAll("iframe, img, ins, a, div");
+        for (let j = 0; j < kids.length; j++) {
+          const k = kids[j];
+          const kst = window.getComputedStyle(k);
+          if (kst.position === "fixed" || kst.display === "none") continue;
+          const kr = k.getBoundingClientRect();
+          if (kr.height >= 24 && kr.width >= 120) {
+            hasInlineCreative = true;
+            break;
+          }
+        }
+        slot.classList.toggle("collapsed", !hasInlineCreative);
+      });
+    }
+
     document.documentElement.style.setProperty("--ad-bottom-safe", `${bottomOverlayH}px`);
+    document.documentElement.style.setProperty("--ad-top-safe", `${topOverlayH}px`);
   }
-  setInterval(syncExternalAdProtection, 900);
+
+  let adGuardTimer = null;
+  const adObserver = new MutationObserver(() => {
+    if (adGuardTimer) return;
+    adGuardTimer = setTimeout(() => {
+      adGuardTimer = null;
+      syncExternalAdProtection();
+    }, 180);
+  });
+  adObserver.observe(document.body, { childList: true, subtree: true });
+  setInterval(syncExternalAdProtection, 800);
 
   // =========================================================================
   // 10. INPUT HANDLERS (STICK, GYRO, TOUCH DRAG, CAMERA, KEYBOARD)
@@ -1994,9 +2048,9 @@
       showcaseAnchor.rotation.z = Math.cos(t * 1.05) * 0.065;
       animateAircraftDetails(showcaseCraft, 1.05, t, dt);
 
-      const radius = hangarOpen ? 5.6 : 6.8;
+      const radius = hangarOpen ? 5.9 : 7.3;
       const targetCamX = showcaseAnchor.position.x + Math.sin(orbitYaw) * Math.cos(orbitPitch) * radius;
-      const targetCamY = showcaseAnchor.position.y + Math.sin(orbitPitch) * radius + (hangarOpen ? 0.6 : 0.9);
+      const targetCamY = showcaseAnchor.position.y + Math.sin(orbitPitch) * radius + (hangarOpen ? 0.65 : 0.95);
       const targetCamZ = showcaseAnchor.position.z + Math.cos(orbitYaw) * Math.cos(orbitPitch) * radius;
 
       camera.position.x += (targetCamX - camera.position.x) * Math.min(1, dt * 6);

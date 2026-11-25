@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=5" />
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -457,46 +457,46 @@
   </div>
 
   <!-- =====================================================================
-       MODAL 5: RESULT SCREEN (SINGLE CLEAN 300x250 RECTANGLE, UNCLUTTERED)
+       MODAL 5: RESULT SCREEN (AIRY, UNCLUTTERED, SINGLE 300x250 SLOT)
        ===================================================================== -->
   <div id="modal-result" class="modal-layer modal-offscreen">
-    <div class="dialog-card">
-      <div class="dialog-header">
+    <div class="dialog-card result-card">
+      <div class="result-top-bar">
         <div class="dialog-title-group">
-          <div id="res-kicker" style="font-size:10.5px; font-weight:800; color:#38bdf8;">RESULT</div>
-          <h2 id="res-title" style="font-size:19px; margin-top:2px;">フライト終了</h2>
+          <div id="res-kicker" class="result-kicker">RESULT</div>
+          <h2 id="res-title" class="result-main-title">フライト終了</h2>
+        </div>
+        <div class="result-share-pills">
+          <button id="btn-share-x" type="button" class="btn-mini-pill" data-i18n="shareXBtn">X投稿</button>
+          <button id="btn-share-copy" type="button" class="btn-mini-pill" data-i18n="shareUrlBtn">URL</button>
         </div>
       </div>
-      <div class="dialog-body">
-        <div class="result-stats-grid">
-          <div class="result-stat-box">
+
+      <div class="dialog-body result-body">
+        <div class="result-summary-strip">
+          <div class="result-metric-col">
             <div class="result-stat-label">SCORE</div>
             <div id="res-score" class="result-stat-val" style="color:#fbbf24;">0</div>
           </div>
-          <div class="result-stat-box">
+          <div class="result-metric-col">
             <div class="result-stat-label">DISTANCE</div>
             <div id="res-dist" class="result-stat-val">0m</div>
           </div>
-          <div class="result-stat-box">
+          <div class="result-metric-col">
             <div class="result-stat-label">CREDITS</div>
             <div id="res-credits" class="result-stat-val" style="color:#38bdf8;">+0</div>
           </div>
         </div>
 
-        <div id="res-bonus" style="font-size:11.5px; color:#cbd5e1; text-align:center; font-weight:700;"></div>
+        <div id="res-bonus" class="result-bonus-line"></div>
         <div id="res-ranking" class="hidden" style="display:flex; flex-direction:column; gap:6px;"></div>
 
-        <div style="display:grid; grid-template-columns:1fr 2fr; gap:8px;">
+        <div class="result-action-row">
           <button id="btn-res-home" type="button" class="btn-action-slate" data-i18n="backHomeBtn">ホームへ</button>
           <button id="btn-res-retry" type="button" class="btn-action-amber" data-i18n="retryBtn">もう一度出撃</button>
         </div>
 
-        <div class="share-row">
-          <button id="btn-share-x" type="button" class="btn-share" data-i18n="shareXBtn">Xでスコア投稿</button>
-          <button id="btn-share-copy" type="button" class="btn-share" data-i18n="shareUrlBtn">招待URLをコピー</button>
-        </div>
-
-        <!-- Dedicated Pixel-Exact 300x250 Medium Rectangle Slot -->
+        <!-- Dedicated Pixel-Exact 300x250 Medium Rectangle Slot with Clean Breathing Room -->
         <div id="result-rect-ad" class="ad-rect-slot">
           <div class="ad-slim-header">SPONSORED</div>
           <div class="ad-rect-body">
@@ -509,8 +509,8 @@
     </div>
   </div>
 
-  <script src="voices.js"></script>
-  <script src="models3d.js"></script>
-  <script src="game.js"></script>
+  <script src="voices.js?v=5"></script>
+  <script src="models3d.js?v=5"></script>
+  <script src="game.js?v=5"></script>
 </body>
 </html>

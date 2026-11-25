@@ -1,11 +1,11 @@
-const CACHE_NAME = "gyro-dodge-3d-aero-v4";
+const CACHE_NAME = "gyro-dodge-3d-aero-v5";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./style.css",
-  "./voices.js",
-  "./models3d.js",
-  "./game.js",
+  "./style.css?v=5",
+  "./voices.js?v=5",
+  "./models3d.js?v=5",
+  "./game.js?v=5",
   "./manifest.webmanifest",
   "./logo.svg",
   "./icons/icon-192.png",
@@ -39,23 +39,21 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// Network-First so newly deployed UI updates on GitHub Pages appear immediately on first reload!
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const reqUrl = event.request.url;
   if (reqUrl.includes("shinobi.jp") || reqUrl.includes("peerjs") || reqUrl.includes("ad_slot_")) return;
 
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const fetchPromise = fetch(event.request)
-        .then((networkRes) => {
-          if (networkRes && networkRes.status === 200) {
-            const copy = networkRes.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-          }
-          return networkRes;
-        })
-        .catch(() => cached);
-      return cached || fetchPromise;
-    })
+    fetch(event.request)
+      .then((networkRes) => {
+        if (networkRes && networkRes.status === 200) {
+          const copy = networkRes.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        }
+        return networkRes;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
