@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>GYRO DODGE 3D — リアル3D超音速フライト＆回避アクション</title>
-  <meta name="description" content="精巧な3D航空機モデルとPBRライティングで描くリアル3Dジャイロ回避＆マルチ対戦スマホゲーム。全12章の空域・巨大回廊ステージ収録・インストール不要。" />
-  <meta property="og:title" content="GYRO DODGE 3D — リアル3D超音速フライト＆マルチ対戦" />
-  <meta property="og:description" content="スマホのジャイロ傾き＆スティックで超音速フライト！4桁コードで友達とリアルタイム対戦も遊べる無料3Dブラウザゲーム。" />
+  <title>GYRO DODGE 3D</title>
+  <meta name="description" content="リアルな3D航空機で渓谷や巨大回廊を駆け抜けるジャイロ回避フライトゲーム。全12章・通信対戦対応。" />
+  <meta property="og:title" content="GYRO DODGE 3D" />
+  <meta property="og:description" content="スマホの傾き＆スティックで操縦するリアル3Dフライト回避ゲーム。4桁コード対戦対応。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="icons/icon-512.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="theme-color" content="#070d17" />
+  <meta name="theme-color" content="#08101c" />
   <link rel="icon" type="image/svg+xml" href="logo.svg" />
   <link rel="manifest" href="manifest.webmanifest" />
 
@@ -24,153 +24,163 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
-  <!-- 3D WebGL Canvas -->
   <canvas id="game-canvas"></canvas>
   <div id="screen-fx"></div>
-
-  <!-- Navigator Voice Callout Toast -->
   <div id="voice-banner-container"></div>
 
-  <!-- Chaff / Smoke Attack Blindness Overlay -->
+  <!-- Smoke Attack Overlay -->
   <div id="blind-overlay">
     <div class="blind-alert-card">
-      <div class="blind-alert-tag">WARNING // ECM CHAFF</div>
-      <div class="blind-alert-title">チャフ煙幕・視界妨害中</div>
-      <div class="blind-alert-sub">計器とジャイロ感覚で回避を維持してください</div>
+      <div class="blind-alert-title" data-i18n="smokeTitle">スモーク妨害中</div>
+      <div class="blind-alert-sub" data-i18n="smokeSub">計器を見ながら回避を続けてください</div>
     </div>
   </div>
 
-  <!-- Body Motion Camera PiP -->
+  <!-- Camera Motion Preview -->
   <div id="body-preview-wrap" class="hidden">
     <video id="body-video" playsinline autoplay muted></video>
     <canvas id="body-canvas" width="160" height="120"></canvas>
-    <div class="pip-badge">MOTION CAM</div>
+    <div class="pip-badge" data-i18n="camBadge">カメラ操縦</div>
   </div>
 
   <!-- =====================================================================
-       HOME & HANGAR SHELL
+       HOME SCREEN
        ===================================================================== -->
   <div id="home-shell" class="ui-shell">
     <header class="top-bar pointer-auto">
-      <div class="brand-pill glass-panel">
+      <div class="brand-pill matte-panel">
         <img src="logo.svg" alt="GYRO DODGE 3D" class="brand-logo" />
         <div class="brand-meta">
-          <h1 class="brand-title">GYRO DODGE 3D</h1>
-          <span class="brand-sub" id="ui-pilot-lvl">PILOT LV.1</span>
+          <h1 class="brand-title">GYRO DODGE</h1>
+          <span class="brand-sub" id="ui-pilot-lvl">LV.1</span>
         </div>
       </div>
 
       <div class="top-telemetry-right">
-        <div class="currency-chip glass-panel" title="獲得クレジット">
+        <div class="currency-chip matte-panel" title="Credits">
           <span class="credit-dot"></span>
           <span id="ui-credits">2,500</span>
         </div>
-        <button id="btn-audio-toggle" type="button" class="icon-pill-btn" aria-label="サウンド切替">
-          音・ボイス ON
+        <button id="btn-lang-toggle" type="button" class="top-btn" aria-label="Language">
+          EN
         </button>
-        <button id="btn-open-settings" type="button" class="icon-pill-btn" aria-label="設定とボイス試聴">
-          設定
+        <button id="btn-audio-toggle" type="button" class="top-btn" aria-label="Audio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path id="audio-wave-path" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+          <span id="ui-audio-label">ON</span>
+        </button>
+        <button id="btn-open-settings" type="button" class="top-btn" aria-label="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
         </button>
       </div>
     </header>
 
     <main id="home-view">
-      <!-- Interactive 3D Showcase Area -->
-      <section id="showcase-drag-area" class="showcase-viewport" aria-label="3D機体プレビュー領域">
+      <!-- 3D Aircraft Showcase -->
+      <section id="showcase-drag-area" class="showcase-viewport" aria-label="3D Aircraft Showcase">
         <div class="pilot-summary-row">
-          <div class="spec-callout glass-panel">
-            <div class="spec-kicker" id="spec-code">VX-01 // INTERCEPTOR</div>
+          <div class="spec-callout matte-panel">
+            <div class="spec-kicker" id="spec-code">VX-01 FALCON</div>
             <div class="spec-craft-name" id="spec-name">ファルコン迎撃機</div>
             <div class="spec-bars">
-              <span>SPEED</span>
+              <span>SPD</span>
               <div class="mini-bar-track"><div id="bar-speed" class="mini-bar-fill" style="width:92%"></div></div>
-              <span>AGILITY</span>
+              <span>TURN</span>
               <div class="mini-bar-track"><div id="bar-agility" class="mini-bar-fill" style="width:86%"></div></div>
-              <span>ARMOR</span>
+              <span>HULL</span>
               <div class="mini-bar-track"><div id="bar-armor" class="mini-bar-fill" style="width:80%"></div></div>
             </div>
           </div>
 
-          <div class="best-record-box glass-panel">
-            <div class="record-label">BEST RECORD</div>
+          <div class="best-record-box matte-panel">
+            <div class="record-label" data-i18n="bestRecord">BEST RECORD</div>
             <div class="record-val" id="ui-best-score">0</div>
-            <div class="record-sub" id="ui-best-dist">MAX 0m</div>
+            <div class="record-sub" id="ui-best-dist">0m</div>
           </div>
         </div>
-
-        <div class="orbit-hint">ドラッグで機体を360°回転プレビュー</div>
       </section>
 
-      <!-- Ergonomic Mobile Launch Deck -->
+      <!-- Bottom Launch Controls -->
       <section class="home-deck pointer-auto">
-        <div class="config-strip glass-panel">
-          <div class="env-seg" role="group" aria-label="フィールド切替">
-            <button id="btn-env-outdoor" type="button" data-env="outdoor" class="env-seg-btn active">空域</button>
-            <button id="btn-env-indoor" type="button" data-env="indoor" class="env-seg-btn">回廊</button>
+        <div class="config-strip matte-panel">
+          <div class="env-seg" role="group">
+            <button id="btn-env-outdoor" type="button" data-env="outdoor" class="env-seg-btn active" data-i18n="envOutdoor">空域</button>
+            <button id="btn-env-indoor" type="button" data-env="indoor" class="env-seg-btn" data-i18n="envIndoor">回廊</button>
           </div>
           <button id="btn-stage-picker" type="button" class="stage-select-trigger">
             <span id="ui-stage-label" class="stage-trigger-text">CH.1 サンセット・キャニオン</span>
-            <span style="font-size:11px; color:#38bdf8; font-weight:800;">変更 ▾</span>
+            <span style="font-size:11px; color:#38bdf8; font-weight:800;" data-i18n="changeBtn">選択 ▾</span>
           </button>
         </div>
 
-        <div id="diff-bar" class="diff-bar glass-panel" role="group" aria-label="難易度選択">
-          <button type="button" data-diff="0" class="diff-pill">EASY</button>
-          <button type="button" data-diff="1" class="diff-pill active">NORMAL</button>
-          <button type="button" data-diff="2" class="diff-pill">HARD</button>
-          <button type="button" data-diff="3" class="diff-pill">EXTREME</button>
+        <div id="diff-bar" class="diff-bar matte-panel" role="group">
+          <button type="button" data-diff="0" class="diff-pill">
+            <span class="diff-pill-name" data-i18n="diff0">かんたん</span>
+            <span class="diff-pill-dist">25,000m</span>
+          </button>
+          <button type="button" data-diff="1" class="diff-pill active">
+            <span class="diff-pill-name" data-i18n="diff1">ふつう</span>
+            <span class="diff-pill-dist">15,000m</span>
+          </button>
+          <button type="button" data-diff="2" class="diff-pill">
+            <span class="diff-pill-name" data-i18n="diff2">むずかしい</span>
+            <span class="diff-pill-dist">8,000m</span>
+          </button>
+          <button type="button" data-diff="3" class="diff-pill">
+            <span class="diff-pill-name" data-i18n="diff3">げきむず</span>
+            <span class="diff-pill-dist">5,000m</span>
+          </button>
         </div>
 
         <button id="btn-sortie" type="button" class="sortie-cta-btn">
-          <span class="sortie-main-text">SORTIE // 出撃スタート</span>
-          <span class="sortie-sub-badge" id="sortie-mode-badge">GYRO + STICK</span>
+          <span class="sortie-main-text" data-i18n="sortieBtn">出撃スタート</span>
+          <span class="sortie-goal-text" id="ui-sortie-goal">目標 15,000m</span>
         </button>
 
-        <nav class="dock-grid" aria-label="メインメニュー">
-          <button id="btn-dock-hangar" type="button" class="dock-btn" data-highlight="amber">
-            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L8 10l-6 4 6 2 2 6 2-6 6-2-6-4-4-8z"/>
+        <nav class="dock-grid">
+          <button id="btn-dock-hangar" type="button" class="dock-btn">
+            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L9 9l-7 3 7 2 3 8 3-8 7-2-7-3-3-7z"/>
             </svg>
-            <span class="dock-label">格納庫</span>
-            <span class="dock-sub">3機体・塗装</span>
+            <span class="dock-label" data-i18n="dockHangar">格納庫</span>
           </button>
 
           <button id="btn-dock-stages" type="button" class="dock-btn">
-            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 3 6"/>
               <line x1="9" y1="3" x2="9" y2="18"/>
               <line x1="15" y1="6" x2="15" y2="21"/>
             </svg>
-            <span class="dock-label">ステージ</span>
-            <span class="dock-sub">全12章選択</span>
+            <span class="dock-label" data-i18n="dockStages">ステージ</span>
           </button>
 
           <button id="btn-dock-body" type="button" class="dock-btn">
-            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
               <circle cx="12" cy="13" r="4"/>
             </svg>
-            <span class="dock-label">体操作</span>
-            <span class="dock-sub">カメラ検知</span>
+            <span class="dock-label" data-i18n="dockBody">体操作</span>
           </button>
 
           <button id="btn-dock-multi" type="button" class="dock-btn">
-            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
               <circle cx="9" cy="7" r="4"/>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
-            <span class="dock-label">マルチ対戦</span>
-            <span class="dock-sub">通信・リモコン</span>
+            <span class="dock-label" data-i18n="dockMulti">通信対戦</span>
           </button>
         </nav>
 
-        <!-- Unobtrusive Home Footer Sponsored Slot -->
+        <!-- Home Bottom Slim Sponsored Slot (Separated safely below buttons) -->
         <div id="home-ad-slot" class="ad-slim-slot">
-          <div class="ad-slim-header">
-            <span>SPONSORED</span>
-          </div>
+          <div class="ad-slim-header">SPONSORED</div>
           <div class="ad-slim-body">
             <!-- admax -->
             <script src="https://adm.shinobi.jp/s/232ea9edd775ef7eee19594e2da5102b"></script>
@@ -187,13 +197,13 @@
   <div id="flight-hud" class="hidden">
     <div class="hud-top-row">
       <div class="hud-cluster-left">
-        <div class="hud-score-card glass-panel">
+        <div class="hud-score-card matte-panel">
           <div class="hud-metric">
             <span class="hud-metric-label">SCORE</span>
             <span id="hud-score" class="hud-metric-val amber">0</span>
           </div>
           <div class="hud-metric">
-            <span class="hud-metric-label">DISTANCE</span>
+            <span class="hud-metric-label">DIST</span>
             <span id="hud-dist" class="hud-metric-val">0m</span>
           </div>
           <div class="hud-metric">
@@ -206,52 +216,50 @@
           </div>
         </div>
 
-        <div class="hull-bar-wrap glass-panel">
-          <span class="hull-label">SHIELD</span>
+        <div class="hull-bar-wrap matte-panel">
+          <span class="hull-label" data-i18n="shieldLabel">SHIELD</span>
           <div id="hud-hull-segs" class="hull-segments"></div>
         </div>
       </div>
 
-      <div class="hud-center-telemetry glass-panel">
-        <span id="hud-stage-title" class="stage-progress-title">CH.1 サンセット・キャニオン</span>
+      <div class="hud-center-telemetry matte-panel">
+        <span id="hud-stage-title" class="stage-progress-title">CH.1</span>
         <div class="stage-progress-track">
           <div id="hud-stage-fill" class="stage-progress-fill"></div>
         </div>
       </div>
 
       <div class="hud-cluster-right pointer-auto">
-        <button id="btn-hud-zero" type="button" class="icon-pill-btn">水平リセット</button>
-        <button id="btn-hud-pause" type="button" class="icon-pill-btn">帰還</button>
+        <button id="btn-hud-zero" type="button" class="top-btn" data-i18n="resetGyroBtn">水平リセット</button>
+        <button id="btn-hud-pause" type="button" class="top-btn" data-i18n="abortBtn">帰還</button>
       </div>
     </div>
 
     <div class="hud-center-feed">
       <div id="hud-event-text"></div>
-      <div id="hud-combo-pill" class="hidden">NEAR MISS x1</div>
+      <div id="hud-combo-pill" class="hidden"></div>
     </div>
 
     <div id="hud-bottom-controls" class="hud-bottom-controls">
-      <!-- Left Thumb Virtual Analog Stick -->
-      <div id="stick-zone" class="stick-zone" aria-label="操縦スティック">
+      <div id="stick-zone" class="stick-zone" aria-label="Control Stick">
         <div class="stick-crosshair"></div>
         <div id="stick-nub" class="stick-nub"></div>
       </div>
 
-      <div id="hud-speed-kmh" class="hud-speed-readout glass-panel">
-        MACH 1.2 // 1,420 km/h
+      <div id="hud-speed-kmh" class="hud-speed-readout matte-panel">
+        1,200 km/h
       </div>
 
-      <!-- Right Thumb Tactical Item + Afterburner Boost -->
       <div class="action-pad-right">
         <button id="btn-tactical-item" type="button" class="tactical-item-btn">
-          <span class="tactical-item-title">WEAPON</span>
-          <span id="hud-item-name" class="tactical-item-name">未装備</span>
+          <span class="tactical-item-title">ITEM</span>
+          <span id="hud-item-name" class="tactical-item-name" data-i18n="noItem">なし</span>
         </button>
 
         <div class="boost-btn-wrap">
-          <svg class="boost-ring-svg" viewBox="0 0 96 96">
-            <circle class="boost-ring-bg" cx="48" cy="48" r="44"></circle>
-            <circle id="boost-meter-arc" class="boost-ring-meter" cx="48" cy="48" r="44"></circle>
+          <svg class="boost-ring-svg" viewBox="0 0 92 92">
+            <circle class="boost-ring-bg" cx="46" cy="46" r="42"></circle>
+            <circle id="boost-meter-arc" class="boost-ring-meter" cx="46" cy="46" r="42"></circle>
           </svg>
           <button id="btn-boost-hold" type="button" class="boost-trigger-btn">
             <span class="boost-label-main">BOOST</span>
@@ -262,43 +270,43 @@
     </div>
   </div>
 
-  <!-- Wide-Screen Outer Margin Sponsored Slots (PC/Tablet only, hidden in flight) -->
-  <aside id="side-rail-left" class="wide-side-rail left" aria-label="スポンサー枠左">
-    <div class="ad-slim-header"><span>SPONSORED</span></div>
-    <iframe class="ad-iframe" src="ad_slot_a.html" title="Sponsored Left" loading="lazy" scrolling="no"></iframe>
+  <!-- Wide-Screen Outer Margin Sponsored Slots (PC/Tablet landscape only, hidden in flight) -->
+  <aside id="side-rail-left" class="wide-side-rail left">
+    <div class="ad-slim-header">SPONSORED</div>
+    <iframe class="ad-iframe" src="ad_slot_b.html" title="Sponsored Left" loading="lazy" scrolling="no"></iframe>
   </aside>
-  <aside id="side-rail-right" class="wide-side-rail right" aria-label="スポンサー枠右">
-    <div class="ad-slim-header"><span>SPONSORED</span></div>
-    <iframe class="ad-iframe" src="ad_slot_b.html" title="Sponsored Right" loading="lazy" scrolling="no"></iframe>
+  <aside id="side-rail-right" class="wide-side-rail right">
+    <div class="ad-slim-header">SPONSORED</div>
+    <iframe class="ad-iframe-rect" src="ad_slot_rect.html" title="Sponsored 300x250 Right" loading="lazy" scrolling="no"></iframe>
   </aside>
 
   <!-- =====================================================================
-       MODAL 1: 3D HANGAR (AIRCRAFT MODEL & METALLIC LIVERY)
+       MODAL 1: HANGAR
        ===================================================================== -->
   <div id="modal-hangar" class="modal-layer hangar-mode hidden">
     <div class="dialog-card">
       <div class="dialog-header">
         <div class="dialog-title-group">
-          <h2>格納庫 — 機体＆メタリック塗装</h2>
-          <p>リアルタイム3DモデルとPBR塗装を選択</p>
+          <h2 data-i18n="hangarTitle">格納庫・機体選択</h2>
+          <p data-i18n="hangarSub">3種の機体形状とメタリック塗装を切り替え</p>
         </div>
         <button type="button" data-close-modal="modal-hangar" class="close-circle-btn">✕</button>
       </div>
       <div class="dialog-body">
         <div>
-          <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-bottom:7px;">機体フレーム（3機種）</div>
+          <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-bottom:6px;" data-i18n="airframeLabel">機体モデル</div>
           <div id="hangar-craft-grid" class="craft-selector-grid"></div>
         </div>
         <div>
-          <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-bottom:7px;">メタリック塗装（5カラー）</div>
+          <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-bottom:6px;" data-i18n="paintLabel">機体カラー</div>
           <div id="hangar-livery-row" class="livery-swatch-row"></div>
         </div>
-        <button type="button" data-close-modal="modal-hangar" class="btn-action-amber">この機体で決定</button>
+        <button type="button" data-close-modal="modal-hangar" class="btn-action-amber" data-i18n="confirmCraftBtn">この機体にする</button>
 
         <div id="hangar-ad-slot" class="ad-slim-slot">
-          <div class="ad-slim-header"><span>SPONSORED</span></div>
+          <div class="ad-slim-header">SPONSORED</div>
           <div class="ad-slim-body">
-            <iframe class="ad-iframe" src="ad_slot_a.html" title="Sponsored Hangar" loading="lazy" scrolling="no"></iframe>
+            <iframe class="ad-iframe" src="ad_slot_b.html" title="Sponsored Hangar" loading="lazy" scrolling="no"></iframe>
           </div>
         </div>
       </div>
@@ -312,25 +320,19 @@
     <div class="dialog-card wide">
       <div class="dialog-header">
         <div class="dialog-title-group">
-          <h2>ミッション空域・回廊選択（全12章）</h2>
-          <p>オープン空域と巨大建築回廊のどちらでも出撃可能</p>
+          <h2 data-i18n="stagesTitle">ステージ選択（全12章）</h2>
+          <p data-i18n="stagesSub">空域または巨大建築回廊を選んで出撃</p>
         </div>
         <button type="button" data-close-modal="modal-stages" class="close-circle-btn">✕</button>
       </div>
       <div class="dialog-body">
-        <div id="stages-ad-top" class="ad-slim-slot" style="margin-top:0;">
-          <div class="ad-slim-header"><span>SPONSORED</span></div>
-          <div class="ad-slim-body">
-            <iframe class="ad-iframe" src="ad_slot_b.html" title="Sponsored Stages Top" loading="lazy" scrolling="no"></iframe>
-          </div>
-        </div>
-
         <div id="chapter-list-grid" class="chapter-grid"></div>
 
-        <div id="stages-ad-bottom" class="ad-slim-slot">
-          <div class="ad-slim-header"><span>SPONSORED</span></div>
-          <div class="ad-slim-body">
-            <iframe class="ad-iframe" src="ad_slot_a.html" title="Sponsored Stages Bottom" loading="lazy" scrolling="no"></iframe>
+        <!-- Exact 300x250 Rectangle at bottom of Stage Scroll -->
+        <div class="ad-rect-slot">
+          <div class="ad-slim-header">SPONSORED</div>
+          <div class="ad-rect-body">
+            <iframe class="ad-iframe-rect" src="ad_slot_rect.html" title="Sponsored Stages 300x250" loading="lazy" scrolling="no"></iframe>
           </div>
         </div>
       </div>
@@ -344,26 +346,25 @@
     <div class="dialog-card wide">
       <div class="dialog-header">
         <div class="dialog-title-group">
-          <h2>マルチ対戦・大型モニター・スマホリモコン</h2>
-          <p>4桁ルームコードで友だちやBOTとリアルタイム空中戦</p>
+          <h2 data-i18n="multiTitle">通信対戦・モニター・スマホリモコン</h2>
+          <p data-i18n="multiSub">4桁コードで友達やBOTとリアルタイム対戦</p>
         </div>
         <button type="button" data-close-modal="modal-multi" class="close-circle-btn">✕</button>
       </div>
       <div class="dialog-body">
         <div class="tab-strip">
-          <button type="button" data-mp-tab="online" class="tab-btn active">オンライン対戦</button>
-          <button type="button" data-mp-tab="monitor" class="tab-btn">モニター画面</button>
-          <button type="button" data-mp-tab="remote" class="tab-btn">スマホリモコン</button>
+          <button type="button" data-mp-tab="online" class="tab-btn active" data-i18n="tabOnline">オンライン対戦</button>
+          <button type="button" data-mp-tab="monitor" class="tab-btn" data-i18n="tabMonitor">モニター画面</button>
+          <button type="button" data-mp-tab="remote" class="tab-btn" data-i18n="tabRemote">スマホリモコン</button>
         </div>
 
-        <!-- Tab A: Online Battle -->
         <div id="mp-panel-online" style="display:flex; flex-direction:column; gap:10px;">
-          <input id="online-name" type="text" maxlength="10" placeholder="パイロット名 (例: ACE-01)" class="aero-input" />
+          <input id="online-name" type="text" maxlength="10" placeholder="PLAYER" class="aero-input" />
           <div id="online-entry-box" style="display:flex; flex-direction:column; gap:8px;">
-            <button id="btn-online-create" type="button" class="btn-action-amber">4桁ルームを作成する</button>
+            <button id="btn-online-create" type="button" class="btn-action-amber" data-i18n="createRoomBtn">4桁ルームを作成する</button>
             <div style="display:flex; gap:8px;">
-              <input id="online-join-code" type="tel" maxlength="4" placeholder="4桁コード" class="aero-input code-lg" style="flex:1; padding:8px;" />
-              <button id="btn-online-join" type="button" class="btn-action-slate" style="padding:0 22px;">参加</button>
+              <input id="online-join-code" type="tel" maxlength="4" placeholder="1234" class="aero-input code-lg" style="flex:1; padding:8px;" />
+              <button id="btn-online-join" type="button" class="btn-action-slate" style="padding:0 20px;" data-i18n="joinBtn">参加</button>
             </div>
           </div>
 
@@ -371,55 +372,52 @@
             <div class="setting-row">
               <div>
                 <div style="font-size:10px; color:#94a3b8; font-weight:800;">ROOM CODE</div>
-                <div id="online-room-code" style="font-size:26px; font-weight:900; color:#fbbf24; letter-spacing:0.2em;">----</div>
+                <div id="online-room-code" style="font-size:24px; font-weight:900; color:#fbbf24; letter-spacing:0.18em;">----</div>
               </div>
-              <button id="btn-online-add-bot" type="button" class="btn-action-slate">+ ライバルBOT追加</button>
+              <button id="btn-online-add-bot" type="button" class="btn-action-slate">+ BOT</button>
             </div>
             <div id="online-member-list" style="display:flex; flex-direction:column; gap:6px;"></div>
-            <button id="btn-online-start" type="button" class="btn-action-amber">バトル出撃スタート！</button>
+            <button id="btn-online-start" type="button" class="btn-action-amber" data-i18n="startBattleBtn">対戦スタート</button>
           </div>
           <div id="online-status-msg" style="font-size:12px; color:#38bdf8; font-weight:700; min-height:18px;"></div>
         </div>
 
-        <!-- Tab B: Monitor Host (Up to 10 Players + QR) -->
         <div id="mp-panel-monitor" class="hidden" style="display:flex; flex-direction:column; gap:12px;">
           <div class="setting-row" style="flex-wrap:wrap;">
             <div>
-              <div style="font-size:10px; color:#38bdf8; font-weight:800;">MAIN MONITOR HOST (最大10機)</div>
-              <div style="font-size:22px; font-weight:900;">コード: <span id="host-code" style="color:#fbbf24; letter-spacing:0.18em;">----</span></div>
-              <div style="font-size:11px; color:#94a3b8; margin-top:2px;">スマホの「スマホリモコン」タブから4桁コードで接続</div>
+              <div style="font-size:10px; color:#38bdf8; font-weight:800;">MONITOR HOST (MAX 10)</div>
+              <div style="font-size:21px; font-weight:900;">CODE: <span id="host-code" style="color:#fbbf24; letter-spacing:0.16em;">----</span></div>
             </div>
-            <div id="host-qrcode" style="background:#ffffff; padding:6px; border-radius:10px;"></div>
+            <div id="host-qrcode" style="background:#ffffff; padding:6px; border-radius:8px;"></div>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:12px; font-weight:800;">エントリー機体 (<span id="host-count">0</span>/10)</span>
+            <span style="font-size:12px; font-weight:800;">PLAYERS (<span id="host-count">0</span>/10)</span>
             <div style="display:flex; gap:6px;">
-              <button id="btn-host-add-bot" type="button" class="btn-action-slate">+ BOT追加</button>
-              <button id="btn-host-clear-bot" type="button" class="btn-action-slate">BOTクリア</button>
+              <button id="btn-host-add-bot" type="button" class="btn-action-slate">+ BOT</button>
+              <button id="btn-host-clear-bot" type="button" class="btn-action-slate">CLEAR</button>
             </div>
           </div>
           <div id="host-slots" class="slot-grid-10"></div>
-          <button id="btn-host-start" type="button" class="btn-action-amber">モニター対戦を開始！</button>
+          <button id="btn-host-start" type="button" class="btn-action-amber" data-i18n="startMonitorBtn">モニター対戦を開始</button>
         </div>
 
-        <!-- Tab C: Smartphone Remote Controller -->
         <div id="mp-panel-remote" class="hidden" style="display:flex; flex-direction:column; gap:10px;">
           <div id="remote-login-view" style="display:flex; flex-direction:column; gap:10px;">
             <input id="remote-code-input" type="tel" maxlength="4" placeholder="1234" class="aero-input code-lg" />
-            <input id="remote-name-input" type="text" maxlength="10" placeholder="パイロット名" class="aero-input" />
-            <button id="btn-remote-connect" type="button" class="btn-action-amber">モニターへ接続する</button>
+            <input id="remote-name-input" type="text" maxlength="10" placeholder="PLAYER" class="aero-input" />
+            <button id="btn-remote-connect" type="button" class="btn-action-amber" data-i18n="connectBtn">接続する</button>
             <div id="remote-msg" style="font-size:12px; color:#f87171; font-weight:700; text-align:center;"></div>
           </div>
 
-          <div id="remote-pad-view" class="hidden" style="display:flex; flex-direction:column; gap:12px;">
+          <div id="remote-pad-view" class="hidden" style="display:flex; flex-direction:column; gap:10px;">
             <div class="setting-row">
               <div>
                 <div style="font-size:10px; color:#38bdf8; font-weight:800;">CONNECTED</div>
                 <div id="remote-badge" style="font-size:15px; font-weight:900;">P1</div>
               </div>
               <div style="display:flex; gap:6px;">
-                <button id="btn-remote-gyro" type="button" class="btn-action-slate">ジャイロ許可</button>
-                <button id="btn-remote-zero" type="button" class="btn-action-slate">水平リセット</button>
+                <button id="btn-remote-gyro" type="button" class="btn-action-slate" data-i18n="allowGyroBtn">ジャイロ許可</button>
+                <button id="btn-remote-zero" type="button" class="btn-action-slate" data-i18n="resetGyroBtn">水平リセット</button>
               </div>
             </div>
 
@@ -428,21 +426,20 @@
             </div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-              <button id="btn-remote-boost" type="button" class="btn-action-amber" style="padding:18px 10px;">
-                BOOST<br/><span style="font-size:11px; font-weight:700;">長押し加速</span>
-              </button>
-              <button id="btn-remote-attack" type="button" class="btn-action-slate" style="padding:18px 10px;">
-                WEAPON<br/><span id="remote-item-label" style="font-size:11px; font-weight:700;">未装備</span>
+              <button id="btn-remote-boost" type="button" class="btn-action-amber" style="padding:16px 10px;">BOOST</button>
+              <button id="btn-remote-attack" type="button" class="btn-action-slate" style="padding:16px 10px;">
+                ITEM: <span id="remote-item-label">---</span>
               </button>
             </div>
-            <div id="remote-alert" style="font-size:12px; color:#cbd5e1; text-align:center;">スマホの傾き または 丸パッドで操縦</div>
+            <div id="remote-alert" style="font-size:12px; color:#cbd5e1; text-align:center;"></div>
           </div>
         </div>
 
-        <div id="multi-ad-slot" class="ad-slim-slot">
-          <div class="ad-slim-header"><span>SPONSORED</span></div>
-          <div class="ad-slim-body">
-            <iframe class="ad-iframe" src="ad_slot_b.html" title="Sponsored Lobby" loading="lazy" scrolling="no"></iframe>
+        <!-- Exact 300x250 Rectangle inside Lobby Scroll -->
+        <div class="ad-rect-slot">
+          <div class="ad-slim-header">SPONSORED</div>
+          <div class="ad-rect-body">
+            <iframe class="ad-iframe-rect" src="ad_slot_rect.html" title="Sponsored Multi 300x250" loading="lazy" scrolling="no"></iframe>
           </div>
         </div>
       </div>
@@ -450,34 +447,39 @@
   </div>
 
   <!-- =====================================================================
-       MODAL 4: SETTINGS, GYRO CALIBRATION & 7 VOICES CHECK
+       MODAL 4: SETTINGS & VOICE CHECK
        ===================================================================== -->
   <div id="modal-settings" class="modal-layer hidden">
     <div class="dialog-card">
       <div class="dialog-header">
         <div class="dialog-title-group">
-          <h2>センサー設定・収録ナビボイス</h2>
-          <p>スマホのジャイロ調整と全7種ボイスの試聴</p>
+          <h2 data-i18n="settingsTitle">設定・センサー調整</h2>
+          <p data-i18n="settingsSub">言語切替・ジャイロ調整・収録ボイスの確認</p>
         </div>
         <button type="button" data-close-modal="modal-settings" class="close-circle-btn">✕</button>
       </div>
       <div class="dialog-body">
         <div class="setting-row">
+          <div style="font-weight:800; font-size:13px;" data-i18n="langSettingLabel">表示言語 / Language</div>
+          <button id="btn-settings-lang" type="button" class="btn-secondary-sm">日本語 / English</button>
+        </div>
+
+        <div class="setting-row">
           <div>
-            <div style="font-weight:800; font-size:13px;">ジャイロセンサー（傾き操縦）</div>
-            <div style="font-size:11px; color:#94a3b8;">iOS/Androidの傾き権限取得と現在角度の水平リセット</div>
+            <div style="font-weight:800; font-size:13px;" data-i18n="gyroSettingLabel">ジャイロセンサー</div>
+            <div style="font-size:11px; color:#94a3b8;" data-i18n="gyroSettingSub">傾き権限の許可と現在角度のリセット</div>
           </div>
           <div style="display:flex; gap:6px;">
-            <button id="btn-settings-gyro" type="button" class="btn-secondary-sm">許可</button>
-            <button id="btn-settings-zero" type="button" class="btn-primary-sm">水平リセット</button>
+            <button id="btn-settings-gyro" type="button" class="btn-secondary-sm" data-i18n="allowGyroBtn">ジャイロ許可</button>
+            <button id="btn-settings-zero" type="button" class="btn-primary-sm" data-i18n="resetGyroBtn">水平リセット</button>
           </div>
         </div>
 
-        <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-top:4px;">収録ナビゲーターボイス（全7種）</div>
+        <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-top:2px;" data-i18n="voiceListLabel">収録ボイス試聴（7種）</div>
         <div id="voice-test-list" style="display:grid; grid-template-columns:1fr 1fr; gap:7px;"></div>
 
         <div id="settings-ad-slot" class="ad-slim-slot">
-          <div class="ad-slim-header"><span>SPONSORED</span></div>
+          <div class="ad-slim-header">SPONSORED</div>
           <div class="ad-slim-body">
             <iframe class="ad-iframe" src="ad_slot_a.html" title="Sponsored Settings" loading="lazy" scrolling="no"></iframe>
           </div>
@@ -487,24 +489,17 @@
   </div>
 
   <!-- =====================================================================
-       MODAL 5: FLIGHT RESULT SUMMARY (NO REVIVE ADS)
+       MODAL 5: RESULT SCREEN (BUTTONS ABOVE, EXACT 300x250 RECTANGLE BELOW)
        ===================================================================== -->
   <div id="modal-result" class="modal-layer modal-offscreen">
     <div class="dialog-card">
       <div class="dialog-header">
         <div class="dialog-title-group">
-          <div id="res-kicker" style="font-size:11px; font-weight:800; letter-spacing:0.14em; color:#38bdf8;">FLIGHT TELEMETRY</div>
-          <h2 id="res-title" style="font-size:22px; margin-top:2px;">ミッション終了</h2>
+          <div id="res-kicker" style="font-size:10.5px; font-weight:800; color:#38bdf8;">RESULT</div>
+          <h2 id="res-title" style="font-size:20px; margin-top:2px;">フライト終了</h2>
         </div>
       </div>
       <div class="dialog-body">
-        <div id="result-ad-top" class="ad-slim-slot" style="margin-top:0;">
-          <div class="ad-slim-header"><span>SPONSORED</span></div>
-          <div class="ad-slim-body">
-            <iframe class="ad-iframe" src="ad_slot_a.html" title="Sponsored Result Top" loading="lazy" scrolling="no"></iframe>
-          </div>
-        </div>
-
         <div class="result-stats-grid">
           <div class="result-stat-box">
             <div class="result-stat-label">SCORE</div>
@@ -523,21 +518,30 @@
         <div id="res-bonus" style="font-size:12px; color:#cbd5e1; text-align:center; font-weight:700;"></div>
         <div id="res-ranking" class="hidden" style="display:flex; flex-direction:column; gap:6px;"></div>
 
-        <div style="display:grid; grid-template-columns:1fr 2fr; gap:10px; margin-top:2px;">
-          <button id="btn-res-home" type="button" class="btn-action-slate">格納庫へ</button>
-          <button id="btn-res-retry" type="button" class="btn-action-amber">もう一度出撃</button>
+        <!-- Primary Action Buttons Placed Safely ABOVE Ads (Never Hidden!) -->
+        <div style="display:grid; grid-template-columns:1fr 2fr; gap:8px;">
+          <button id="btn-res-home" type="button" class="btn-action-slate" data-i18n="backHomeBtn">ホームへ</button>
+          <button id="btn-res-retry" type="button" class="btn-action-amber" data-i18n="retryBtn">もう一度出撃</button>
         </div>
 
         <div class="share-row">
-          <button id="btn-share-x" type="button" class="btn-share">Xでスコア投稿</button>
-          <button id="btn-share-copy" type="button" class="btn-share">友達招待URL共有</button>
+          <button id="btn-share-x" type="button" class="btn-share" data-i18n="shareXBtn">Xでスコア投稿</button>
+          <button id="btn-share-copy" type="button" class="btn-share" data-i18n="shareUrlBtn">招待URLをコピー</button>
         </div>
 
-        <!-- Unobtrusive Result Footer Sponsored Slot -->
-        <div id="result-ad-slot" class="ad-slim-slot" style="margin-top:4px;">
-          <div class="ad-slim-header">
-            <span>SPONSORED</span>
+        <!-- Dedicated Pixel-Exact 300x250 Medium Rectangle Slot -->
+        <div id="result-rect-ad" class="ad-rect-slot">
+          <div class="ad-slim-header">SPONSORED</div>
+          <div class="ad-rect-body">
+            <!-- admax -->
+            <script src="https://adm.shinobi.jp/s/87fa901da9b109d36175d5520669b54a"></script>
+            <!-- admax -->
           </div>
+        </div>
+
+        <!-- Secondary 320x50 Banner Slot at Bottom of Result Scroll -->
+        <div id="result-ad-slot" class="ad-slim-slot">
+          <div class="ad-slim-header">SPONSORED</div>
           <div class="ad-slim-body">
             <!-- admax -->
             <script src="https://adm.shinobi.jp/s/6deabf2adba66b7bba510d1b374de414"></script>

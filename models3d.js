@@ -8,7 +8,9 @@
       code: "VX-01",
       name: "FALCON",
       jpName: "ファルコン迎撃機",
+      enName: "VX-01 Falcon",
       role: "超音速デルタ翼ジェット",
+      enRole: "Supersonic Delta Interceptor",
       speedStat: 92,
       agilityStat: 86,
       armorStat: 80
@@ -18,7 +20,9 @@
       code: "GX-07",
       name: "VALKYRIE",
       jpName: "ヴァルキリー試験機",
+      enName: "GX-07 Valkyrie",
       role: "前進翼ジャイロ・ジンバル機",
+      enRole: "Forward-Swept Gyro Fighter",
       speedStat: 86,
       agilityStat: 98,
       armorStat: 76
@@ -28,7 +32,9 @@
       code: "RX-12",
       name: "SPECTER",
       jpName: "スペクター重装機",
+      enName: "RX-12 Specter",
       role: "双胴ステルス制空戦闘機",
+      enRole: "Twin-Boom Stealth Striker",
       speedStat: 96,
       agilityStat: 82,
       armorStat: 94
@@ -36,85 +42,85 @@
   ];
 
   const LIVERY_CATALOG = [
-    { id: "titanium", name: "チタニウム・シルバー", primary: 0xe2e8f0, secondary: 0x334155, accent: 0x0ea5e9, burner: 0x38bdf8 },
-    { id: "navy",     name: "ミッドナイト・ネイビー", primary: 0x1e3a5f, secondary: 0x0f172a, accent: 0xf59e0b, burner: 0x38bdf8 },
-    { id: "crimson",  name: "クリムゾン・エース", primary: 0xb91c1c, secondary: 0x1e293b, accent: 0xfbbf24, burner: 0xfb923c },
-    { id: "desert",   name: "デザート・サンド", primary: 0xd6bfa2, secondary: 0x44403c, accent: 0xea580c, burner: 0x60a5fa },
-    { id: "emerald",  name: "エメラルド・スコードロン", primary: 0x0f766e, secondary: 0x0f172a, accent: 0x34d399, burner: 0x2dd4bf }
+    { id: "titanium", name: "チタニウム・シルバー", enName: "Titanium Silver", primary: 0xe2e8f0, secondary: 0x334155, accent: 0x0ea5e9, burner: 0x38bdf8 },
+    { id: "navy",     name: "ミッドナイト・ネイビー", enName: "Midnight Navy",   primary: 0x1e3a5f, secondary: 0x0f172a, accent: 0xf59e0b, burner: 0x38bdf8 },
+    { id: "crimson",  name: "クリムゾン・エース",     enName: "Crimson Ace",     primary: 0xb91c1c, secondary: 0x1e293b, accent: 0xfbbf24, burner: 0xfb923c },
+    { id: "desert",   name: "デザート・サンド",       enName: "Desert Sand",     primary: 0xd6bfa2, secondary: 0x44403c, accent: 0xea580c, burner: 0x60a5fa },
+    { id: "emerald",  name: "エメラルド・スコードロン", enName: "Emerald Squadron", primary: 0x0f766e, secondary: 0x0f172a, accent: 0x34d399, burner: 0x2dd4bf }
   ];
 
   const CHAPTERS = [
     {
-      chapter: 1, name: "サンセット・キャニオン", tag: "八角格納回廊", shape: "OCTAGON",
+      chapter: 1, name: "サンセット・キャニオン", enName: "Sunset Canyon", tag: "八角格納回廊", enTag: "Octagon Hangar", shape: "OCTAGON",
       skyTop: 0x172554, skyHorizon: 0xf97316, sunColor: 0xfde68a, sunPos: [0.35, 0.22, -1.0],
       fogHex: 0xd97746, waterHex: 0x1e3a5f, cliffHex: 0x8c4a2f, capHex: 0xb45309,
-      corridorBg: 0x1a1412, floorHex: 0x292220, ribHex: 0x57534e, railHex: 0xf97316, lightHex: 0xfdba74, speedMult: 0.92
+      corridorBg: 0x1a1412, floorHex: 0x292220, ribHex: 0x57534e, railHex: 0xf97316, lightHex: 0xfdba74, speedMult: 0.94
     },
     {
-      chapter: 2, name: "エメラルド・フィヨルド", tag: "六角バイオドーム", shape: "HEXAGON",
+      chapter: 2, name: "エメラルド・フィヨルド", enName: "Emerald Fjord", tag: "六角バイオドーム", enTag: "Hex Bio-Dome", shape: "HEXAGON",
       skyTop: 0x0c4a6e, skyHorizon: 0xbae6fd, sunColor: 0xffffff, sunPos: [-0.3, 0.48, -1.0],
       fogHex: 0x93c5fd, waterHex: 0x0369a1, cliffHex: 0x475569, capHex: 0x15803d,
-      corridorBg: 0x0f1f1c, floorHex: 0x1a2e29, ribHex: 0x334155, railHex: 0x10b981, lightHex: 0x6ee7b7, speedMult: 0.96
+      corridorBg: 0x0f1f1c, floorHex: 0x1a2e29, ribHex: 0x334155, railHex: 0x10b981, lightHex: 0x6ee7b7, speedMult: 0.97
     },
     {
-      chapter: 3, name: "サクラ・シュライン", tag: "千本鳥居回廊", shape: "TORII",
+      chapter: 3, name: "サクラ・シュライン", enName: "Sakura Shrine", tag: "千本鳥居回廊", enTag: "Torii Colonnade", shape: "TORII",
       skyTop: 0x1e293b, skyHorizon: 0xfda4af, sunColor: 0xfff1f2, sunPos: [0.0, 0.28, -1.0],
       fogHex: 0xe2a8b4, waterHex: 0x1e3a5f, cliffHex: 0x57534e, capHex: 0xf472b6,
       corridorBg: 0x1c1217, floorHex: 0x2b2126, ribHex: 0xdc2626, railHex: 0xef4444, lightHex: 0xfecdd3, speedMult: 1.00
     },
     {
-      chapter: 4, name: "ゴールデン・デューン", tag: "ピラミッド石室", shape: "TRIANGLE",
+      chapter: 4, name: "ゴールデン・デューン", enName: "Golden Dunes", tag: "ピラミッド石室", enTag: "Pyramid Vault", shape: "TRIANGLE",
       skyTop: 0x1e3a8a, skyHorizon: 0xfde047, sunColor: 0xfef9c3, sunPos: [0.42, 0.36, -1.0],
       fogHex: 0xeab308, waterHex: 0x0c4a6e, cliffHex: 0xa16207, capHex: 0xca8a04,
-      corridorBg: 0x211b0d, floorHex: 0x362c16, ribHex: 0x854d0e, railHex: 0xf59e0b, lightHex: 0xfef08a, speedMult: 1.04
+      corridorBg: 0x211b0d, floorHex: 0x362c16, ribHex: 0x854d0e, railHex: 0xf59e0b, lightHex: 0xfef08a, speedMult: 1.03
     },
     {
-      chapter: 5, name: "クリスタル・グレイシャー", tag: "氷晶クレバス", shape: "DIAMOND",
+      chapter: 5, name: "クリスタル・グレイシャー", enName: "Crystal Glacier", tag: "氷晶クレバス", enTag: "Ice Crevasse", shape: "DIAMOND",
       skyTop: 0x082f49, skyHorizon: 0xe0f2fe, sunColor: 0xffffff, sunPos: [-0.25, 0.4, -1.0],
       fogHex: 0xbae6fd, waterHex: 0x075985, cliffHex: 0x64748b, capHex: 0xf8fafc,
-      corridorBg: 0x081e2e, floorHex: 0x0f2d44, ribHex: 0x38bdf8, railHex: 0x0ea5e9, lightHex: 0xe0f2fe, speedMult: 1.08
+      corridorBg: 0x081e2e, floorHex: 0x0f2d44, ribHex: 0x38bdf8, railHex: 0x0ea5e9, lightHex: 0xe0f2fe, speedMult: 1.06
     },
     {
-      chapter: 6, name: "アルパイン・クラウドシー", tag: "成層圏リング", shape: "CIRCLE",
+      chapter: 6, name: "アルパイン・クラウドシー", enName: "Alpine Cloud Sea", tag: "成層圏リング", enTag: "Stratosphere Ring", shape: "CIRCLE",
       skyTop: 0x0369a1, skyHorizon: 0xf0f9ff, sunColor: 0xfffbeb, sunPos: [0.15, 0.55, -1.0],
       fogHex: 0xcbd5e1, waterHex: 0x0284c7, cliffHex: 0x475569, capHex: 0xf1f5f9,
-      corridorBg: 0x0f172a, floorHex: 0x1e293b, ribHex: 0x94a3b8, railHex: 0xf59e0b, lightHex: 0xbae6fd, speedMult: 1.12
+      corridorBg: 0x0f172a, floorHex: 0x1e293b, ribHex: 0x94a3b8, railHex: 0xf59e0b, lightHex: 0xbae6fd, speedMult: 1.09
     },
     {
-      chapter: 7, name: "エンシェント・モノリス", tag: "古代列柱神殿", shape: "SQUARE",
+      chapter: 7, name: "エンシェント・モノリス", enName: "Ancient Monolith", tag: "古代列柱神殿", enTag: "Stone Temple", shape: "SQUARE",
       skyTop: 0x1c1917, skyHorizon: 0xd6d3d1, sunColor: 0xfef3c7, sunPos: [-0.35, 0.25, -1.0],
       fogHex: 0xa8a29e, waterHex: 0x1e293b, cliffHex: 0x44403c, capHex: 0x57534e,
-      corridorBg: 0x171412, floorHex: 0x292524, ribHex: 0x78716c, railHex: 0xd97706, lightHex: 0xfde68a, speedMult: 1.15
+      corridorBg: 0x171412, floorHex: 0x292524, ribHex: 0x78716c, railHex: 0xd97706, lightHex: 0xfde68a, speedMult: 1.12
     },
     {
-      chapter: 8, name: "アビス・ハイドロチューブ", tag: "海底タービン管", shape: "TURBINE",
+      chapter: 8, name: "アビス・ハイドロチューブ", enName: "Abyss Hydro-Tube", tag: "海底タービン管", enTag: "Subsea Turbine", shape: "TURBINE",
       skyTop: 0x042f2e, skyHorizon: 0x2dd4bf, sunColor: 0x99f6e4, sunPos: [0.0, 0.62, -1.0],
       fogHex: 0x0d9488, waterHex: 0x0f766e, cliffHex: 0x1e293b, capHex: 0x115e59,
-      corridorBg: 0x041f24, floorHex: 0x08333a, ribHex: 0x0e7490, railHex: 0x14b8a6, lightHex: 0x5eead4, speedMult: 1.18
+      corridorBg: 0x041f24, floorHex: 0x08333a, ribHex: 0x0e7490, railHex: 0x14b8a6, lightHex: 0x5eead4, speedMult: 1.15
     },
     {
-      chapter: 9, name: "クロックワーク・フォージ", tag: "巨大歯車機関", shape: "GEAR",
+      chapter: 9, name: "クロックワーク・フォージ", enName: "Clockwork Forge", tag: "巨大歯車機関", enTag: "Giant Gearworks", shape: "GEAR",
       skyTop: 0x271709, skyHorizon: 0xf59e0b, sunColor: 0xfef3c7, sunPos: [0.28, 0.3, -1.0],
       fogHex: 0xb45309, waterHex: 0x1c1917, cliffHex: 0x451a03, capHex: 0x78350f,
-      corridorBg: 0x1a120b, floorHex: 0x291d12, ribHex: 0xb45309, railHex: 0xf59e0b, lightHex: 0xfde68a, speedMult: 1.22
+      corridorBg: 0x1a120b, floorHex: 0x291d12, ribHex: 0xb45309, railHex: 0xf59e0b, lightHex: 0xfde68a, speedMult: 1.18
     },
     {
-      chapter: 10, name: "ナイト・メトロポリス", tag: "湾岸ハイウェイ", shape: "SQUARE",
+      chapter: 10, name: "ナイト・メトロポリス", enName: "Night Metropolis", tag: "湾岸ハイウェイ", enTag: "Bay Expressway", shape: "SQUARE",
       skyTop: 0x020617, skyHorizon: 0x0f172a, sunColor: 0x38bdf8, sunPos: [-0.2, 0.18, -1.0],
       fogHex: 0x0f172a, waterHex: 0x020617, cliffHex: 0x0f172a, capHex: 0x38bdf8, isNight: true,
-      corridorBg: 0x030712, floorHex: 0x0f172a, ribHex: 0x1e293b, railHex: 0x06b6d4, lightHex: 0x38bdf8, speedMult: 1.26
+      corridorBg: 0x030712, floorHex: 0x0f172a, ribHex: 0x1e293b, railHex: 0x06b6d4, lightHex: 0x38bdf8, speedMult: 1.21
     },
     {
-      chapter: 11, name: "カルデラ・ボルケーノ", tag: "地熱溶岩シャフト", shape: "HEXAGON",
+      chapter: 11, name: "カルデラ・ボルケーノ", enName: "Caldera Volcano", tag: "地熱溶岩シャフト", enTag: "Magma Shaft", shape: "HEXAGON",
       skyTop: 0x180808, skyHorizon: 0xdc2626, sunColor: 0xfca5a5, sunPos: [0.1, 0.16, -1.0],
       fogHex: 0x7f1d1d, waterHex: 0x450a0a, cliffHex: 0x1c1917, capHex: 0xea580c, isNight: true,
-      corridorBg: 0x170909, floorHex: 0x261010, ribHex: 0x44403c, railHex: 0xef4444, lightHex: 0xf97316, speedMult: 1.30
+      corridorBg: 0x170909, floorHex: 0x261010, ribHex: 0x44403c, railHex: 0xef4444, lightHex: 0xf97316, speedMult: 1.24
     },
     {
-      chapter: 12, name: "オービタル・スターゲート", tag: "軌道エレベーター", shape: "VOID",
+      chapter: 12, name: "オービタル・スターゲート", enName: "Orbital Stargate", tag: "軌道エレベーター", enTag: "Orbital Ring", shape: "VOID",
       skyTop: 0x01040d, skyHorizon: 0x0c1e3d, sunColor: 0xe0f2fe, sunPos: [0.4, 0.35, -1.0],
       fogHex: 0x071126, waterHex: 0x020617, cliffHex: 0x1e293b, capHex: 0x64748b, isNight: true,
-      corridorBg: 0x020510, floorHex: 0x0b1326, ribHex: 0x334155, railHex: 0x38bdf8, lightHex: 0xfbbf24, speedMult: 1.36
+      corridorBg: 0x020510, floorHex: 0x0b1326, ribHex: 0x334155, railHex: 0x38bdf8, lightHex: 0xfbbf24, speedMult: 1.28
     }
   ];
 
@@ -876,137 +882,269 @@
     return geo;
   }
 
+  const OBSTACLE_TYPES = [
+    "MINE",
+    "BARRIER",
+    "CROSS_BLADE",
+    "BOULDER",
+    "DRONE",
+    "MONOLITH",
+    "SHUTTER",
+    "CRYSTAL_CLUSTER",
+    "RING_TRAP"
+  ];
+
   function createObstacle(type = "MINE", chapterObj = CHAPTERS[0]) {
     const grp = new THREE.Group();
     const hazardTex = getHazardTexture();
     const rockBump = getRockBumpTexture();
     const carbonTex = getCarbonTexture();
+    const panel = getPanelTextures();
 
-    if (type === "BARRIER") {
-      // Industrial Truss Laser / Armor Gate Bar
-      const beamLen = 6.8;
-      const truss = new THREE.Mesh(
-        new THREE.BoxGeometry(beamLen, 0.62, 0.62),
-        new THREE.MeshStandardMaterial({
-          map: hazardTex,
-          metalness: 0.68,
-          roughness: 0.35
+    const darkSteelMat = new THREE.MeshStandardMaterial({
+      color: 0x1e293b,
+      map: carbonTex,
+      metalness: 0.78,
+      roughness: 0.28
+    });
+    const hazardMat = new THREE.MeshStandardMaterial({
+      map: hazardTex,
+      metalness: 0.65,
+      roughness: 0.34
+    });
+    const armorMat = new THREE.MeshStandardMaterial({
+      color: 0x475569,
+      map: panel.map,
+      bumpMap: panel.bump,
+      bumpScale: 0.03,
+      metalness: 0.72,
+      roughness: 0.32
+    });
+    const redPlasmaMat = new THREE.MeshBasicMaterial({
+      color: 0xef4444,
+      transparent: true,
+      opacity: 0.9
+    });
+
+    const makeRedFlare = (scale = 1.7) => {
+      const sp = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: getGlowTexture("#ef4444"),
+          transparent: true,
+          opacity: 0.88,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
         })
       );
+      sp.scale.set(scale, scale, 1);
+      return sp;
+    };
+
+    if (type === "BARRIER") {
+      // 1. Industrial Truss Laser / Armor Gate Bar
+      const beamLen = 7.1;
+      const truss = new THREE.Mesh(new THREE.BoxGeometry(beamLen, 0.64, 0.64), hazardMat);
       truss.castShadow = true;
       grp.add(truss);
 
-      // Twin Plasma Laser Rails above & below truss
-      const laserMat = new THREE.MeshBasicMaterial({
-        color: 0xef4444,
-        transparent: true,
-        opacity: 0.88
-      });
-      [-0.52, 0.52].forEach((ly) => {
-        const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, beamLen, 10), laserMat);
+      [-0.54, 0.54].forEach((ly) => {
+        const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, beamLen, 10), redPlasmaMat);
         beam.rotation.z = Math.PI / 2;
         beam.position.y = ly;
         grp.add(beam);
       });
 
-      // Heavy Generator End-Pods
-      const podMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, map: carbonTex, metalness: 0.75, roughness: 0.28 });
       [-beamLen / 2, beamLen / 2].forEach((px) => {
-        const pod = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 1.45, 14), podMat);
+        const pod = new THREE.Mesh(new THREE.CylinderGeometry(0.56, 0.56, 1.48, 14), darkSteelMat);
         pod.position.x = px;
         grp.add(pod);
-
-        const flare = new THREE.Sprite(
-          new THREE.SpriteMaterial({
-            map: getGlowTexture("#ef4444"),
-            transparent: true,
-            opacity: 0.85,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false
-          })
-        );
-        flare.scale.set(1.6, 1.6, 1);
+        const flare = makeRedFlare(1.65);
         flare.position.set(px, 0, 0.35);
         grp.add(flare);
       });
-      return { mesh: grp, hitShape: "BAR", halfLen: beamLen * 0.5, thickness: 0.95 };
+      return { mesh: grp, hitShape: "BAR", halfLen: beamLen * 0.5, thickness: 1.02 };
+    }
+
+    if (type === "CROSS_BLADE") {
+      // 2. Giant 4-Bladed Rotating Industrial Turbine / Cross Rotor
+      const span = 8.2;
+      const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.9, 16), darkSteelMat);
+      hub.rotation.x = Math.PI / 2;
+      grp.add(hub);
+
+      const hubCore = makeRedFlare(2.1);
+      hubCore.position.z = 0.5;
+      grp.add(hubCore);
+
+      [0, Math.PI / 2].forEach((rot) => {
+        const armGroup = new THREE.Group();
+        armGroup.rotation.z = rot;
+        const blade = new THREE.Mesh(new THREE.BoxGeometry(span, 0.58, 0.32), armorMat);
+        blade.castShadow = true;
+        armGroup.add(blade);
+
+        const edge = new THREE.Mesh(new THREE.BoxGeometry(span * 0.92, 0.14, 0.38), redPlasmaMat);
+        armGroup.add(edge);
+
+        [-span / 2, span / 2].forEach((tx) => {
+          const tip = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.78, 0.5), hazardMat);
+          tip.position.x = tx;
+          armGroup.add(tip);
+        });
+        grp.add(armGroup);
+      });
+
+      return { mesh: grp, hitShape: "CROSS", halfLen: span * 0.5, thickness: 0.92 };
+    }
+
+    if (type === "MONOLITH") {
+      // 3. Tall Vertical Armored Skyscraper / Canyon Steel Pillar
+      const colH = 8.4;
+      const col = new THREE.Mesh(new THREE.BoxGeometry(1.75, colH, 1.65), armorMat);
+      col.castShadow = true;
+      grp.add(col);
+
+      [-2.2, 0, 2.2].forEach((by) => {
+        const band = new THREE.Mesh(new THREE.BoxGeometry(1.86, 0.42, 1.74), hazardMat);
+        band.position.y = by;
+        grp.add(band);
+      });
+
+      [-colH * 0.44, colH * 0.44].forEach((fy) => {
+        const fl = makeRedFlare(1.6);
+        fl.position.set(0, fy, 0.95);
+        grp.add(fl);
+      });
+
+      return { mesh: grp, hitShape: "BOX", halfW: 1.25, halfH: colH * 0.5 };
+    }
+
+    if (type === "SHUTTER") {
+      // 4. Heavy Armored Sliding Blast-Door Bulkhead
+      const w = 4.8, h = 2.5;
+      const plate = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.85), armorMat);
+      plate.castShadow = true;
+      grp.add(plate);
+
+      const frameTop = new THREE.Mesh(new THREE.BoxGeometry(w + 0.2, 0.36, 0.96), hazardMat);
+      frameTop.position.y = h * 0.5 - 0.18;
+      const frameBot = frameTop.clone();
+      frameBot.position.y = -h * 0.5 + 0.18;
+      grp.add(frameTop, frameBot);
+
+      [-w * 0.42, w * 0.42].forEach((lx) => {
+        const fl = makeRedFlare(1.45);
+        fl.position.set(lx, 0, 0.55);
+        grp.add(fl);
+      });
+
+      return { mesh: grp, hitShape: "BOX", halfW: w * 0.5 + 0.35, halfH: h * 0.5 + 0.35 };
+    }
+
+    if (type === "CRYSTAL_CLUSTER") {
+      // 5. Razor-Sharp Metallic / Mineral Spike Cluster
+      const crystalMat = new THREE.MeshStandardMaterial({
+        color: 0x991b1b,
+        emissive: 0x7f1d1d,
+        emissiveIntensity: 0.45,
+        metalness: 0.55,
+        roughness: 0.18
+      });
+      const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.95, 0), darkSteelMat);
+      grp.add(core);
+
+      const dirs = [
+        [1, 0.2, 0], [-1, -0.2, 0], [0.2, 1, 0], [-0.2, -1, 0],
+        [0.65, 0.65, 0.3], [-0.65, 0.65, -0.3], [0.65, -0.65, -0.3], [-0.65, -0.65, 0.3],
+        [0, 0.3, 1], [0, -0.3, -1]
+      ];
+      dirs.forEach(([dx, dy, dz], idx) => {
+        const dir = new THREE.Vector3(dx, dy, dz).normalize();
+        const len = 1.45 + (idx % 3) * 0.32;
+        const spike = new THREE.Mesh(new THREE.ConeGeometry(0.28, len, 6), crystalMat);
+        spike.position.copy(dir).multiplyScalar(len * 0.48);
+        spike.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+        grp.add(spike);
+      });
+
+      grp.add(makeRedFlare(2.4));
+      return { mesh: grp, hitShape: "SPHERE", radius: 1.68 };
+    }
+
+    if (type === "RING_TRAP") {
+      // 6. High-Voltage Electromagnetic Danger Coil Ring (Fly dead-center OR outside!)
+      const outerCoil = new THREE.Mesh(new THREE.TorusGeometry(2.65, 0.38, 12, 32), darkSteelMat);
+      grp.add(outerCoil);
+
+      const plasmaCoil = new THREE.Mesh(new THREE.TorusGeometry(2.65, 0.42, 10, 24), redPlasmaMat);
+      plasmaCoil.scale.set(1, 1, 0.45);
+      grp.add(plasmaCoil);
+
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2;
+        const lug = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.65, 0.8), hazardMat);
+        lug.position.set(Math.cos(a) * 2.65, Math.sin(a) * 2.65, 0);
+        lug.rotation.z = a;
+        grp.add(lug);
+      }
+
+      return { mesh: grp, hitShape: "RING_TRAP", innerSafeR: 1.55, outerHitR: 3.35 };
     }
 
     if (type === "BOULDER") {
-      const rockGeo = createDisplacedRockGeo(1.52, 2, Math.random() * 10);
+      // 7. Craggy Asteroid / Canyon Boulder with Varied Geological Proportions
+      const rockGeo = createDisplacedRockGeo(1.62, 2, Math.random() * 12);
       const rockMat = new THREE.MeshStandardMaterial({
         color: chapterObj.cliffHex || 0x64748b,
         bumpMap: rockBump,
-        bumpScale: 0.14,
+        bumpScale: 0.16,
         roughness: 0.82,
         metalness: 0.12
       });
       const rock = new THREE.Mesh(rockGeo, rockMat);
+      rock.scale.set(0.9 + Math.random() * 0.45, 0.9 + Math.random() * 0.45, 0.95);
       rock.castShadow = true;
       rock.receiveShadow = true;
       grp.add(rock);
-      return { mesh: grp, hitShape: "SPHERE", radius: 1.45 };
+      return { mesh: grp, hitShape: "SPHERE", radius: 1.62 };
     }
 
     if (type === "DRONE") {
-      // Autonomous Security Interceptor Drone
-      const shellMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, map: carbonTex, metalness: 0.78, roughness: 0.24 });
-      const core = new THREE.Mesh(new THREE.SphereGeometry(0.78, 18, 14), shellMat);
-      core.scale.set(1.35, 0.72, 1.1);
+      // 8. Autonomous Patrol Interceptor Drone
+      const core = new THREE.Mesh(new THREE.SphereGeometry(0.82, 18, 14), darkSteelMat);
+      core.scale.set(1.38, 0.74, 1.12);
       grp.add(core);
 
-      const wings = new THREE.Mesh(new THREE.BoxGeometry(3.1, 0.1, 0.68), shellMat);
+      const wings = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.12, 0.72), armorMat);
       grp.add(wings);
 
-      [-1.52, 1.52].forEach((wx) => {
-        const pod = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.88, 10), shellMat);
+      [-1.6, 1.6].forEach((wx) => {
+        const pod = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.24, 0.92, 10), hazardMat);
         pod.rotation.x = Math.PI / 2;
         pod.position.set(wx, 0, 0);
         grp.add(pod);
       });
 
-      const visor = new THREE.Mesh(
-        new THREE.BoxGeometry(0.85, 0.16, 0.2),
-        new THREE.MeshBasicMaterial({ color: 0xef4444 })
-      );
-      visor.position.set(0, 0.05, 0.78);
+      const visor = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 0.22), redPlasmaMat);
+      visor.position.set(0, 0.05, 0.8);
       grp.add(visor);
 
-      const eyeGlow = new THREE.Sprite(
-        new THREE.SpriteMaterial({
-          map: getGlowTexture("#ef4444"),
-          transparent: true,
-          opacity: 0.9,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false
-        })
-      );
-      eyeGlow.scale.set(1.8, 1.1, 1);
-      eyeGlow.position.set(0, 0.05, 0.9);
+      const eyeGlow = makeRedFlare(1.85);
+      eyeGlow.position.set(0, 0.05, 0.92);
       grp.add(eyeGlow);
 
-      return { mesh: grp, hitShape: "SPHERE", radius: 1.42 };
+      return { mesh: grp, hitShape: "SPHERE", radius: 1.52 };
     }
 
-    // Default: Armored Aerial Proximity Mine
-    const mineMat = new THREE.MeshStandardMaterial({
-      color: 0x1f2937,
-      map: carbonTex,
-      metalness: 0.75,
-      roughness: 0.32
-    });
-    const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.02, 20, 16), mineMat);
+    // 9. Default: Armored Aerial Proximity Mine
+    const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.06, 20, 16), darkSteelMat);
     sphere.castShadow = true;
     grp.add(sphere);
 
-    const eqBand = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.06, 1.06, 0.26, 20),
-      new THREE.MeshStandardMaterial({ map: hazardTex, metalness: 0.6, roughness: 0.35 })
-    );
+    const eqBand = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 0.28, 20), hazardMat);
     grp.add(eqBand);
 
-    // 14 Metallic Contact Horns
-    const hornGeo = new THREE.ConeGeometry(0.13, 0.56, 8);
+    const hornGeo = new THREE.ConeGeometry(0.14, 0.6, 8);
     const hornDirs = [
       [1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1],
       [0.7, 0.7, 0], [-0.7, 0.7, 0], [0.7, -0.7, 0], [-0.7, -0.7, 0],
@@ -1014,69 +1152,71 @@
     ];
     hornDirs.forEach(([dx, dy, dz]) => {
       const dir = new THREE.Vector3(dx, dy, dz).normalize();
-      const horn = new THREE.Mesh(hornGeo, mineMat);
-      horn.position.copy(dir).multiplyScalar(1.12);
+      const horn = new THREE.Mesh(hornGeo, darkSteelMat);
+      horn.position.copy(dir).multiplyScalar(1.16);
       horn.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
       grp.add(horn);
     });
 
-    const beacon = new THREE.Sprite(
-      new THREE.SpriteMaterial({
-        map: getGlowTexture("#ef4444"),
-        transparent: true,
-        opacity: 0.9,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      })
-    );
-    beacon.scale.set(2.3, 2.3, 1);
-    grp.add(beacon);
-
-    return { mesh: grp, hitShape: "SPHERE", radius: 1.35, beacon };
+    grp.add(makeRedFlare(2.35));
+    return { mesh: grp, hitShape: "SPHERE", radius: 1.44 };
   }
 
   function createEnergyRing(accentHex = 0xfbbf24) {
     const grp = new THREE.Group();
     const frameMat = new THREE.MeshStandardMaterial({
       color: 0x334155,
-      metalness: 0.82,
-      roughness: 0.22
+      metalness: 0.85,
+      roughness: 0.2
     });
-    const outerTorus = new THREE.Mesh(new THREE.TorusGeometry(1.75, 0.11, 12, 36), frameMat);
+    const outerTorus = new THREE.Mesh(new THREE.TorusGeometry(2.05, 0.13, 12, 40), frameMat);
     grp.add(outerTorus);
 
     const innerGlowMat = new THREE.MeshStandardMaterial({
       color: accentHex,
       emissive: accentHex,
-      emissiveIntensity: 0.85,
-      metalness: 0.4,
-      roughness: 0.15
+      emissiveIntensity: 1.0,
+      metalness: 0.35,
+      roughness: 0.12
     });
-    const innerRing = new THREE.Mesh(new THREE.TorusGeometry(1.56, 0.065, 10, 32), innerGlowMat);
+    const innerRing = new THREE.Mesh(new THREE.TorusGeometry(1.82, 0.08, 10, 36), innerGlowMat);
     grp.add(innerRing);
 
     // 4 Capacitor Clamp Housings
     for (let i = 0; i < 4; i++) {
       const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
-      const clamp = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.36, 0.32), frameMat);
-      clamp.position.set(Math.cos(a) * 1.72, Math.sin(a) * 1.72, 0);
+      const clamp = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.42, 0.36), frameMat);
+      clamp.position.set(Math.cos(a) * 2.02, Math.sin(a) * 2.02, 0);
       clamp.rotation.z = a;
       grp.add(clamp);
     }
 
     // Translucent energy field shimmer
     const field = new THREE.Mesh(
-      new THREE.CircleGeometry(1.52, 28),
+      new THREE.CircleGeometry(1.78, 32),
       new THREE.MeshBasicMaterial({
         color: accentHex,
         transparent: true,
-        opacity: 0.14,
+        opacity: 0.18,
         blending: THREE.AdditiveBlending,
         side: THREE.DoubleSide,
         depthWrite: false
       })
     );
     grp.add(field);
+
+    const hexStr = "#" + new THREE.Color(accentHex).getHexString();
+    const halo = new THREE.Sprite(
+      new THREE.SpriteMaterial({
+        map: getGlowTexture(hexStr),
+        transparent: true,
+        opacity: 0.42,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      })
+    );
+    halo.scale.set(5.4, 5.4, 1);
+    grp.add(halo);
 
     return { mesh: grp, innerRing };
   }
@@ -1234,7 +1374,7 @@
       chunk.position.z = 18 - i * spacing;
 
       [-1, 1].forEach((side) => {
-        const xBase = side * (17.5 + (i % 3) * 3.2);
+        const xBase = side * (26.5 + (i % 3) * 4.2);
         const hScale = 1.15 + ((i * 7 + (side > 0 ? 3 : 1)) % 5) * 0.32;
         const rockGeo = createDisplacedRockGeo(6.4, 2, i * 1.7 + side);
         const massif = new THREE.Mesh(rockGeo, cliffMat);
@@ -1254,12 +1394,12 @@
       // Every 4th chunk: High-altitude Steel Arch Sky-Bridge spanning high above!
       if (i % 4 === 2) {
         const arch = new THREE.Group();
-        const deck = new THREE.Mesh(new THREE.BoxGeometry(44, 0.55, 2.2), bridgeMat);
-        deck.position.y = 10.6;
+        const deck = new THREE.Mesh(new THREE.BoxGeometry(62, 0.55, 2.2), bridgeMat);
+        deck.position.y = 11.2;
         arch.add(deck);
 
-        const archRing = new THREE.Mesh(new THREE.TorusGeometry(19, 0.42, 8, 24, Math.PI), bridgeMat);
-        archRing.position.y = -4.5;
+        const archRing = new THREE.Mesh(new THREE.TorusGeometry(26, 0.42, 8, 24, Math.PI), bridgeMat);
+        archRing.position.y = -5.5;
         arch.add(archRing);
         chunk.add(arch);
       }
@@ -1460,6 +1600,7 @@
     CRAFT_CATALOG,
     LIVERY_CATALOG,
     CHAPTERS,
+    OBSTACLE_TYPES,
     getGlowTexture,
     buildEnvironmentMap,
     createAircraft,
