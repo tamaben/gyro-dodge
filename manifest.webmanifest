@@ -1,13 +1,13 @@
 {
-  "name": "GYRO DODGE",
+  "name": "GYRO DODGE 3D",
   "short_name": "GYRO DODGE",
-  "description": "画面の向きに自動追従するジャイロ＆方角コンパスと全12マップ・全126コレクションで遊ぶ3D次元回避アクション＆バトルゲーム",
+  "description": "精巧な3D航空機モデルとPBRライティングで描くリアル3Dジャイロ回避＆マルチ対戦ゲーム（全12章・収録ナビボイス搭載）",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#FFF7ED",
-  "theme_color": "#FFF7ED",
+  "background_color": "#070d17",
+  "theme_color": "#070d17",
   "icons": [
     {
       "src": "./icons/icon-192.png",
