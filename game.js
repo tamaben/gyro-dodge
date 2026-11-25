@@ -35,6 +35,9 @@
       diff2: "むずかしい",
       diff3: "げきむず",
       sortieBtn: "出撃スタート",
+      endlessBtn: "エンドレス飛行",
+      endlessSub: "ステージ・難易度は不明 / 終わりなし",
+      endlessZone: "ゾーン変化！",
       goalPrefix: "目標 ",
       dockHangar: "格納庫",
       dockStages: "ステージ",
@@ -102,6 +105,9 @@
       diff2: "HARD",
       diff3: "EXTREME",
       sortieBtn: "LAUNCH",
+      endlessBtn: "ENDLESS FLIGHT",
+      endlessSub: "Unknown stage & difficulty / No finish line",
+      endlessZone: "ZONE SHIFT!",
       goalPrefix: "GOAL ",
       dockHangar: "HANGAR",
       dockStages: "STAGES",
@@ -182,6 +188,12 @@
     const raw = localStorage.getItem(SAVE_KEY);
     if (raw) Object.assign(saveData, JSON.parse(raw));
   } catch (e) {}
+  // v6: score is now the ring count — reset legacy point-based records once.
+  if (saveData.scoreSystem !== "rings") {
+    saveData.bestScore = 0;
+    saveData.bestDist = Math.min(saveData.bestDist || 0, 10000);
+    saveData.scoreSystem = "rings";
+  }
 
   function persistSave() {
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(saveData)); } catch (e) {}
@@ -193,12 +205,12 @@
   }
 
   // =========================================================================
-  // 3. DIFFICULTY & DISTANCE CONFIGURATION (25,000m / 15,000m / 8,000m / 5,000m)
+  // 3. DIFFICULTY & DISTANCE CONFIGURATION (10,000m MAX / 7,000m / 4,500m / 3,000m) — distance never exceeds goal
   // =========================================================================
   const DIFFICULTIES = [
     {
       id: "EASY",
-      goalDist: 25000,
+      goalDist: 10000,
       speed: 35,
       maxExtraSpeed: 16,
       spawnBase: 0.96,
@@ -210,7 +222,7 @@
     },
     {
       id: "NORMAL",
-      goalDist: 15000,
+      goalDist: 7000,
       speed: 42,
       maxExtraSpeed: 21,
       spawnBase: 0.78,
@@ -222,7 +234,7 @@
     },
     {
       id: "HARD",
-      goalDist: 8000,
+      goalDist: 4500,
       speed: 50,
       maxExtraSpeed: 25,
       spawnBase: 0.64,
@@ -234,7 +246,7 @@
     },
     {
       id: "EXTREME",
-      goalDist: 5000,
+      goalDist: 3000,
       speed: 58,
       maxExtraSpeed: 30,
       spawnBase: 0.52,
@@ -531,6 +543,7 @@
       corridorWorld.railMat.emissive.setHex(ch.railHex);
       corridorWorld.lightStripMat.color.setHex(ch.lightHex);
       corridorWorld.rebuildShape(ch.shape);
+      spMat.color.setHex(0xffffff);
     } else {
       scene.background = null;
       scene.fog = new THREE.FogExp2(ch.fogHex, 0.0058);
@@ -549,6 +562,9 @@
       outdoorWorld.water.material.color.setHex(ch.waterHex);
       outdoorWorld.cliffMat.color.setHex(ch.cliffHex);
       outdoorWorld.capMat.color.setHex(ch.capHex);
+      // Rebuild stage-specific scenery (desert pyramids, city, sakura, glacier, space...)
+      if (typeof outdoorWorld.rebuildBiome === "function") outdoorWorld.rebuildBiome(ch);
+      if (ch.weatherHex !== undefined) spMat.color.setHex(ch.weatherHex);
     }
 
     syncAllUI();
@@ -578,6 +594,12 @@
   let cameraShake = 0;
   let eventBannerTimer = 0;
   let waveCounter = 0;
+  // Endless mode: random hidden stage/difficulty, no goal, zones shift every ENDLESS_ZONE_M metres
+  let endless = false;
+  let lastRunEndless = false;
+  let endlessBackup = null;
+  let nextZoneDist = 0;
+  const ENDLESS_ZONE_M = 1800;
 
   let players = [];
   let obstacles = [];
@@ -738,15 +760,19 @@
 
     function tryPlaceSingleObstacle(type, ox, oy, allowMotion = true) {
       const built = createObstacle(type, ch);
-      const angleZ = (type === "BARRIER" || type === "CROSS_BLADE") ? Math.random() * Math.PI : 0;
+      const angleZ = (type === "BARRIER" || type === "CROSS_BLADE" || type === "TORII_GATE")
+        ? (type === "TORII_GATE" ? (Math.random() - 0.5) * 0.9 : Math.random() * Math.PI)
+        : 0;
       let rotSpeedZ = 0;
       if (type === "CROSS_BLADE") rotSpeedZ = (Math.random() < 0.5 ? 1 : -1) * (1.05 + Math.random() * 0.7);
       else if (type === "BARRIER" && allowMotion && Math.random() < 0.55) {
         rotSpeedZ = (Math.random() < 0.5 ? 1 : -1) * (0.75 + Math.random() * 0.65);
+      } else if (type === "TORII_GATE" && allowMotion && ch.stars >= 3 && Math.random() < 0.4) {
+        rotSpeedZ = (Math.random() < 0.5 ? 1 : -1) * (0.45 + Math.random() * 0.4);
       }
 
       let moveAmpX = 0, moveFreq = 0, movePhase = Math.random() * Math.PI * 2;
-      if (allowMotion && (type === "DRONE" || type === "SHUTTER") && Math.random() < 0.65) {
+      if (allowMotion && (type === "DRONE" || type === "SHUTTER" || type === "DEPTH_TORPEDO" || type === "SAND_PILLAR") && Math.random() < 0.65) {
         moveAmpX = 1.8 + Math.random() * 1.6;
         moveFreq = 1.6 + Math.random() * 0.9;
       }
@@ -780,8 +806,9 @@
         moveAmpX,
         moveFreq,
         movePhase,
-        spinX: (type === "BOULDER" || type === "CRYSTAL_CLUSTER") ? (Math.random() - 0.5) * 2.0 : 0,
-        spinY: (type === "MINE" || type === "BOULDER" || type === "CRYSTAL_CLUSTER") ? (Math.random() - 0.5) * 2.2 : 0,
+        spinX: (type === "BOULDER" || type === "CRYSTAL_CLUSTER" || type === "MAGMA_METEOR" || type === "ICE_SPIRE") ? (Math.random() - 0.5) * 2.0 : 0,
+        spinY: (type === "MINE" || type === "BOULDER" || type === "CRYSTAL_CLUSTER" || type === "MAGMA_METEOR" || type === "DEPTH_TORPEDO") ? (Math.random() - 0.5) * 2.2 : 0,
+        spinZ: (type === "STEAM_GEAR") ? (Math.random() < 0.5 ? 1 : -1) * (1.2 + Math.random() * 0.8) : 0,
         passed: new Set()
       });
       return true;
@@ -789,7 +816,9 @@
 
     // Step 2: Direct Anti-Camp / Anti-Corner Blocker right on player's current (curX, curY)!
     // Even if player sits at (-6.4, -3.3) extreme corner, this spawns dead-on (-6.4, -3.3)!
-    const directPool = ["MINE", "BOULDER", "CRYSTAL_CLUSTER", "DRONE", "SHUTTER"];
+    // Stage-specific blockers (each world has its own obstacle set)
+    const directPool = (ch.directPool && ch.directPool.length) ? ch.directPool : ["MINE", "BOULDER", "CRYSTAL_CLUSTER", "DRONE", "SHUTTER"];
+    const stagePool = (ch.obsPool && ch.obsPool.length) ? ch.obsPool : OBSTACLE_TYPES;
     const directType = directPool[(waveCounter + Math.floor(Math.random() * directPool.length)) % directPool.length];
     const jitter = (focus && focus.campTime > 0.45) ? 0.0 : 0.22;
     const lockX = Math.max(-BOUND_X, Math.min(BOUND_X, curX + (Math.random() - 0.5) * jitter));
@@ -800,7 +829,8 @@
 
     // Step 3: Additional Random Diverse Shapes + Deliberate Edge/Corner Sweepers
     const progress = Math.min(1.3, distance / diff.goalDist);
-    const targetExtra = Math.round(diff.minObs - 1 + progress * (diff.maxObs - diff.minObs + 0.6));
+    const density = ch.hazardDensity || 1.0;
+    const targetExtra = Math.max(1, Math.round((diff.minObs - 1 + progress * (diff.maxObs - diff.minObs + 0.6)) * density));
 
     const corners = [
       [-BOUND_X + 0.2, BOUND_Y_MAX - 0.2],
@@ -812,7 +842,10 @@
     let placedExtra = 0;
     for (let slot = 0; slot < targetExtra; slot++) {
       for (let tries = 0; tries < 10; tries++) {
-        const randType = OBSTACLE_TYPES[Math.floor(Math.random() * OBSTACLE_TYPES.length)];
+        // Mostly stage-themed obstacles, with an occasional generic one for variety
+        const randType = Math.random() < 0.85
+          ? stagePool[Math.floor(Math.random() * stagePool.length)]
+          : OBSTACLE_TYPES[Math.floor(Math.random() * OBSTACLE_TYPES.length)];
         let rx, ry;
         if (slot === 0 && Math.random() < 0.55) {
           // Edge / Corner sweeper so edges are actively contested!
@@ -920,11 +953,8 @@
           blasted++;
         }
       }
-      const bonus = 400 + blasted * 150;
-      attacker.score += bonus;
       if (attacker.id === "me") {
-        pulseScoreReadout();
-        showHudEvent("EMP BLAST!", `+${bonus} PTS`);
+        showHudEvent("EMP BLAST!", saveData.lang === "en" ? `${blasted} CLEARED` : `${blasted}個破壊`);
         updateTacticalButton(attacker);
       }
       if (attacker.conn && attacker.conn.open) {
@@ -955,9 +985,21 @@
   // =========================================================================
   // 8. LAUNCH & FINISH FLIGHT FLOWS
   // =========================================================================
-  async function launchSoloOrBody(useBodyCam = false) {
+  async function launchSoloOrBody(useBodyCam = false, endlessRun = false) {
     AudioEngine.ensure();
     closeAllModals();
+
+    lastRunEndless = endlessRun;
+    if (endless && endlessBackup) restoreFromEndless();
+    if (endlessRun) {
+      endlessBackup = { chapterIdx: saveData.chapterIdx, diffIdx: saveData.diffIdx, environment: saveData.environment };
+      endless = true;
+      saveData.chapterIdx = Math.floor(Math.random() * CHAPTERS.length);
+      saveData.diffIdx = Math.floor(Math.random() * DIFFICULTIES.length);
+      saveData.environment = Math.random() < 0.75 ? "outdoor" : "indoor";
+      nextZoneDist = ENDLESS_ZONE_M;
+      applyWorldTheme();
+    }
 
     gameMode = useBodyCam ? "BODY" : "SOLO";
     if (useBodyCam) {
@@ -971,6 +1013,17 @@
     }
 
     beginFlightSession([{ id: "me", name: "YOU", isBot: false, conn: null }]);
+  }
+
+  function restoreFromEndless() {
+    if (endlessBackup) {
+      saveData.chapterIdx = endlessBackup.chapterIdx;
+      saveData.diffIdx = endlessBackup.diffIdx;
+      saveData.environment = endlessBackup.environment;
+    }
+    endless = false;
+    endlessBackup = null;
+    applyWorldTheme();
   }
 
   function beginFlightSession(roster) {
@@ -1007,8 +1060,9 @@
     const ch = CHAPTERS[saveData.chapterIdx] || CHAPTERS[0];
     const diff = DIFFICULTIES[saveData.diffIdx];
     const chTitle = saveData.lang === "en" ? ch.enName : ch.name;
-    document.getElementById("hud-stage-title").textContent =
-      `CH.${ch.chapter} ${chTitle} / ${diff.goalDist.toLocaleString()}m`;
+    document.getElementById("hud-stage-title").textContent = endless
+      ? `ENDLESS  ???`
+      : `CH.${ch.chapter} ${chTitle} / ${diff.goalDist.toLocaleString()}m`;
 
     document.getElementById("home-shell").classList.add("hidden");
     document.getElementById("flight-hud").classList.remove("hidden");
@@ -1019,7 +1073,7 @@
     syncExternalAdProtection();
 
     isPlaying = true;
-    showHudEvent("READY — GO!", `${tr("goalPrefix")}${diff.goalDist.toLocaleString()}m`);
+    showHudEvent("READY — GO!", endless ? "ENDLESS" : `${tr("goalPrefix")}${diff.goalDist.toLocaleString()}m`);
     playVoice("start", true);
 
     if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
@@ -1028,6 +1082,7 @@
   }
 
   function finishFlightSession(victory = false) {
+    if (endless) { victory = false; restoreFromEndless(); }
     isPlaying = false;
     isBoosting = false;
     document.body.classList.remove("in-flight");
@@ -1040,7 +1095,7 @@
     const me = players.find((p) => p.id === "me") || players[0];
     const finalScore = Math.floor(me ? me.score : score);
     const finalDist = Math.floor(me ? me.distance : distance);
-    const earnedCredits = Math.max(30, Math.floor(finalScore * 0.06) + ringsCollected * 35 + (victory ? 500 : 0));
+    const earnedCredits = Math.max(30, finalScore * 60 + (victory ? 500 : 0));
 
     saveData.credits += earnedCredits;
     saveData.xp += Math.floor(finalDist * 0.08) + ringsCollected * 20;
@@ -1066,7 +1121,7 @@
       rankBox.innerHTML = sorted.map((p, idx) => `
         <div class="setting-row" style="padding:7px 12px;">
           <span style="font-weight:900; font-size:13px;">#${idx + 1} ${p.name}</span>
-          <span style="font-weight:800; font-size:13px; color:#fbbf24;">${Math.floor(p.score).toLocaleString()} (${Math.floor(p.distance).toLocaleString()}m)</span>
+          <span style="font-weight:800; font-size:13px; color:#fbbf24;">${Math.floor(p.score).toLocaleString()} RINGS (${Math.floor(p.distance).toLocaleString()}m)</span>
         </div>
       `).join("");
     } else {
@@ -1265,8 +1320,15 @@
 
   window.addEventListener("deviceorientation", (e) => {
     if (e.beta === null || e.gamma === null) return;
-    rawBeta = e.beta;
-    rawGamma = e.gamma;
+    // Orientation-aware mapping so "center" works in any holding position.
+    const ang = (screen.orientation && typeof screen.orientation.angle === "number")
+      ? screen.orientation.angle
+      : (typeof window.orientation === "number" ? window.orientation : 0);
+    const a = ((ang % 360) + 360) % 360;
+    if (a === 90) { rawBeta = -e.gamma; rawGamma = e.beta; }
+    else if (a === 270) { rawBeta = e.gamma; rawGamma = -e.beta; }
+    else if (a === 180) { rawBeta = -e.beta; rawGamma = -e.gamma; }
+    else { rawBeta = e.beta; rawGamma = e.gamma; }
     if (zeroBeta === null) {
       zeroBeta = rawBeta;
       zeroGamma = rawGamma;
@@ -1292,10 +1354,25 @@
 
   function calibrateGyroZero() {
     AudioEngine.sfxClick();
+    // Current device tilt becomes the new neutral (center) position.
     zeroBeta = rawBeta;
     zeroGamma = rawGamma;
     gyroX = 0;
     gyroY = 0;
+    // In flight: bring my aircraft back to the center of the screen at this moment.
+    if (isPlaying) {
+      const me = players.find((p) => p.id === "me" && p.alive);
+      if (me) {
+        me.x = 0;
+        me.y = 0.6;
+        me.vx = 0;
+        me.vy = 0;
+        me.anchorX = 0;
+        me.anchorY = 0.6;
+        me.campTime = 0;
+        me.craft.root.position.set(0, 0.6, PLAYER_Z);
+      }
+    }
     showCallout(tr("gyroResetToast"));
   }
 
@@ -1414,7 +1491,7 @@
     const lvl = Math.floor(saveData.xp / 500) + 1;
 
     document.getElementById("ui-best-inline").textContent =
-      `BEST ${saveData.bestScore.toLocaleString()}`;
+      `BEST ${saveData.bestScore.toLocaleString()} RINGS`;
     document.getElementById("ui-hangar-credits").textContent =
       `CREDITS: ${saveData.credits.toLocaleString()}  |  LV.${lvl}`;
 
@@ -1508,6 +1585,11 @@
             <span class="chapter-shape-badge">${isEn ? c.enTag : c.tag}</span>
           </div>
           <div class="chapter-title">${isEn ? c.enName : c.name}</div>
+          <div class="chapter-meta-row">
+            <span class="chapter-stars" aria-label="difficulty ${c.stars || 1}/5">${"★".repeat(c.stars || 1)}<span class="chapter-stars-off">${"★".repeat(5 - (c.stars || 1))}</span></span>
+            <span class="chapter-biome">${c.biome || ""}</span>
+          </div>
+          ${(isEn ? c.enDesc : c.desc) ? `<p class="chapter-desc">${isEn ? c.enDesc : c.desc}</p>` : ""}
         </div>
         <div class="chapter-actions">
           <button type="button" data-launch-env="outdoor" data-launch-ch="${idx}" class="btn-secondary-sm">${tr("launchSky")}</button>
@@ -1858,6 +1940,7 @@
   });
 
   document.getElementById("btn-sortie").addEventListener("click", () => launchSoloOrBody(false));
+  document.getElementById("btn-endless").addEventListener("click", () => launchSoloOrBody(false, true));
 
   document.getElementById("btn-dock-hangar").addEventListener("click", () => {
     AudioEngine.sfxClick();
@@ -1906,7 +1989,7 @@
     document.getElementById("modal-result").classList.add("modal-offscreen");
     if (gameMode === "BODY") launchSoloOrBody(true);
     else if ((gameMode === "ONLINE" || gameMode === "MONITOR") && hostRoster.length > 0) beginFlightSession(hostRoster);
-    else launchSoloOrBody(false);
+    else launchSoloOrBody(false, lastRunEndless);
   });
 
   document.getElementById("btn-share-x").addEventListener("click", () => {
@@ -1914,8 +1997,8 @@
     const s = document.getElementById("res-score").textContent;
     const d = document.getElementById("res-dist").textContent;
     const text = saveData.lang === "en"
-      ? `Scored ${s} (${d}) in GYRO DODGE 3D! #GYRODODGE`
-      : `GYRO DODGE 3D で スコア ${s}（飛行距離 ${d}）を達成！ #GYRODODGE`;
+      ? `Passed ${s} rings (${d}) in GYRO DODGE 3D! #GYRODODGE`
+      : `GYRO DODGE 3D で リング${s}個通過（飛行距離 ${d}）を達成！ #GYRODODGE`;
     const url = location.href.split("?")[0];
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, "_blank", "noopener");
   });
@@ -1926,7 +2009,7 @@
     const url = location.href.split("?")[0];
     const shareData = {
       title: "GYRO DODGE 3D",
-      text: saveData.lang === "en" ? `Play GYRO DODGE 3D! My score: ${s}` : `GYRO DODGE 3D でスコア ${s} を記録！`,
+      text: saveData.lang === "en" ? `Play GYRO DODGE 3D! My score: ${s} rings` : `GYRO DODGE 3D でリング${s}個通過！`,
       url
     };
     if (navigator.share) {
@@ -2002,12 +2085,24 @@
         cl.position.z += baseSpeed * 0.55 * dt;
         while (cl.position.z > 22) cl.position.z -= cloudSpan;
       });
+      if (typeof outdoorWorld.getSpinners === "function") {
+        outdoorWorld.getSpinners().forEach((s, idx) => {
+          s.rotation.z += dt * (idx % 2 === 0 ? 0.6 : -0.6);
+        });
+      }
     }
+    const weatherCh = CHAPTERS[saveData.chapterIdx] || CHAPTERS[0];
+    const weatherVy = (saveData.environment === "indoor") ? 0 : (weatherCh.weatherVelY || 0);
 
     // Speed Dust Streaks
     const spArr = speedDust.geometry.attributes.position.array;
     for (let i = 0; i < speedParticlesCount; i++) {
       spArr[i * 3 + 2] += baseSpeed * (activeBoost ? 1.85 : 1.25) * dt;
+      if (weatherVy) {
+        spArr[i * 3 + 1] += weatherVy * dt;
+        if (spArr[i * 3 + 1] < -9) spArr[i * 3 + 1] += 18;
+        else if (spArr[i * 3 + 1] > 9) spArr[i * 3 + 1] -= 18;
+      }
       if (spArr[i * 3 + 2] > 14) {
         spArr[i * 3]     = (Math.random() - 0.5) * 28;
         spArr[i * 3 + 1] = (Math.random() - 0.5) * 18;
@@ -2015,7 +2110,8 @@
       }
     }
     speedDust.geometry.attributes.position.needsUpdate = true;
-    spMat.size = activeBoost ? 0.36 : 0.22;
+    const wSize = (saveData.environment === "indoor") ? 0.22 : (weatherCh.weatherSize || 0.22);
+    spMat.size = wSize * (activeBoost ? 1.6 : 1.0);
 
     // 3D Spark Bursts
     for (let i = bursts.length - 1; i >= 0; i--) {
@@ -2161,9 +2257,9 @@
       animateAircraftDetails(p.craft, p.boost ? 1.65 : 1.0, t, dt);
 
       const pSpd = baseSpeed * (p.boost ? 1.15 : 1.0);
-      // Supersonic distance scale calibrated to 25,000m / 15,000m / 8,000m / 5,000m!
-      p.distance += pSpd * dt * 3.65;
-      p.score += pSpd * dt * (p.boost ? 2.4 : 1.4) * diff.mult;
+      // Distance is hard-capped at the stage goal (Easy max 10,000m) — never exceeds it.
+      p.distance = endless ? p.distance + pSpd * dt * 3.65 : Math.min(diff.goalDist, p.distance + pSpd * dt * 3.65);
+      // Score = number of rings passed (no distance-based points).
     });
 
     const me = players.find((p) => p.id === "me" && p.alive) || players.find((p) => p.alive);
@@ -2204,12 +2300,21 @@
       showHudEvent(`SPEED UP LV.${speedTierAnnounced}`, "");
       playVoice("speedup", true);
     }
-    if (!clearedStage && distance >= diff.goalDist) {
+    if (endless && isPlaying && distance >= nextZoneDist) {
+      // Zone shift: new random world + difficulty, player is never told which
+      nextZoneDist += ENDLESS_ZONE_M;
+      let ni = Math.floor(Math.random() * CHAPTERS.length);
+      if (ni === saveData.chapterIdx) ni = (ni + 1) % CHAPTERS.length;
+      saveData.chapterIdx = ni;
+      saveData.diffIdx = Math.floor(Math.random() * DIFFICULTIES.length);
+      saveData.environment = Math.random() < 0.75 ? "outdoor" : "indoor";
+      applyWorldTheme();
+      showHudEvent(tr("endlessZone"), "???");
+    }
+    if (!endless && !clearedStage && distance >= diff.goalDist) {
       clearedStage = true;
-      if (me) me.score += Math.round(2500 * diff.mult);
-      pulseScoreReadout();
-      showHudEvent(tr("stageClearTitle"), "+2,500 CLEAR BONUS");
-      playVoice("clear", true);
+      distance = diff.goalDist;
+      players.forEach((p) => { p.distance = Math.min(p.distance, diff.goalDist); });
     }
 
     if (eventBannerTimer > 0) {
@@ -2241,11 +2346,12 @@
       }
       o.mesh.position.set(o.x, o.y, o.z);
 
-      if (o.type === "BARRIER" || o.type === "CROSS_BLADE") {
+      if (o.type === "BARRIER" || o.type === "CROSS_BLADE" || o.type === "TORII_GATE") {
         o.mesh.rotation.z = o.angleZ;
       } else {
         o.mesh.rotation.x += o.spinX * dt;
         o.mesh.rotation.y += o.spinY * dt;
+        if (o.spinZ) o.mesh.rotation.z += o.spinZ * dt;
       }
 
       // Swept Z-window across PLAYER_Z
@@ -2282,14 +2388,11 @@
             }
           } else if (clearance < 1.5 && !o.passed.has(p.id)) {
             o.passed.add(p.id);
-            const nmBonus = Math.round(200 * diff.mult);
-            p.score += nmBonus;
             if (p.id === "me") {
               nearMisses++;
               boostEnergy = Math.min(100, boostEnergy + 15);
-              pulseScoreReadout();
               AudioEngine.sfxNearMiss();
-              showHudEvent(tr("nearMissMsg"), `+${nmBonus} PTS`);
+              showHudEvent(tr("nearMissMsg"), "BOOST +15%");
               if (nearMisses % 4 === 0) playVoice("good", false);
               else playVoice("abuna", false);
             }
@@ -2321,8 +2424,7 @@
             if (p.id === "me") {
               ringCombo = (now - lastRingAt < 5500) ? Math.min(5, ringCombo + 1) : 1;
               lastRingAt = now;
-              const ringPts = Math.round(500 * ringCombo * diff.mult);
-              p.score += ringPts;
+              p.score += 1;
               ringsCollected++;
               boostEnergy = Math.min(100, boostEnergy + 24);
               pulseScoreReadout();
@@ -2332,13 +2434,13 @@
               if (ringsCollected % 5 === 0 && p.shields < p.maxShields) {
                 p.shields++;
                 updateShieldHUD(p);
-                showHudEvent(tr("shieldRepairMsg"), `+${ringPts.toLocaleString()} PTS (COMBO x${ringCombo})`);
+                showHudEvent(tr("shieldRepairMsg"), `RING ${ringsCollected}${ringCombo > 1 ? ` (COMBO x${ringCombo})` : ""}`);
               } else {
-                showHudEvent(tr("ringBonusMsg"), `+${ringPts.toLocaleString()} PTS${ringCombo > 1 ? ` (COMBO x${ringCombo})` : ""}`);
+                showHudEvent(tr("ringBonusMsg"), `+1  RING ${ringsCollected}${ringCombo > 1 ? ` (COMBO x${ringCombo})` : ""}`);
               }
               if (ringsCollected % 3 === 0) playVoice("good", false);
             } else {
-              p.score += Math.round(500 * diff.mult);
+              p.score += 1;
             }
             break;
           }
@@ -2401,12 +2503,18 @@
     document.getElementById("hud-dist").textContent = `${Math.floor(distance).toLocaleString()}m`;
     document.getElementById("hud-rings").textContent = String(ringsCollected);
     document.getElementById("hud-alive").textContent = `${aliveList.length}/${players.length}`;
-    document.getElementById("hud-stage-fill").style.width = `${Math.min(100, (distance / diff.goalDist) * 100)}%`;
+    document.getElementById("hud-stage-fill").style.width = endless
+      ? `${Math.min(100, ((distance - (nextZoneDist - ENDLESS_ZONE_M)) / ENDLESS_ZONE_M) * 100)}%`
+      : `${Math.min(100, (distance / diff.goalDist) * 100)}%`;
 
     const kmh = Math.round(baseSpeed * 28);
     document.getElementById("hud-speed-kmh").textContent = `${kmh.toLocaleString()} km/h`;
 
-    if (gameMode === "SOLO" || gameMode === "BODY") {
+    if (clearedStage) {
+      // Goal distance reached: flight ends here so distance never exceeds the goal.
+      const myEntity = players.find((p) => p.id === "me");
+      finishFlightSession(!myEntity || myEntity.alive);
+    } else if (gameMode === "SOLO" || gameMode === "BODY") {
       const myEntity = players.find((p) => p.id === "me");
       if (myEntity && !myEntity.alive) finishFlightSession(clearedStage);
     } else {

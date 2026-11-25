@@ -1439,3 +1439,53 @@ body.in-flight .admax-ext-hidden {
   display: none !important;
   pointer-events: none !important;
 }
+
+/* Stage difficulty & worldview info (v6) */
+.chapter-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+}
+.chapter-stars {
+  color: #fbbf24;
+  font-size: 13px;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+.chapter-stars-off {
+  color: rgba(255, 255, 255, 0.18);
+}
+.chapter-biome {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: rgba(226, 232, 240, 0.55);
+}
+.chapter-desc {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(226, 232, 240, 0.72);
+}
+
+/* Endless mode button (flat, no gradient) */
+.endless-cta-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: #1e293b;
+  border: 1.5px solid #64748b;
+  border-radius: 14px;
+  color: #f1f5f9;
+  cursor: pointer;
+}
+.endless-cta-btn:hover { background: #273449; }
+.endless-cta-btn:active { transform: scale(0.98); }
+.endless-main-text { font-size: 16px; font-weight: 900; letter-spacing: 0.08em; }
+.endless-sub-text { font-size: 11px; font-weight: 700; color: rgba(226, 232, 240, 0.6); }
