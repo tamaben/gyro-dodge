@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>GYRO DODGE 3D</title>
-  <meta name="description" content="リアルな3D航空機で渓谷や巨大回廊を駆け抜けるジャイロ回避フライトゲーム。全12章・通信対戦対応。" />
-  <meta property="og:title" content="GYRO DODGE 3D" />
-  <meta property="og:description" content="スマホの傾き＆スティックで操縦するリアル3Dフライト回避ゲーム。4桁コード対戦対応。" />
+  <title>GYRO SMASH FLIGHT 3D — ジャイロ＆スチールボール破壊フライト</title>
+  <meta name="description" content="スマホを傾けて操縦し、超リアルな鋼球を投げて障害物を粉砕する爽快3Dフライトアクション。全12ステージ・エンドレス・通信対戦対応。" />
+  <meta property="og:title" content="GYRO SMASH FLIGHT 3D" />
+  <meta property="og:description" content="傾けて操縦＆鋼球スローで障害物を粉砕！超リアル3Dアーケードフライト。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="icons/icon-512.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="theme-color" content="#08101c" />
+  <meta name="theme-color" content="#0f172a" />
   <link rel="icon" type="image/svg+xml" href="logo.svg" />
   <link rel="manifest" href="manifest.webmanifest" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -32,7 +32,7 @@
   <div id="blind-overlay">
     <div class="blind-alert-card">
       <div class="blind-alert-title" data-i18n="smokeTitle">スモーク視界妨害中</div>
-      <div class="blind-alert-sub" data-i18n="smokeSub">計器と動きで障害物を回避してください</div>
+      <div class="blind-alert-sub" data-i18n="smokeSub">計器とボール発射で切り抜けてください</div>
     </div>
   </div>
 
@@ -44,47 +44,69 @@
   </div>
 
   <!-- =====================================================================
-       SPACIOUS HOME SCREEN (OPEN 3D SKY + COMPACT BOTTOM DECK)
+       HOME SCREEN — BRIGHT, TACTILE, SPACIOUS COMMERCIAL ARCADE UI
        ===================================================================== -->
   <div id="home-shell" class="ui-shell">
-    <header class="top-bar pointer-auto">
-      <div class="brand-pill matte-panel">
-        <img src="logo.svg" alt="GYRO DODGE 3D" class="brand-logo" />
-        <div class="brand-meta">
-          <h1 class="brand-title">GYRO DODGE</h1>
-          <span class="brand-best" id="ui-best-inline">BEST 0</span>
+    <div class="home-top-stack pointer-auto">
+      <header class="top-bar">
+        <div class="profile-pill">
+          <img src="logo.svg" alt="GYRO SMASH 3D" class="brand-logo" />
+          <div class="brand-meta">
+            <div class="rank-line">
+              <span id="ui-rank-badge" class="rank-chip">LV.1</span>
+              <h1 id="ui-rank-title" class="brand-title">GYRO SMASH</h1>
+            </div>
+            <span class="brand-best" id="ui-best-inline">BEST 0 RINGS</span>
+          </div>
         </div>
-      </div>
 
-      <div class="top-telemetry-right">
-        <button id="btn-lang-toggle" type="button" class="top-btn" aria-label="Language">
-          EN
-        </button>
-        <button id="btn-audio-toggle" type="button" class="top-btn icon-only" aria-label="Audio">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-            <path id="audio-wave-path" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-          </svg>
-        </button>
-        <button id="btn-open-settings" type="button" class="top-btn icon-only" aria-label="Settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-          </svg>
-        </button>
-      </div>
-    </header>
+        <div class="top-telemetry-right">
+          <button id="btn-top-coins" type="button" class="coin-pill" aria-label="Coins & Upgrades">
+            <span class="coin-dot">●</span>
+            <span id="ui-coins-inline">2,500</span>
+          </button>
+          <button id="btn-lang-toggle" type="button" class="top-btn" aria-label="Language">EN</button>
+          <button id="btn-audio-toggle" type="button" class="top-btn icon-only" aria-label="Audio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path id="audio-wave-path" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+            </svg>
+          </button>
+          <button id="btn-open-settings" type="button" class="top-btn icon-only" aria-label="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Addictive Rolling Mission Bar (Tap to claim reward when complete!) -->
+      <button id="btn-mission-banner" type="button" class="mission-banner">
+        <div class="mission-left">
+          <span id="ui-mission-tag" class="mission-tag">MISSION</span>
+          <span id="ui-mission-text" class="mission-text">ボールで障害物を8個粉砕 (0/8)</span>
+        </div>
+        <div class="mission-right">
+          <div class="mission-mini-bar"><div id="ui-mission-fill" class="mission-mini-fill" style="width:0%"></div></div>
+          <span id="ui-mission-reward" class="mission-reward">+250</span>
+        </div>
+      </button>
+    </div>
 
     <main id="home-view">
-      <!-- Wide-Open Unobstructed 3D Aircraft Showcase -->
-      <section id="showcase-drag-area" class="showcase-viewport" aria-label="3D Aircraft Showcase">
-        <div class="craft-caption-pill">
-          <span class="craft-caption-code" id="spec-code">VX-01</span>
-          <span id="spec-name">ファルコン迎撃機</span>
+      <!-- Wide-Open 3D Showcase: Tap Sky to Test-Throw Chrome Steel Ball! -->
+      <section id="showcase-drag-area" class="showcase-viewport" aria-label="3D Aircraft & Gyro-Ball Showcase">
+        <div class="showcase-bottom-pills">
+          <div class="craft-caption-pill">
+            <span class="craft-caption-code" id="spec-code">VX-01</span>
+            <span id="spec-name">ファルコン迎撃機</span>
+          </div>
+          <div class="tap-demo-hint" data-i18n="tapDemoHint">画面タップで鋼球スロー試射</div>
         </div>
       </section>
 
-      <!-- Spacious, Compact Launch Deck -->
+      <!-- Spacious, Tactile Bottom Launch Deck -->
       <section class="home-deck pointer-auto">
         <div class="config-strip">
           <div class="env-seg" role="group">
@@ -93,37 +115,41 @@
           </div>
           <button id="btn-stage-picker" type="button" class="stage-select-trigger">
             <span id="ui-stage-label" class="stage-trigger-text">CH.1 サンセット・キャニオン</span>
-            <span style="font-size:10.5px; color:#38bdf8; font-weight:800;">▾</span>
+            <span class="stage-caret">▾</span>
           </button>
         </div>
 
-        <div id="diff-bar" class="diff-bar matte-panel" role="group">
+        <div id="diff-bar" class="diff-bar" role="group">
           <button type="button" data-diff="0" class="diff-pill" data-i18n="diff0">かんたん</button>
           <button type="button" data-diff="1" class="diff-pill active" data-i18n="diff1">ふつう</button>
           <button type="button" data-diff="2" class="diff-pill" data-i18n="diff2">むずかしい</button>
           <button type="button" data-diff="3" class="diff-pill" data-i18n="diff3">げきむず</button>
         </div>
 
-        <button id="btn-sortie" type="button" class="sortie-cta-btn">
-          <span class="sortie-main-text" data-i18n="sortieBtn">出撃スタート</span>
-          <span class="sortie-goal-text" id="ui-sortie-goal">目標 15,000m</span>
-        </button>
+        <div class="launch-cta-row">
+          <button id="btn-sortie" type="button" class="sortie-cta-btn">
+            <span class="sortie-main-text" data-i18n="sortieBtn">プレイ開始</span>
+            <span class="sortie-goal-text" id="ui-sortie-goal">目標 7,000m</span>
+          </button>
 
-        <button id="btn-endless" type="button" class="endless-cta-btn">
-          <span class="endless-main-text" data-i18n="endlessBtn">エンドレス飛行</span>
-          <span class="endless-sub-text" data-i18n="endlessSub">ステージ・難易度は不明 / 終わりなし</span>
-        </button>
+          <button id="btn-endless" type="button" class="endless-cta-btn">
+            <span class="endless-main-text" data-i18n="endlessBtn">エンドレス</span>
+            <span class="endless-sub-text" data-i18n="endlessSub">不明・無限</span>
+          </button>
+        </div>
 
         <nav class="dock-grid">
           <button id="btn-dock-hangar" type="button" class="dock-btn">
-            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L9 9l-7 3 7 2 3 8 3-8 7-2-7-3-3-7z"/>
+            <span id="ui-upgrade-dot" class="notif-dot hidden"></span>
+            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="7"/>
+              <path d="M12 8v8M8 12h8"/>
             </svg>
-            <span class="dock-label" data-i18n="dockHangar">格納庫</span>
+            <span class="dock-label" data-i18n="dockHangar">強化・機体</span>
           </button>
 
           <button id="btn-dock-stages" type="button" class="dock-btn">
-            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 3 6"/>
               <line x1="9" y1="3" x2="9" y2="18"/>
               <line x1="15" y1="6" x2="15" y2="21"/>
@@ -132,7 +158,7 @@
           </button>
 
           <button id="btn-dock-body" type="button" class="dock-btn">
-            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
               <circle cx="12" cy="13" r="4"/>
             </svg>
@@ -140,7 +166,7 @@
           </button>
 
           <button id="btn-dock-multi" type="button" class="dock-btn">
-            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
               <circle cx="9" cy="7" r="4"/>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
@@ -161,46 +187,62 @@
   </div>
 
   <!-- =====================================================================
-       IN-GAME FLIGHT HUD
+       IN-GAME FLIGHT & BALL-SMASH HUD
        ===================================================================== -->
   <div id="flight-hud" class="hidden">
-    <div class="hud-top-row">
-      <div class="hud-cluster-left">
-        <div class="hud-score-card matte-panel">
+    <!-- Optical Gyro Aim Crosshair -->
+    <div id="aim-reticle" class="aim-reticle">
+      <div class="aim-ring"></div>
+      <div class="aim-dot"></div>
+    </div>
+
+    <div class="hud-top-stack">
+      <div class="hud-top-row">
+        <div class="hud-score-card">
           <div class="hud-metric">
-            <span class="hud-metric-label">RINGS SCORE</span>
+            <span class="hud-metric-label">RINGS</span>
             <span id="hud-score" class="hud-metric-val amber">0</span>
+          </div>
+          <div class="hud-metric">
+            <span class="hud-metric-label">SMASH</span>
+            <span id="hud-smash" class="hud-metric-val orange">0</span>
           </div>
           <div class="hud-metric">
             <span class="hud-metric-label">DIST</span>
             <span id="hud-dist" class="hud-metric-val">0m</span>
           </div>
-          <div class="hud-metric">
-            <span class="hud-metric-label">RINGS</span>
-            <span id="hud-rings" class="hud-metric-val cyan">0</span>
-          </div>
+          <span id="hud-rings" class="hidden">0</span>
           <div id="hud-alive-wrap" class="hud-metric hidden">
             <span class="hud-metric-label">ALIVE</span>
             <span id="hud-alive" class="hud-metric-val">1/1</span>
           </div>
         </div>
 
-        <div class="hull-bar-wrap matte-panel">
-          <span class="hull-label" data-i18n="shieldLabel">SHIELD</span>
-          <div id="hud-hull-segs" class="hull-segments"></div>
+        <div class="hud-cluster-right pointer-auto">
+          <button id="btn-hud-zero" type="button" class="top-btn hud-sm-btn" data-i18n="resetGyroBtn">中央リセット</button>
+          <button id="btn-hud-pause" type="button" class="top-btn hud-sm-btn" data-i18n="abortBtn">帰還</button>
         </div>
       </div>
 
-      <div class="hud-center-telemetry matte-panel">
-        <span id="hud-stage-title" class="stage-progress-title">CH.1</span>
-        <div class="stage-progress-track">
-          <div id="hud-stage-fill" class="stage-progress-fill"></div>
+      <div class="hud-sub-row">
+        <div class="hull-fever-row">
+          <div class="hull-bar-wrap">
+            <span class="hull-label" data-i18n="shieldLabel">SHIELD</span>
+            <div id="hud-hull-segs" class="hull-segments"></div>
+          </div>
+          <div id="hud-multiball-badge" class="multiball-badge">1x BALL</div>
         </div>
-      </div>
 
-      <div class="hud-cluster-right pointer-auto">
-        <button id="btn-hud-zero" type="button" class="top-btn" data-i18n="resetGyroBtn">水平リセット</button>
-        <button id="btn-hud-pause" type="button" class="top-btn" data-i18n="abortBtn">帰還</button>
+        <div class="hud-center-telemetry">
+          <span id="hud-stage-title" class="stage-progress-title">CH.1</span>
+          <div class="stage-progress-track">
+            <div id="hud-stage-fill" class="stage-progress-fill"></div>
+          </div>
+          <div class="fever-bar-row">
+            <span class="fever-lbl">FEVER</span>
+            <div class="fever-track"><div id="hud-fever-fill" class="fever-fill"></div></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -210,31 +252,39 @@
     </div>
 
     <div id="hud-bottom-controls" class="hud-bottom-controls">
-      <div id="stick-zone" class="stick-zone" aria-label="Control Stick">
-        <div class="stick-crosshair"></div>
-        <div id="stick-nub" class="stick-nub"></div>
-      </div>
-
-      <div id="hud-speed-kmh" class="hud-speed-readout matte-panel">
-        1,200 km/h
+      <div class="hud-left-pad">
+        <div id="hud-speed-kmh" class="hud-speed-readout">1,200 km/h</div>
+        <div id="stick-zone" class="stick-zone" aria-label="Control Stick">
+          <div class="stick-crosshair"></div>
+          <div id="stick-nub" class="stick-nub"></div>
+        </div>
       </div>
 
       <div class="action-pad-right">
-        <button id="btn-tactical-item" type="button" class="tactical-item-btn">
-          <span class="tactical-item-title">ITEM</span>
-          <span id="hud-item-name" class="tactical-item-name" data-i18n="noItem">なし</span>
-        </button>
-
-        <div class="boost-btn-wrap">
-          <svg class="boost-ring-svg" viewBox="0 0 82 82">
-            <circle class="boost-ring-bg" cx="41" cy="41" r="38"></circle>
-            <circle id="boost-meter-arc" class="boost-ring-meter" cx="41" cy="41" r="38"></circle>
-          </svg>
-          <button id="btn-boost-hold" type="button" class="boost-trigger-btn">
-            <span class="boost-label-main">BOOST</span>
-            <span id="boost-pct-label" class="boost-label-sub">100%</span>
+        <div class="sub-action-col">
+          <button id="btn-tactical-item" type="button" class="tactical-item-btn">
+            <span class="tactical-item-title">ITEM</span>
+            <span id="hud-item-name" class="tactical-item-name" data-i18n="noItem">なし</span>
           </button>
+
+          <div class="boost-btn-wrap">
+            <svg class="boost-ring-svg" viewBox="0 0 82 82">
+              <circle class="boost-ring-bg" cx="41" cy="41" r="38"></circle>
+              <circle id="boost-meter-arc" class="boost-ring-meter" cx="41" cy="41" r="38"></circle>
+            </svg>
+            <button id="btn-boost-hold" type="button" class="boost-trigger-btn">
+              <span class="boost-label-main">BOOST</span>
+              <span id="boost-pct-label" class="boost-label-sub">100%</span>
+            </button>
+          </div>
         </div>
+
+        <!-- Dedicated Tactile Chrome Ball Throw Trigger -->
+        <button id="btn-throw-ball" type="button" class="ball-throw-btn">
+          <span class="ball-btn-sphere"></span>
+          <span class="ball-btn-title" data-i18n="ballShotBtn">BALL</span>
+          <span id="hud-balls-count" class="ball-btn-count">×18</span>
+        </button>
       </div>
     </div>
   </div>
@@ -250,37 +300,55 @@
   </aside>
 
   <!-- =====================================================================
-       MODAL 1: HANGAR (SPECS DISPLAYED HERE CLEANLY)
+       MODAL 1: UPGRADE WORKSHOP, BALL SKINS & HANGAR
        ===================================================================== -->
   <div id="modal-hangar" class="modal-layer hangar-mode hidden">
     <div class="dialog-card">
       <div class="dialog-header">
         <div class="dialog-title-group">
-          <h2 data-i18n="hangarTitle">格納庫・機体選択</h2>
-          <p id="ui-hangar-credits">CREDITS: 2,500</p>
+          <h2 data-i18n="hangarTitle">パワー強化・ボール・機体</h2>
+          <p id="ui-hangar-credits">COINS: 2,500</p>
         </div>
         <button type="button" data-close-modal="modal-hangar" class="close-circle-btn">✕</button>
       </div>
       <div class="dialog-body">
-        <div class="hangar-specs-bar">
-          <div class="hangar-spec-item">
-            <span>SPEED</span>
-            <div class="mini-bar-track"><div id="bar-speed" class="mini-bar-fill" style="width:92%"></div></div>
-          </div>
-          <div class="hangar-spec-item">
-            <span>TURN</span>
-            <div class="mini-bar-track"><div id="bar-agility" class="mini-bar-fill" style="width:86%"></div></div>
-          </div>
-          <div class="hangar-spec-item">
-            <span>ARMOR</span>
-            <div class="mini-bar-track"><div id="bar-armor" class="mini-bar-fill" style="width:80%"></div></div>
-          </div>
+        <div class="tab-strip" id="hangar-tabs">
+          <button type="button" data-hg-tab="upgrade" class="tab-btn active" data-i18n="hgTabUpgrade">強化</button>
+          <button type="button" data-hg-tab="balls" class="tab-btn" data-i18n="hgTabBalls">ボール材質</button>
+          <button type="button" data-hg-tab="craft" class="tab-btn" data-i18n="hgTabCraft">機体・塗装</button>
         </div>
 
-        <div id="hangar-craft-grid" class="craft-selector-grid"></div>
-        <div id="hangar-livery-row" class="livery-swatch-row"></div>
+        <!-- Sub-panel 1: Addictive Coin Upgrades -->
+        <div id="hg-panel-upgrade" class="hg-subpanel">
+          <div id="upgrade-list" class="upgrade-list"></div>
+        </div>
 
-        <button type="button" data-close-modal="modal-hangar" class="btn-action-amber" data-i18n="confirmCraftBtn">この機体で決定</button>
+        <!-- Sub-panel 2: Realistic Metal Ball Skins -->
+        <div id="hg-panel-balls" class="hg-subpanel hidden">
+          <div id="ball-skin-grid" class="ball-skin-grid"></div>
+        </div>
+
+        <!-- Sub-panel 3: Aircraft & Liveries -->
+        <div id="hg-panel-craft" class="hg-subpanel hidden">
+          <div class="hangar-specs-bar">
+            <div class="hangar-spec-item">
+              <span>SPEED</span>
+              <div class="mini-bar-track"><div id="bar-speed" class="mini-bar-fill" style="width:92%"></div></div>
+            </div>
+            <div class="hangar-spec-item">
+              <span>TURN</span>
+              <div class="mini-bar-track"><div id="bar-agility" class="mini-bar-fill" style="width:86%"></div></div>
+            </div>
+            <div class="hangar-spec-item">
+              <span>ARMOR</span>
+              <div class="mini-bar-track"><div id="bar-armor" class="mini-bar-fill" style="width:80%"></div></div>
+            </div>
+          </div>
+          <div id="hangar-craft-grid" class="craft-selector-grid"></div>
+          <div id="hangar-livery-row" class="livery-swatch-row"></div>
+        </div>
+
+        <button type="button" data-close-modal="modal-hangar" class="btn-action-amber" data-i18n="confirmCraftBtn">決定して戻る</button>
 
         <div id="hangar-ad-slot" class="ad-slim-slot">
           <!-- admax -->
@@ -299,7 +367,7 @@
       <div class="dialog-header">
         <div class="dialog-title-group">
           <h2 data-i18n="stagesTitle">ステージ選択（全12章）</h2>
-          <p data-i18n="stagesSub">空域または巨大建築回廊を選んで出撃</p>
+          <p data-i18n="stagesSub">ステージごとの世界観と専用ギミックを攻略</p>
         </div>
         <button type="button" data-close-modal="modal-stages" class="close-circle-btn">✕</button>
       </div>
@@ -329,7 +397,7 @@
         <button type="button" data-close-modal="modal-multi" class="close-circle-btn">✕</button>
       </div>
       <div class="dialog-body">
-        <div class="tab-strip">
+        <div class="tab-strip" id="mp-tabs">
           <button type="button" data-mp-tab="online" class="tab-btn active" data-i18n="tabOnline">オンライン対戦</button>
           <button type="button" data-mp-tab="monitor" class="tab-btn" data-i18n="tabMonitor">モニター画面</button>
           <button type="button" data-mp-tab="remote" class="tab-btn" data-i18n="tabRemote">スマホリモコン</button>
@@ -348,24 +416,24 @@
           <div id="online-room-box" class="hidden" style="display:flex; flex-direction:column; gap:10px;">
             <div class="setting-row">
               <div>
-                <div style="font-size:10px; color:#94a3b8; font-weight:800;">ROOM CODE</div>
-                <div id="online-room-code" style="font-size:24px; font-weight:900; color:#fbbf24; letter-spacing:0.18em;">----</div>
+                <div style="font-size:10px; color:#64748b; font-weight:800;">ROOM CODE</div>
+                <div id="online-room-code" style="font-size:24px; font-weight:900; color:#f59e0b; letter-spacing:0.18em;">----</div>
               </div>
               <button id="btn-online-add-bot" type="button" class="btn-action-slate">+ BOT</button>
             </div>
             <div id="online-member-list" style="display:flex; flex-direction:column; gap:6px;"></div>
             <button id="btn-online-start" type="button" class="btn-action-amber" data-i18n="startBattleBtn">対戦スタート</button>
           </div>
-          <div id="online-status-msg" style="font-size:12px; color:#38bdf8; font-weight:700; min-height:18px;"></div>
+          <div id="online-status-msg" style="font-size:12px; color:#0284c7; font-weight:700; min-height:18px;"></div>
         </div>
 
         <div id="mp-panel-monitor" class="hidden" style="display:flex; flex-direction:column; gap:12px;">
           <div class="setting-row" style="flex-wrap:wrap;">
             <div>
-              <div style="font-size:10px; color:#38bdf8; font-weight:800;">MONITOR HOST (MAX 10)</div>
-              <div style="font-size:21px; font-weight:900;">CODE: <span id="host-code" style="color:#fbbf24; letter-spacing:0.16em;">----</span></div>
+              <div style="font-size:10px; color:#0284c7; font-weight:800;">MONITOR HOST (MAX 10)</div>
+              <div style="font-size:21px; font-weight:900;">CODE: <span id="host-code" style="color:#f59e0b; letter-spacing:0.16em;">----</span></div>
             </div>
-            <div id="host-qrcode" style="background:#ffffff; padding:6px; border-radius:8px;"></div>
+            <div id="host-qrcode" style="background:#ffffff; padding:6px; border-radius:8px; border:1px solid #cbd5e1;"></div>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span style="font-size:12px; font-weight:800;">PLAYERS (<span id="host-count">0</span>/10)</span>
@@ -383,13 +451,13 @@
             <input id="remote-code-input" type="tel" maxlength="4" placeholder="1234" class="aero-input code-lg" />
             <input id="remote-name-input" type="text" maxlength="10" placeholder="PLAYER" class="aero-input" />
             <button id="btn-remote-connect" type="button" class="btn-action-amber" data-i18n="connectBtn">接続する</button>
-            <div id="remote-msg" style="font-size:12px; color:#f87171; font-weight:700; text-align:center;"></div>
+            <div id="remote-msg" style="font-size:12px; color:#dc2626; font-weight:700; text-align:center;"></div>
           </div>
 
           <div id="remote-pad-view" class="hidden" style="display:flex; flex-direction:column; gap:10px;">
             <div class="setting-row">
               <div>
-                <div style="font-size:10px; color:#38bdf8; font-weight:800;">CONNECTED</div>
+                <div style="font-size:10px; color:#0284c7; font-weight:800;">CONNECTED</div>
                 <div id="remote-badge" style="font-size:15px; font-weight:900;">P1</div>
               </div>
               <div style="display:flex; gap:6px;">
@@ -408,7 +476,7 @@
                 ITEM: <span id="remote-item-label">---</span>
               </button>
             </div>
-            <div id="remote-alert" style="font-size:12px; color:#cbd5e1; text-align:center;"></div>
+            <div id="remote-alert" style="font-size:12px; color:#64748b; text-align:center;"></div>
           </div>
         </div>
 
@@ -443,7 +511,7 @@
         <div class="setting-row">
           <div>
             <div style="font-weight:800; font-size:13px;" data-i18n="gyroSettingLabel">ジャイロセンサー</div>
-            <div style="font-size:11px; color:#94a3b8;" data-i18n="gyroSettingSub">傾き権限の許可と水平角度のリセット</div>
+            <div style="font-size:11px; color:#64748b;" data-i18n="gyroSettingSub">今の持ち方を中央にリセット</div>
           </div>
           <div style="display:flex; gap:6px;">
             <button id="btn-settings-gyro" type="button" class="btn-secondary-sm" data-i18n="allowGyroBtn">ジャイロ許可</button>
@@ -451,7 +519,7 @@
           </div>
         </div>
 
-        <div style="font-size:11px; font-weight:800; color:#94a3b8;" data-i18n="voiceListLabel">収録ボイス試聴（7種）</div>
+        <div style="font-size:11px; font-weight:800; color:#64748b;" data-i18n="voiceListLabel">収録ボイス試聴（7種）</div>
         <div id="voice-test-list" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"></div>
 
         <div id="settings-ad-slot" class="ad-slim-slot">
@@ -462,7 +530,7 @@
   </div>
 
   <!-- =====================================================================
-       MODAL 5: RESULT SCREEN (AIRY, UNCLUTTERED, SINGLE 300x250 SLOT)
+       MODAL 5: RESULT SCREEN — ONE-MORE-RUN PROGRESSION + 300x250 AD
        ===================================================================== -->
   <div id="modal-result" class="modal-layer modal-offscreen">
     <div class="dialog-card result-card">
@@ -480,25 +548,39 @@
       <div class="dialog-body result-body">
         <div class="result-summary-strip">
           <div class="result-metric-col">
-            <div class="result-stat-label">SCORE (RINGS)</div>
-            <div id="res-score" class="result-stat-val" style="color:#fbbf24;">0</div>
+            <div class="result-stat-label">RINGS</div>
+            <div id="res-score" class="result-stat-val amber-txt">0</div>
           </div>
           <div class="result-metric-col">
-            <div class="result-stat-label">DISTANCE</div>
+            <div class="result-stat-label">SMASH</div>
+            <div id="res-smash" class="result-stat-val orange-txt">0</div>
+          </div>
+          <div class="result-metric-col">
+            <div class="result-stat-label">DIST</div>
             <div id="res-dist" class="result-stat-val">0m</div>
           </div>
           <div class="result-metric-col">
-            <div class="result-stat-label">CREDITS</div>
-            <div id="res-credits" class="result-stat-val" style="color:#38bdf8;">+0</div>
+            <div class="result-stat-label">COINS</div>
+            <div id="res-credits" class="result-stat-val blue-txt">+0</div>
           </div>
+        </div>
+
+        <!-- Rank XP Progression Bar -->
+        <div class="result-xp-card">
+          <div class="result-xp-top">
+            <span id="res-rank-label" class="result-rank-name">LV.1 ROOKIE</span>
+            <span id="res-xp-next" class="result-xp-next">NEXT 500 XP</span>
+          </div>
+          <div class="result-xp-track"><div id="res-xp-fill" class="result-xp-fill" style="width:20%"></div></div>
         </div>
 
         <div id="res-bonus" class="result-bonus-line"></div>
         <div id="res-ranking" class="hidden" style="display:flex; flex-direction:column; gap:6px;"></div>
 
         <div class="result-action-row">
-          <button id="btn-res-home" type="button" class="btn-action-slate" data-i18n="backHomeBtn">ホームへ</button>
-          <button id="btn-res-retry" type="button" class="btn-action-amber" data-i18n="retryBtn">もう一度出撃</button>
+          <button id="btn-res-home" type="button" class="btn-action-slate" data-i18n="backHomeBtn">ホーム</button>
+          <button id="btn-res-upgrade" type="button" class="btn-action-blue" data-i18n="resUpgradeBtn">強化する</button>
+          <button id="btn-res-retry" type="button" class="btn-action-amber" data-i18n="retryBtn">もう1回！</button>
         </div>
 
         <!-- Dedicated Pixel-Exact 300x250 Medium Rectangle Slot with Clean Breathing Room -->
@@ -514,8 +596,8 @@
     </div>
   </div>
 
-  <script src="voices.js?v=7"></script>
-  <script src="models3d.js?v=7"></script>
-  <script src="game.js?v=7"></script>
+  <script src="voices.js?v=8"></script>
+  <script src="models3d.js?v=8"></script>
+  <script src="game.js?v=8"></script>
 </body>
 </html>

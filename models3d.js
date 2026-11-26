@@ -49,6 +49,74 @@
     { id: "emerald",  name: "エメラルド・スコードロン", enName: "Emerald Squadron", primary: 0x0f766e, secondary: 0x0f172a, accent: 0x34d399, burner: 0x2dd4bf }
   ];
 
+  const BALL_SKINS = [
+    {
+      id: "chrome",
+      name: "ミラークローム鋼球",
+      enName: "Mirror Chrome",
+      cost: 0,
+      color: 0xf8fafc,
+      seam: 0x0284c7,
+      emissive: 0x000000,
+      emissiveIntensity: 0,
+      metalness: 0.99,
+      roughness: 0.045,
+      trailHex: 0xe0f2fe
+    },
+    {
+      id: "gold",
+      name: "24Kゴールド重球",
+      enName: "24K Solid Gold",
+      cost: 500,
+      color: 0xfbbf24,
+      seam: 0xfffbeb,
+      emissive: 0x78350f,
+      emissiveIntensity: 0.14,
+      metalness: 0.98,
+      roughness: 0.07,
+      trailHex: 0xfde047
+    },
+    {
+      id: "tungsten",
+      name: "黒鉄タングステン",
+      enName: "Heavy Tungsten",
+      cost: 1100,
+      color: 0x475569,
+      seam: 0xf97316,
+      emissive: 0x000000,
+      emissiveIntensity: 0,
+      metalness: 0.96,
+      roughness: 0.12,
+      trailHex: 0xfdba74
+    },
+    {
+      id: "cobalt",
+      name: "チタン・コバルト",
+      enName: "Titanium Cobalt",
+      cost: 1900,
+      color: 0x0ea5e9,
+      seam: 0xf8fafc,
+      emissive: 0x075985,
+      emissiveIntensity: 0.18,
+      metalness: 0.97,
+      roughness: 0.06,
+      trailHex: 0x7dd3fc
+    },
+    {
+      id: "meteor",
+      name: "メテオ灼熱コア",
+      enName: "Molten Meteor",
+      cost: 3000,
+      color: 0x991b1b,
+      seam: 0xfef08a,
+      emissive: 0xea580c,
+      emissiveIntensity: 0.52,
+      metalness: 0.88,
+      roughness: 0.16,
+      trailHex: 0xfb923c
+    }
+  ];
+
   const CHAPTERS = [
     {
       chapter: 1, biome: "CANYON", stars: 1, hazardDensity: 0.88,
@@ -425,15 +493,40 @@
       );
       envScene.add(skyMesh);
 
-      // Bright sun specular card for crisp highlights on metallic wings & glass
+      // Bright sun specular card for crisp highlights on chrome spheres, wings & glass
       const sunDisc = new THREE.Mesh(
-        new THREE.SphereGeometry(6, 12, 12),
+        new THREE.SphereGeometry(7.5, 16, 16),
         new THREE.MeshBasicMaterial({ color: 0xffffff })
       );
-      sunDisc.position.set(22, 26, -34);
+      sunDisc.position.set(22, 28, -32);
       envScene.add(sunDisc);
 
-      const rt = pmrem.fromScene(envScene, 0.03);
+      // Overhead studio softbox strip for realistic chrome ball highlights
+      const softbox = new THREE.Mesh(
+        new THREE.PlaneGeometry(46, 18),
+        new THREE.MeshBasicMaterial({ color: 0xf8fafc, side: THREE.DoubleSide })
+      );
+      softbox.position.set(-8, 42, 10);
+      softbox.rotation.x = Math.PI * 0.5;
+      envScene.add(softbox);
+
+      // Warm horizon bounce panel + crisp dark horizon rim for authentic metal contrast
+      const warmRim = new THREE.Mesh(
+        new THREE.PlaneGeometry(54, 10),
+        new THREE.MeshBasicMaterial({ color: 0xfde68a, side: THREE.DoubleSide })
+      );
+      warmRim.position.set(-28, 4, -28);
+      warmRim.lookAt(0, 0, 0);
+      envScene.add(warmRim);
+
+      const darkBand = new THREE.Mesh(
+        new THREE.CylinderGeometry(56, 56, 7, 32, 1, true),
+        new THREE.MeshBasicMaterial({ color: 0x0f172a, side: THREE.BackSide })
+      );
+      darkBand.position.y = -4;
+      envScene.add(darkBand);
+
+      const rt = pmrem.fromScene(envScene, 0.02);
       pmrem.dispose();
       return rt.texture;
     } catch (e) {
@@ -2082,9 +2175,192 @@
     };
   }
 
+  // =========================================================================
+  // HYPER-REALISTIC MACHINED GYRO-BALL & 3D SHATTER DEBRIS SYSTEM
+  // =========================================================================
+  function getBrushedSteelTexture() {
+    if (texCache.brushedSteel) return texCache.brushedSteel;
+    const c = document.createElement("canvas");
+    c.width = 256;
+    c.height = 256;
+    const ctx = c.getContext("2d");
+    ctx.fillStyle = "#888888";
+    ctx.fillRect(0, 0, 256, 256);
+
+    // Fine lathe-machined circumferential grain
+    for (let y = 0; y < 256; y++) {
+      const v = 128 + Math.sin(y * 0.65) * 14 + (Math.random() - 0.5) * 22;
+      ctx.fillStyle = `rgb(${v | 0},${v | 0},${v | 0})`;
+      ctx.fillRect(0, y, 256, 1);
+    }
+    // Precision milled equator groove & meridian witness marks
+    ctx.fillStyle = "#363636";
+    ctx.fillRect(0, 124, 256, 8);
+    ctx.fillStyle = "#d8d8d8";
+    ctx.fillRect(0, 122, 256, 2);
+    ctx.fillRect(0, 132, 256, 2);
+    for (let x = 0; x < 256; x += 32) {
+      ctx.fillStyle = "#4a4a4a";
+      ctx.fillRect(x, 114, 3, 28);
+    }
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(2, 1);
+    texCache.brushedSteel = tex;
+    return tex;
+  }
+
+  let sharedBallGeo = null;
+  let sharedSeamGeo = null;
+  let sharedShatterGeos = null;
+
+  function createGyroBall(skinId = "chrome", scaleMult = 1.0, isFever = false) {
+    if (!sharedBallGeo) {
+      sharedBallGeo = new THREE.SphereGeometry(0.48, 32, 24);
+      sharedSeamGeo = new THREE.TorusGeometry(0.486, 0.022, 10, 36);
+    }
+    const skin = isFever
+      ? BALL_SKINS[1] // 24K Solid Gold during Fever!
+      : (BALL_SKINS.find((s) => s.id === skinId) || BALL_SKINS[0]);
+
+    const grp = new THREE.Group();
+    const steelBump = getBrushedSteelTexture();
+
+    const sphereMat = new THREE.MeshStandardMaterial({
+      color: skin.color,
+      emissive: skin.emissive || 0x000000,
+      emissiveIntensity: isFever ? 0.35 : (skin.emissiveIntensity || 0),
+      metalness: skin.metalness,
+      roughness: skin.roughness,
+      bumpMap: steelBump,
+      bumpScale: 0.012,
+      envMapIntensity: 1.9
+    });
+
+    const ballMesh = new THREE.Mesh(sharedBallGeo, sphereMat);
+    ballMesh.castShadow = true;
+    grp.add(ballMesh);
+
+    const seamMat = new THREE.MeshStandardMaterial({
+      color: skin.seam,
+      emissive: skin.seam,
+      emissiveIntensity: 0.45,
+      metalness: 0.7,
+      roughness: 0.2
+    });
+    const seamRing = new THREE.Mesh(sharedSeamGeo, seamMat);
+    seamRing.rotation.x = Math.PI * 0.5;
+    grp.add(seamRing);
+
+    const seamRingB = new THREE.Mesh(sharedSeamGeo, seamMat);
+    seamRingB.scale.setScalar(0.995);
+    grp.add(seamRingB);
+
+    // Subtle specular air-wake halo sprite
+    const wakeMat = new THREE.SpriteMaterial({
+      map: getGlowTexture("#bae6fd"),
+      color: skin.trailHex || 0xe0f2fe,
+      transparent: true,
+      opacity: 0.48,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const wake = new THREE.Sprite(wakeMat);
+    wake.scale.set(1.55, 1.55, 1);
+    grp.add(wake);
+
+    grp.scale.setScalar(scaleMult);
+    return {
+      mesh: grp,
+      ballMesh,
+      skin,
+      baseRadius: 0.48 * scaleMult,
+      setSkin(nextSkinId) {
+        const ns = BALL_SKINS.find((s) => s.id === nextSkinId) || BALL_SKINS[0];
+        sphereMat.color.setHex(ns.color);
+        sphereMat.emissive.setHex(ns.emissive || 0x000000);
+        sphereMat.emissiveIntensity = ns.emissiveIntensity || 0;
+        sphereMat.metalness = ns.metalness;
+        sphereMat.roughness = ns.roughness;
+        seamMat.color.setHex(ns.seam);
+        seamMat.emissive.setHex(ns.seam);
+        wakeMat.color.setHex(ns.trailHex || 0xe0f2fe);
+      }
+    };
+  }
+
+  function createShatterPieces(obstacleType = "BOULDER", chapterObj = CHAPTERS[0], count = 13) {
+    if (!sharedShatterGeos) {
+      sharedShatterGeos = [
+        new THREE.DodecahedronGeometry(0.36, 0),
+        new THREE.TetrahedronGeometry(0.44, 0),
+        new THREE.OctahedronGeometry(0.38, 0),
+        new THREE.BoxGeometry(0.56, 0.24, 0.38)
+      ];
+    }
+
+    const isIcy = obstacleType === "ICE_SPIRE" || obstacleType === "CRYSTAL_CLUSTER";
+    const isRock = obstacleType === "BOULDER" || obstacleType === "SAND_PILLAR" || obstacleType === "MAGMA_METEOR";
+    const isWood = obstacleType === "TORII_GATE";
+
+    let baseHex = chapterObj.obsPrimaryHex || 0x475569;
+    let accentHex = chapterObj.obsGlowHex || 0xf97316;
+    let metal = 0.78;
+    let rough = 0.26;
+
+    if (isIcy) {
+      baseHex = 0xbae6fd;
+      accentHex = 0x38bdf8;
+      metal = 0.35;
+      rough = 0.08;
+    } else if (isRock) {
+      baseHex = obstacleType === "SAND_PILLAR" ? 0xd97706 : (chapterObj.cliffHex || 0x64748b);
+      metal = 0.14;
+      rough = 0.78;
+    } else if (isWood) {
+      baseHex = 0xdc2626;
+      accentHex = 0x1e293b;
+      metal = 0.22;
+      rough = 0.48;
+    }
+
+    const mainMat = new THREE.MeshStandardMaterial({
+      color: baseHex,
+      metalness: metal,
+      roughness: rough,
+      bumpMap: isRock ? getRockBumpTexture() : undefined,
+      bumpScale: isRock ? 0.08 : 0,
+      envMapIntensity: 1.4
+    });
+
+    const coreMat = new THREE.MeshStandardMaterial({
+      color: accentHex,
+      emissive: accentHex,
+      emissiveIntensity: obstacleType === "MAGMA_METEOR" ? 0.9 : 0.45,
+      metalness: 0.65,
+      roughness: 0.2
+    });
+
+    const pieces = [];
+    for (let i = 0; i < count; i++) {
+      const geo = sharedShatterGeos[i % sharedShatterGeos.length];
+      const mat = (i % 4 === 0) ? coreMat : mainMat;
+      const mesh = new THREE.Mesh(geo, mat);
+      const sx = 0.65 + Math.random() * 0.95;
+      const sy = 0.55 + Math.random() * 0.9;
+      const sz = 0.65 + Math.random() * 0.95;
+      mesh.scale.set(sx, sy, sz);
+      mesh.rotation.set(Math.random() * 6.28, Math.random() * 6.28, Math.random() * 6.28);
+      pieces.push(mesh);
+    }
+    return { pieces, materials: [mainMat, coreMat], flashHex: accentHex };
+  }
+
   window.AeroModels = {
     CRAFT_CATALOG,
     LIVERY_CATALOG,
+    BALL_SKINS,
     CHAPTERS,
     OBSTACLE_TYPES,
     getGlowTexture,
@@ -2093,8 +2369,11 @@
     createObstacle,
     createEnergyRing,
     createSupplyPod,
+    createGyroBall,
+    createShatterPieces,
     createAtmosphericSkyDome,
     createOutdoorWorld,
     createCorridorWorld
   };
 })();
+

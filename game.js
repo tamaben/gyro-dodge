@@ -5,6 +5,7 @@
   const {
     CRAFT_CATALOG,
     LIVERY_CATALOG,
+    BALL_SKINS,
     CHAPTERS,
     OBSTACLE_TYPES,
     getGlowTexture,
@@ -13,6 +14,8 @@
     createObstacle,
     createEnergyRing,
     createSupplyPod,
+    createGyroBall,
+    createShatterPieces,
     createAtmosphericSkyDome,
     createOutdoorWorld,
     createCorridorWorld
@@ -24,9 +27,12 @@
   const I18N = {
     ja: {
       smokeTitle: "スモーク視界妨害中",
-      smokeSub: "計器と動きで障害物を回避してください",
+      smokeSub: "計器とボール発射で障害物を粉砕してください",
       camBadge: "カメラ操縦",
       bestRecord: "最高記録",
+      tapDemoHint: "画面タップで鋼球スロー試射",
+      hudTapThrowTip: "画面タップでも狙って発射！",
+      ballShotBtn: "BALL",
       envOutdoor: "空域",
       envIndoor: "回廊",
       changeBtn: "選択 ▾",
@@ -34,27 +40,30 @@
       diff1: "ふつう",
       diff2: "むずかしい",
       diff3: "げきむず",
-      sortieBtn: "出撃スタート",
-      endlessBtn: "エンドレス飛行",
-      endlessSub: "ステージ・難易度は不明 / 終わりなし",
+      sortieBtn: "プレイ開始",
+      endlessBtn: "エンドレス",
+      endlessSub: "不明・無限",
       endlessZone: "ゾーン変化！",
       goalPrefix: "目標 ",
-      dockHangar: "格納庫",
+      dockHangar: "強化・機体",
       dockStages: "ステージ",
       dockBody: "体操作",
       dockMulti: "通信対戦",
-      shieldLabel: "シールド",
+      shieldLabel: "SHIELD",
       resetGyroBtn: "水平リセット",
       allowGyroBtn: "ジャイロ許可",
       abortBtn: "帰還",
       noItem: "なし",
-      hangarTitle: "格納庫・機体選択",
-      hangarSub: "3種のリアル機体と塗装を切り替え",
+      hangarTitle: "パワー強化・ボール・機体",
+      hangarSub: "コインで鋼球パワー強化＆コレクション解放",
+      hgTabUpgrade: "パワー強化",
+      hgTabBalls: "ボール材質",
+      hgTabCraft: "機体・塗装",
       airframeLabel: "機体モデル",
       paintLabel: "機体カラー",
-      confirmCraftBtn: "この機体で決定",
+      confirmCraftBtn: "決定して戻る",
       stagesTitle: "ステージ選択（全12章）",
-      stagesSub: "空域または巨大建築回廊を選んで出撃",
+      stagesSub: "ステージごとの世界観と専用ギミックを攻略",
       launchSky: "空域で出撃",
       launchCorridor: "回廊で出撃",
       multiTitle: "通信対戦・モニター・リモコン",
@@ -71,20 +80,24 @@
       settingsSub: "言語切替・ジャイロ調整・収録ボイスの試聴",
       langSettingLabel: "表示言語 / Language",
       gyroSettingLabel: "ジャイロセンサー",
-      gyroSettingSub: "傾き権限の許可と水平角度のリセット",
+      gyroSettingSub: "今の持ち方を中央にリセット",
       voiceListLabel: "収録ボイス試聴（7種）",
-      backHomeBtn: "ホームへ",
-      retryBtn: "もう一度出撃",
+      backHomeBtn: "ホーム",
+      resUpgradeBtn: "強化する",
+      retryBtn: "もう1回！",
       shareXBtn: "X投稿",
       shareUrlBtn: "URL",
       stageClearTitle: "ステージクリア！",
       gameOverTitle: "フライト終了",
       ringBonusMsg: "リング通過！",
+      smashMsg: "SMASH!",
+      feverStartMsg: "FEVER RUSH!",
+      noBallsMsg: "ボール補充中… リング通過で+4！",
       nearMissMsg: "ニアミス回避！",
       shieldHitMsg: "シールド被弾！",
       shieldRepairMsg: "シールド修復！",
-      gyroResetToast: "ジャイロの水平基準をリセットしました",
-      dailyToast: "デイリーボーナス +300 CR 獲得！",
+      gyroResetToast: "現在の傾きを中央にリセットしました",
+      dailyToast: "デイリーボーナス +300 COINS 獲得！",
       copiedToast: "招待URLをコピーしました",
       camFallbackToast: "カメラ未検出のため通常操作で出撃します",
       waitPlayers: "参加者を待っています（BOT追加ですぐ開始可能）",
@@ -94,37 +107,43 @@
     },
     en: {
       smokeTitle: "SMOKE SCREEN ACTIVE",
-      smokeSub: "Keep dodging using instruments and motion",
+      smokeSub: "Throw steel balls to smash obstacles ahead",
       camBadge: "MOTION CAM",
       bestRecord: "BEST RECORD",
-      envOutdoor: "OPEN SKY",
-      envIndoor: "CORRIDOR",
+      tapDemoHint: "TAP SKY TO THROW STEEL BALL",
+      hudTapThrowTip: "TAP ANYWHERE TO AIM & THROW!",
+      ballShotBtn: "BALL",
+      envOutdoor: "SKY",
+      envIndoor: "TUNNEL",
       changeBtn: "STAGE ▾",
       diff0: "EASY",
       diff1: "NORMAL",
       diff2: "HARD",
       diff3: "EXTREME",
-      sortieBtn: "LAUNCH",
-      endlessBtn: "ENDLESS FLIGHT",
-      endlessSub: "Unknown stage & difficulty / No finish line",
+      sortieBtn: "PLAY",
+      endlessBtn: "ENDLESS",
+      endlessSub: "UNKNOWN · ∞",
       endlessZone: "ZONE SHIFT!",
       goalPrefix: "GOAL ",
-      dockHangar: "HANGAR",
+      dockHangar: "UPGRADE",
       dockStages: "STAGES",
       dockBody: "CAMERA",
-      dockMulti: "MULTI",
+      dockMulti: "VERSUS",
       shieldLabel: "SHIELD",
       resetGyroBtn: "RECENTER",
       allowGyroBtn: "ALLOW GYRO",
       abortBtn: "EXIT",
       noItem: "NONE",
-      hangarTitle: "HANGAR & AIRCRAFT",
-      hangarSub: "Select 3D airframe and metallic livery",
+      hangarTitle: "UPGRADES, BALLS & JETS",
+      hangarSub: "Power up steel balls & unlock new materials",
+      hgTabUpgrade: "UPGRADES",
+      hgTabBalls: "BALL SKINS",
+      hgTabCraft: "AIRCRAFT",
       airframeLabel: "AIRCRAFT MODEL",
       paintLabel: "PAINT LIVERY",
-      confirmCraftBtn: "SELECT AIRCRAFT",
+      confirmCraftBtn: "DONE",
       stagesTitle: "SELECT STAGE (12 CHAPTERS)",
-      stagesSub: "Launch in Open Sky or Megastructure Corridor",
+      stagesSub: "Unique worldviews and stage hazards",
       launchSky: "OPEN SKY",
       launchCorridor: "CORRIDOR",
       multiTitle: "MULTIPLAYER & REMOTE PAD",
@@ -141,20 +160,24 @@
       settingsSub: "Language, gyro calibration & voice check",
       langSettingLabel: "Language / 表示言語",
       gyroSettingLabel: "Gyro Sensor",
-      gyroSettingSub: "Request permission and calibrate neutral tilt",
+      gyroSettingSub: "Set current device tilt as center",
       voiceListLabel: "VOICE SAMPLES (7 CLIPS)",
       backHomeBtn: "HOME",
-      retryBtn: "PLAY AGAIN",
+      resUpgradeBtn: "UPGRADE",
+      retryBtn: "ONE MORE!",
       shareXBtn: "POST X",
       shareUrlBtn: "LINK",
       stageClearTitle: "STAGE CLEAR!",
-      gameOverTitle: "FLIGHT ENDED",
-      ringBonusMsg: "RING BONUS!",
+      gameOverTitle: "RUN COMPLETE",
+      ringBonusMsg: "RING +4 BALLS!",
+      smashMsg: "SMASH!",
+      feverStartMsg: "FEVER RUSH!",
+      noBallsMsg: "RELOADING... PASS RINGS FOR +4!",
       nearMissMsg: "NEAR MISS!",
       shieldHitMsg: "SHIELD HIT!",
       shieldRepairMsg: "SHIELD REPAIRED!",
-      gyroResetToast: "Gyroscope neutral angle calibrated",
-      dailyToast: "Daily Bonus +300 CR claimed!",
+      gyroResetToast: "Current device position set as center",
+      dailyToast: "Daily Bonus +300 COINS claimed!",
       copiedToast: "Invite link copied to clipboard",
       camFallbackToast: "Camera unavailable — launching with standard controls",
       waitPlayers: "Waiting for players (or add BOTs to start)",
@@ -165,7 +188,7 @@
   };
 
   // =========================================================================
-  // 2. PERSISTENT SAVE STATE
+  // 2. PERSISTENT SAVE STATE, UPGRADES, BALL SKINS & ROLLING MISSIONS
   // =========================================================================
   const SAVE_KEY = "gyro_dodge_aero_save_v2";
   const defaultLang = (navigator.language || "ja").toLowerCase().startsWith("ja") ? "ja" : "en";
@@ -177,6 +200,14 @@
     bestDist: 0,
     craftId: "falcon",
     liveryIdx: 0,
+    ballSkinId: "chrome",
+    unlockedBalls: ["chrome"],
+    upBallPower: 1,
+    upBallStock: 1,
+    upShieldMag: 1,
+    totalSmashed: 0,
+    missionIdx: 0,
+    missionProg: 0,
     chapterIdx: 0,
     environment: "outdoor",
     diffIdx: 1,
@@ -188,7 +219,16 @@
     const raw = localStorage.getItem(SAVE_KEY);
     if (raw) Object.assign(saveData, JSON.parse(raw));
   } catch (e) {}
-  // v6: score is now the ring count — reset legacy point-based records once.
+  if (!Array.isArray(saveData.unlockedBalls) || saveData.unlockedBalls.length === 0) {
+    saveData.unlockedBalls = ["chrome"];
+  }
+  saveData.upBallPower = Math.max(1, Math.min(10, Number(saveData.upBallPower) || 1));
+  saveData.upBallStock = Math.max(1, Math.min(10, Number(saveData.upBallStock) || 1));
+  saveData.upShieldMag = Math.max(1, Math.min(10, Number(saveData.upShieldMag) || 1));
+  saveData.missionIdx = Math.max(0, Number(saveData.missionIdx) || 0);
+  saveData.missionProg = Math.max(0, Number(saveData.missionProg) || 0);
+
+  // v6+: score is the ring count — reset legacy point-based records once.
   if (saveData.scoreSystem !== "rings") {
     saveData.bestScore = 0;
     saveData.bestDist = Math.min(saveData.bestDist || 0, 10000);
@@ -202,6 +242,125 @@
   function tr(key) {
     const dict = I18N[saveData.lang] || I18N.ja;
     return dict[key] !== undefined ? dict[key] : key;
+  }
+
+  const RANK_TITLES = [
+    { ja: "ROOKIE",         en: "ROOKIE" },
+    { ja: "BRONZE SMASHER", en: "BRONZE SMASHER" },
+    { ja: "SILVER ACE",     en: "SILVER ACE" },
+    { ja: "GOLD BREAKER",   en: "GOLD BREAKER" },
+    { ja: "PLATINUM WING",  en: "PLATINUM WING" },
+    { ja: "MASTER GYRO",    en: "MASTER GYRO" },
+    { ja: "LEGEND",         en: "LEGEND" }
+  ];
+
+  function getRankInfo(xp = saveData.xp) {
+    const lvl = Math.floor(xp / 500) + 1;
+    const inLvlXp = xp % 500;
+    const tier = RANK_TITLES[Math.min(RANK_TITLES.length - 1, Math.floor((lvl - 1) / 2))];
+    return {
+      lvl,
+      title: saveData.lang === "en" ? tier.en : tier.ja,
+      pct: Math.min(100, Math.round((inLvlXp / 500) * 100)),
+      rem: 500 - inLvlXp
+    };
+  }
+
+  const UPGRADE_DEFS = [
+    {
+      key: "upBallPower",
+      jaName: "鋼球サイズ＆破壊範囲",
+      enName: "Ball Size & Smash Power",
+      jaDesc: (lv) => `破壊半径 +${(lv - 1) * 12}%・破壊コインUP`,
+      enDesc: (lv) => `Smash radius +${(lv - 1) * 12}% & bonus coins`,
+      cost: (lv) => 180 + (lv - 1) * 160
+    },
+    {
+      key: "upBallStock",
+      jaName: "初期ボール数＆高速補充",
+      enName: "Ball Capacity & Reload",
+      jaDesc: (lv) => `開始時 ${15 + (lv - 1) * 3}球・自動補充スピードUP`,
+      enDesc: (lv) => `Start with ${15 + (lv - 1) * 3} balls & faster reload`,
+      cost: (lv) => 200 + (lv - 1) * 170
+    },
+    {
+      key: "upShieldMag",
+      jaName: "シールド装甲＆リング吸引",
+      enName: "Armor & Ring Magnet",
+      jaDesc: (lv) => `追加シールド +${Math.floor(lv / 3)}・吸引範囲 +${(lv - 1) * 10}%`,
+      enDesc: (lv) => `+${Math.floor(lv / 3)} Extra Shield & +${(lv - 1) * 10}% Magnet`,
+      cost: (lv) => 240 + (lv - 1) * 190
+    }
+  ];
+
+  function hasAffordableUpgrade() {
+    for (const u of UPGRADE_DEFS) {
+      const lv = saveData[u.key] || 1;
+      if (lv < 10 && saveData.credits >= u.cost(lv)) return true;
+    }
+    for (const b of BALL_SKINS) {
+      if (!saveData.unlockedBalls.includes(b.id) && saveData.credits >= b.cost) return true;
+    }
+    return false;
+  }
+
+  function getCurrentMission() {
+    const idx = saveData.missionIdx || 0;
+    const cycle = Math.floor(idx / 3);
+    const kind = idx % 3;
+    if (kind === 0) {
+      const goal = 8 + cycle * 4;
+      const reward = 250 + cycle * 60;
+      return {
+        type: "smash",
+        goal,
+        reward,
+        ja: `ボールで障害物を${goal}個粉砕`,
+        en: `Smash ${goal} obstacles with balls`
+      };
+    }
+    if (kind === 1) {
+      const goal = 6 + cycle * 3;
+      const reward = 280 + cycle * 60;
+      return {
+        type: "ring",
+        goal,
+        reward,
+        ja: `リングを${goal}個通過する`,
+        en: `Pass through ${goal} rings`
+      };
+    }
+    const goal = 2500 + cycle * 1500;
+    const reward = 300 + cycle * 70;
+    return {
+      type: "dist",
+      goal,
+      reward,
+      ja: `累計${goal.toLocaleString()}m飛行する`,
+      en: `Fly ${goal.toLocaleString()}m total`
+    };
+  }
+
+  function advanceMission(type, amount) {
+    const m = getCurrentMission();
+    if (m.type !== type) return;
+    if (saveData.missionProg < m.goal) {
+      saveData.missionProg = Math.min(m.goal, saveData.missionProg + amount);
+    }
+  }
+
+  function claimMissionReward() {
+    const m = getCurrentMission();
+    if (saveData.missionProg < m.goal) return false;
+    AudioEngine.sfxRing(3);
+    saveData.credits += m.reward;
+    saveData.xp += 120;
+    saveData.missionIdx += 1;
+    saveData.missionProg = 0;
+    persistSave();
+    syncAllUI();
+    showCallout(saveData.lang === "en" ? `MISSION CLEAR! +${m.reward} COINS` : `ミッション達成！ +${m.reward} COINS`);
+    return true;
   }
 
   // =========================================================================
@@ -359,6 +518,23 @@
       this.playTone(220, 960, 0.34, "sine", 0.16);
     },
 
+    sfxThrow(multiCount = 1) {
+      this.playTone(340 + multiCount * 35, 130, 0.11, "triangle", 0.13);
+      this.playTone(1280, 620, 0.055, "sine", 0.06);
+    },
+
+    sfxShatter(isCrystal = false) {
+      if (!saveData.soundOn) return;
+      this.ensure();
+      if (!this.ctx) return;
+      // Heavy steel-ball punch + cascading crystalline/metallic fracture harmonics
+      this.playTone(185, 48, 0.18, "triangle", 0.22);
+      const base = isCrystal ? 1420 : 860;
+      this.playTone(base, base * 0.42, 0.13, "sawtooth", 0.11);
+      setTimeout(() => this.playTone(base * 1.35, base * 0.65, 0.11, "triangle", 0.09), 26);
+      setTimeout(() => this.playTone(base * 1.72, base * 0.85, 0.09, "sine", 0.07), 55);
+    },
+
     sfxClick() {
       this.playTone(680, 500, 0.045, "triangle", 0.045);
     }
@@ -409,7 +585,7 @@
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.12;
+  renderer.toneMappingExposure = 1.18;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -420,14 +596,14 @@
   const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.15, 380);
   camera.position.set(0, 2.2, 9.5);
 
-  const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0x334155, 0.95);
+  const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0x334155, 1.05);
   scene.add(hemiLight);
 
-  const sunLight = new THREE.DirectionalLight(0xfff7ed, 1.55);
+  const sunLight = new THREE.DirectionalLight(0xfff7ed, 1.72);
   sunLight.position.set(18, 28, 16);
   sunLight.castShadow = true;
-  sunLight.shadow.mapSize.width = 1024;
-  sunLight.shadow.mapSize.height = 1024;
+  sunLight.shadow.mapSize.width = 2048;
+  sunLight.shadow.mapSize.height = 2048;
   sunLight.shadow.camera.near = 2;
   sunLight.shadow.camera.far = 95;
   sunLight.shadow.camera.left = -16;
@@ -436,12 +612,15 @@
   sunLight.shadow.camera.bottom = -16;
   scene.add(sunLight);
 
-  const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.55);
+  const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.65);
   rimLight.position.set(-14, 6, -18);
   scene.add(rimLight);
 
   const burnerLight = new THREE.PointLight(0x38bdf8, 1.4, 14);
   scene.add(burnerLight);
+
+  const smashFlashLight = new THREE.PointLight(0xfbbf24, 0.0, 22);
+  scene.add(smashFlashLight);
 
   const skyDome = createAtmosphericSkyDome();
   scene.add(skyDome.mesh);
@@ -452,17 +631,23 @@
   const corridorWorld = createCorridorWorld();
   scene.add(corridorWorld.group);
 
-  // Showcase Aircraft (Angled cleanly at front-3/4 view!)
+  // Showcase Aircraft + Gleaming Hero Gyro-Ball!
   const showcaseAnchor = new THREE.Group();
   showcaseAnchor.position.set(0, 1.15, 2.0);
   scene.add(showcaseAnchor);
   let showcaseCraft = null;
+  let showcaseBall = null;
 
   function rebuildShowcaseCraft() {
     if (showcaseCraft) showcaseAnchor.remove(showcaseCraft.root);
+    if (showcaseBall) showcaseAnchor.remove(showcaseBall.mesh);
     const livery = LIVERY_CATALOG[saveData.liveryIdx] || LIVERY_CATALOG[0];
     showcaseCraft = createAircraft(saveData.craftId, livery);
     showcaseAnchor.add(showcaseCraft.root);
+
+    showcaseBall = createGyroBall(saveData.ballSkinId, 1.18, false);
+    showcaseBall.mesh.position.set(1.55, 0.42, 1.35);
+    showcaseAnchor.add(showcaseBall.mesh);
   }
   rebuildShowcaseCraft();
 
@@ -605,6 +790,18 @@
   let obstacles = [];
   let energyRings = [];
   let supplyPods = [];
+  let thrownBalls = [];
+  let shatterBursts = [];
+
+  // Gyro-Ball Ammo, Multi-Ball Streak & Fever Rush State
+  let ballsLeft = 18;
+  let ballReloadTimer = 0;
+  let smashedCount = 0;
+  let sessionSmashCoins = 0;
+  let smashStreak = 0;
+  let feverGauge = 0;
+  let feverTimer = 0;
+  let lastThrowTime = 0;
 
   let obsSpawnTimer = 0;
   let podSpawnTimer = 4.0;
@@ -613,6 +810,7 @@
   let orbitYaw = 2.45;
   let orbitPitch = 0.18;
   let showcaseDragging = false;
+  let showcaseMovedDist = 0;
   let lastPointerX = 0;
   let lastPointerY = 0;
 
@@ -631,10 +829,207 @@
     obstacles.forEach((o) => scene.remove(o.mesh));
     energyRings.forEach((r) => scene.remove(r.mesh));
     supplyPods.forEach((b) => scene.remove(b.mesh));
+    thrownBalls.forEach((tb) => scene.remove(tb.mesh));
+    shatterBursts.forEach((sb) => {
+      sb.items.forEach((it) => scene.remove(it.mesh));
+      sb.materials.forEach((m) => m.dispose());
+    });
     players = [];
     obstacles = [];
     energyRings = [];
     supplyPods = [];
+    thrownBalls = [];
+    shatterBursts = [];
+  }
+
+  function spawnObstacleShatter(obs, hitX, hitY, hitZ) {
+    const ch = CHAPTERS[saveData.chapterIdx] || CHAPTERS[0];
+    const count = 13;
+    const built = createShatterPieces(obs.type, ch, count);
+    const items = built.pieces.map((mesh, idx) => {
+      const ang = (idx / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+      const radialSpd = 6.5 + Math.random() * 11.5;
+      const ox = hitX + (Math.random() - 0.5) * 1.1;
+      const oy = hitY + (Math.random() - 0.5) * 1.1;
+      const oz = hitZ + (Math.random() - 0.5) * 0.8;
+      mesh.position.set(ox, oy, oz);
+      scene.add(mesh);
+      return {
+        mesh,
+        vx: Math.cos(ang) * radialSpd,
+        vy: Math.sin(ang) * radialSpd + 3.8 + Math.random() * 4.5,
+        vz: -10 + Math.random() * 24,
+        rx: (Math.random() - 0.5) * 11,
+        ry: (Math.random() - 0.5) * 11,
+        rz: (Math.random() - 0.5) * 11
+      };
+    });
+    shatterBursts.push({
+      items,
+      materials: built.materials,
+      age: 0,
+      maxAge: 1.15
+    });
+
+    spawnBurst3D(hitX, hitY, hitZ, built.flashHex, 20);
+    smashFlashLight.color.setHex(built.flashHex);
+    smashFlashLight.position.set(hitX, hitY, hitZ + 2.0);
+    smashFlashLight.intensity = 3.2;
+
+    const isIcy = obs.type === "ICE_SPIRE" || obs.type === "CRYSTAL_CLUSTER";
+    AudioEngine.sfxShatter(isIcy);
+  }
+
+  const unprojVec = new THREE.Vector3();
+  const rayDirVec = new THREE.Vector3();
+
+  function getMultiBallCount() {
+    if (feverTimer > 0) return 5;
+    if (smashStreak >= 6) return 3;
+    if (smashStreak >= 3) return 2;
+    return 1;
+  }
+
+  function updateBallHUD() {
+    const cntEl = document.getElementById("hud-balls-count");
+    const badgeEl = document.getElementById("hud-multiball-badge");
+    const throwBtn = document.getElementById("btn-throw-ball");
+    if (cntEl) cntEl.textContent = feverTimer > 0 ? "∞" : `×${ballsLeft}`;
+    const multi = getMultiBallCount();
+    if (badgeEl) {
+      badgeEl.classList.remove("tier-2", "tier-3", "fever");
+      if (feverTimer > 0) {
+        badgeEl.textContent = "FEVER 5x";
+        badgeEl.classList.add("fever");
+      } else if (multi === 3) {
+        badgeEl.textContent = "3x BALL";
+        badgeEl.classList.add("tier-3");
+      } else if (multi === 2) {
+        badgeEl.textContent = "2x BALL";
+        badgeEl.classList.add("tier-2");
+      } else {
+        badgeEl.textContent = "1x BALL";
+      }
+    }
+    if (throwBtn) throwBtn.classList.toggle("fever-btn", feverTimer > 0);
+  }
+
+  function throwGyroBalls(screenX = null, screenY = null) {
+    const now = performance.now();
+    if (now - lastThrowTime < 95) return;
+    lastThrowTime = now;
+
+    // Home Screen Interactive Demo Throw!
+    if (!isPlaying) {
+      AudioEngine.ensure();
+      AudioEngine.sfxThrow(1);
+      const scaleMult = 1.0 + (saveData.upBallPower - 1) * 0.06;
+      const bObj = createGyroBall(saveData.ballSkinId, scaleMult, false);
+      const startPos = new THREE.Vector3(
+        showcaseAnchor.position.x + 1.2,
+        showcaseAnchor.position.y + 0.35,
+        showcaseAnchor.position.z + 0.8
+      );
+      let targetX = (Math.random() - 0.5) * 4;
+      let targetY = 1.6;
+      const targetZ = -42;
+      if (screenX !== null && screenY !== null) {
+        const ndcX = (screenX / window.innerWidth) * 2 - 1;
+        const ndcY = -(screenY / window.innerHeight) * 2 + 1;
+        unprojVec.set(ndcX, ndcY, 0.5).unproject(camera);
+        rayDirVec.copy(unprojVec).sub(camera.position).normalize();
+        const tRay = (targetZ - camera.position.z) / (rayDirVec.z || -1);
+        if (tRay > 0) {
+          targetX = camera.position.x + rayDirVec.x * tRay;
+          targetY = camera.position.y + rayDirVec.y * tRay;
+        }
+      }
+      const flightT = 0.45;
+      bObj.mesh.position.copy(startPos);
+      scene.add(bObj.mesh);
+      thrownBalls.push({
+        ...bObj,
+        x: startPos.x, y: startPos.y, z: startPos.z, prevZ: startPos.z,
+        vx: (targetX - startPos.x) / flightT,
+        vy: (targetY - startPos.y) / flightT + 1.6,
+        vz: (targetZ - startPos.z) / flightT,
+        hitRadius: 1.0,
+        demo: true,
+        age: 0
+      });
+      return;
+    }
+
+    const me = players.find((p) => p.id === "me" && p.alive);
+    if (!me) return;
+
+    if (feverTimer <= 0 && ballsLeft <= 0) {
+      AudioEngine.sfxClick();
+      showHudEvent(tr("noBallsMsg"), "");
+      return;
+    }
+
+    if (feverTimer <= 0) {
+      ballsLeft = Math.max(0, ballsLeft - 1);
+    }
+
+    const multi = getMultiBallCount();
+    AudioEngine.sfxThrow(multi);
+    updateBallHUD();
+
+    const reticle = document.getElementById("aim-reticle");
+    if (reticle) {
+      reticle.classList.add("throw-pulse");
+      setTimeout(() => reticle.classList.remove("throw-pulse"), 110);
+    }
+
+    // Compute world target point at z = -38 (either tapped spot or Gyro Nose Sight!)
+    const targetZ = -38;
+    let aimTargetX = Math.max(-BOUND_X, Math.min(BOUND_X, me.x + me.ix * 3.2 + gyroX * 1.4));
+    let aimTargetY = Math.max(BOUND_Y_MIN, Math.min(BOUND_Y_MAX + 1.2, me.y + me.iy * 2.5 + gyroY * 1.1 + 0.35));
+
+    if (screenX !== null && screenY !== null) {
+      const ndcX = (screenX / window.innerWidth) * 2 - 1;
+      const ndcY = -(screenY / window.innerHeight) * 2 + 1;
+      unprojVec.set(ndcX, ndcY, 0.5).unproject(camera);
+      rayDirVec.copy(unprojVec).sub(camera.position).normalize();
+      const tRay = (targetZ - camera.position.z) / (rayDirVec.z || -1);
+      if (tRay > 0) {
+        aimTargetX = Math.max(-BOUND_X - 1.2, Math.min(BOUND_X + 1.2, camera.position.x + rayDirVec.x * tRay + gyroX * 0.5));
+        aimTargetY = Math.max(BOUND_Y_MIN - 1.0, Math.min(BOUND_Y_MAX + 2.0, camera.position.y + rayDirVec.y * tRay + gyroY * 0.4));
+      }
+    }
+
+    const scaleMult = (1.0 + (saveData.upBallPower - 1) * 0.065) * (feverTimer > 0 ? 1.16 : 1.0);
+    const hitRadius = (0.92 + (saveData.upBallPower - 1) * 0.11) * (feverTimer > 0 ? 1.25 : 1.0);
+    const startX = me.x;
+    const startY = me.y + 0.15;
+    const startZ = PLAYER_Z - 1.1;
+    const speedZ = -112;
+    const tToTarget = (targetZ - startZ) / speedZ; // ~0.35s crisp ballistic arc
+
+    for (let i = 0; i < multi; i++) {
+      const spreadIdx = i - (multi - 1) * 0.5;
+      const tx = aimTargetX + spreadIdx * 1.45;
+      const ty = aimTargetY + (multi >= 5 ? Math.abs(spreadIdx) * 0.25 : 0);
+      const bObj = createGyroBall(saveData.ballSkinId, scaleMult, feverTimer > 0);
+      bObj.mesh.position.set(startX + spreadIdx * 0.28, startY, startZ);
+      scene.add(bObj.mesh);
+
+      thrownBalls.push({
+        ...bObj,
+        x: startX + spreadIdx * 0.28,
+        y: startY,
+        z: startZ,
+        prevZ: startZ,
+        vx: (tx - (startX + spreadIdx * 0.28)) / tToTarget,
+        vy: (ty - startY) / tToTarget + 0.5 * 6.2 * tToTarget, // Compensates gravity so ball lands dead-on target!
+        vz: speedZ,
+        hitRadius,
+        demo: false,
+        age: 0
+      });
+    }
   }
 
   function spawnPlayerEntity(id, name, slotIdx, isBot = false, conn = null) {
@@ -653,6 +1048,8 @@
     scene.add(craft.root);
 
     const diff = DIFFICULTIES[saveData.diffIdx];
+    const bonusShields = slotIdx === 0 ? Math.floor((saveData.upShieldMag || 1) / 3) : 0;
+    const totalShields = diff.shields + bonusShields;
     return {
       id, name, slotIdx, isBot, conn, craft,
       x: sx, y: sy,
@@ -661,8 +1058,8 @@
       anchorX: sx, anchorY: sy, campTime: 0,
       boost: false,
       alive: true,
-      shields: diff.shields,
-      maxShields: diff.shields,
+      shields: totalShields,
+      maxShields: totalShields,
       invulnUntil: 0,
       score: 0,
       distance: 0,
@@ -1044,6 +1441,15 @@
     obsSpawnTimer = 0.55;
     podSpawnTimer = 3.2;
 
+    // Reset Gyro-Ball Ammo & Fever Rush state
+    ballsLeft = 15 + (saveData.upBallStock - 1) * 3;
+    ballReloadTimer = 0;
+    smashedCount = 0;
+    sessionSmashCoins = 0;
+    smashStreak = 0;
+    feverGauge = 0;
+    feverTimer = 0;
+
     if (rawBeta !== 0 || rawGamma !== 0) {
       zeroBeta = rawBeta;
       zeroGamma = rawGamma;
@@ -1056,6 +1462,11 @@
     const me = players.find((p) => p.id === "me") || players[0];
     updateShieldHUD(me);
     updateTacticalButton(me);
+    updateBallHUD();
+    const smashEl = document.getElementById("hud-smash");
+    if (smashEl) smashEl.textContent = "0";
+    const feverEl = document.getElementById("hud-fever-fill");
+    if (feverEl) feverEl.style.width = "0%";
 
     const ch = CHAPTERS[saveData.chapterIdx] || CHAPTERS[0];
     const diff = DIFFICULTIES[saveData.diffIdx];
@@ -1085,34 +1496,51 @@
     if (endless) { victory = false; restoreFromEndless(); }
     isPlaying = false;
     isBoosting = false;
+    feverTimer = 0;
     document.body.classList.remove("in-flight");
     syncExternalAdProtection();
     AudioEngine.updateEngine(false, false, 0);
     document.getElementById("blind-overlay").classList.remove("active");
-    document.getElementById("screen-fx").classList.remove("boost-active", "damage-flash");
+    document.getElementById("screen-fx").classList.remove("boost-active", "fever-active", "damage-flash");
     document.getElementById("body-preview-wrap").classList.add("hidden");
 
     const me = players.find((p) => p.id === "me") || players[0];
     const finalScore = Math.floor(me ? me.score : score);
     const finalDist = Math.floor(me ? me.distance : distance);
-    const earnedCredits = Math.max(30, finalScore * 60 + (victory ? 500 : 0));
+    const earnedCredits = Math.max(35, finalScore * 60 + sessionSmashCoins + (victory ? 500 : 0));
 
+    advanceMission("dist", finalDist);
     saveData.credits += earnedCredits;
-    saveData.xp += Math.floor(finalDist * 0.08) + ringsCollected * 20;
+    saveData.xp += Math.floor(finalDist * 0.08) + ringsCollected * 22 + smashedCount * 14;
     if (finalScore > saveData.bestScore) saveData.bestScore = finalScore;
     if (finalDist > saveData.bestDist) saveData.bestDist = finalDist;
     persistSave();
     syncAllUI();
 
-    document.getElementById("res-kicker").textContent = victory ? "STAGE CLEAR" : "FLIGHT ENDED";
-    document.getElementById("res-kicker").style.color = victory ? "#10b981" : "#f87171";
+    const rk = getRankInfo(saveData.xp);
+    document.getElementById("res-kicker").textContent = victory ? "STAGE CLEAR" : "RUN COMPLETE";
+    document.getElementById("res-kicker").style.color = victory ? "#10b981" : "#f97316";
     document.getElementById("res-title").textContent = victory ? tr("stageClearTitle") : tr("gameOverTitle");
     document.getElementById("res-score").textContent = finalScore.toLocaleString();
+    const resSmashEl = document.getElementById("res-smash");
+    if (resSmashEl) resSmashEl.textContent = smashedCount.toLocaleString();
     document.getElementById("res-dist").textContent = `${finalDist.toLocaleString()}m`;
     document.getElementById("res-credits").textContent = `+${earnedCredits.toLocaleString()}`;
-    document.getElementById("res-bonus").textContent = saveData.lang === "en"
-      ? `Rings Passed: ${ringsCollected}  |  Near Misses: ${nearMisses}`
-      : `リング通過: ${ringsCollected}回  /  ニアミス回避: ${nearMisses}回`;
+
+    const rkLbl = document.getElementById("res-rank-label");
+    const rkNext = document.getElementById("res-xp-next");
+    const rkFill = document.getElementById("res-xp-fill");
+    if (rkLbl) rkLbl.textContent = `LV.${rk.lvl} ${rk.title}`;
+    if (rkNext) rkNext.textContent = saveData.lang === "en" ? `NEXT ${rk.rem} XP` : `次まで ${rk.rem} XP`;
+    if (rkFill) rkFill.style.width = `${rk.pct}%`;
+
+    const curM = getCurrentMission();
+    const mReady = saveData.missionProg >= curM.goal;
+    document.getElementById("res-bonus").textContent = mReady
+      ? (saveData.lang === "en" ? `🎯 Mission Complete! Tap Home banner for +${curM.reward} Coins!` : `🎯 ミッション達成！ホーム上部で +${curM.reward} COINS 受取可能！`)
+      : (saveData.lang === "en"
+          ? `Smashed: ${smashedCount}  |  Rings: ${ringsCollected}  |  Near Miss: ${nearMisses}`
+          : `粉砕: ${smashedCount}個  /  リング: ${ringsCollected}個  /  ニアミス: ${nearMisses}回`);
 
     const rankBox = document.getElementById("res-ranking");
     if (players.length > 1) {
@@ -1121,7 +1549,7 @@
       rankBox.innerHTML = sorted.map((p, idx) => `
         <div class="setting-row" style="padding:7px 12px;">
           <span style="font-weight:900; font-size:13px;">#${idx + 1} ${p.name}</span>
-          <span style="font-weight:800; font-size:13px; color:#fbbf24;">${Math.floor(p.score).toLocaleString()} RINGS (${Math.floor(p.distance).toLocaleString()}m)</span>
+          <span style="font-weight:800; font-size:13px; color:#b45309;">${Math.floor(p.score).toLocaleString()} RINGS (${Math.floor(p.distance).toLocaleString()}m)</span>
         </div>
       `).join("");
     } else {
@@ -1136,8 +1564,10 @@
   }
 
   function returnToHangarHome() {
+    if (endless) restoreFromEndless();
     isPlaying = false;
     isBoosting = false;
+    feverTimer = 0;
     document.body.classList.remove("in-flight");
     syncExternalAdProtection();
     AudioEngine.updateEngine(false, false, 0);
@@ -1149,6 +1579,7 @@
     document.getElementById("flight-hud").classList.add("hidden");
     document.getElementById("body-preview-wrap").classList.add("hidden");
     document.getElementById("blind-overlay").classList.remove("active");
+    document.getElementById("screen-fx").classList.remove("boost-active", "fever-active", "damage-flash");
     document.getElementById("home-shell").classList.remove("hidden");
     syncAllUI();
   }
@@ -1243,6 +1674,7 @@
   const showcaseArea = document.getElementById("showcase-drag-area");
   showcaseArea.addEventListener("pointerdown", (e) => {
     showcaseDragging = true;
+    showcaseMovedDist = 0;
     lastPointerX = e.clientX;
     lastPointerY = e.clientY;
   });
@@ -1250,10 +1682,17 @@
     if (!showcaseDragging || isPlaying) return;
     const dx = e.clientX - lastPointerX;
     const dy = e.clientY - lastPointerY;
+    showcaseMovedDist += Math.hypot(dx, dy);
     lastPointerX = e.clientX;
     lastPointerY = e.clientY;
     orbitYaw += dx * 0.011;
     orbitPitch = Math.max(-0.28, Math.min(0.62, orbitPitch + dy * 0.008));
+  });
+  showcaseArea.addEventListener("pointerup", (e) => {
+    if (!isPlaying && showcaseMovedDist < 12) {
+      throwGyroBalls(e.clientX, e.clientY);
+    }
+    showcaseDragging = false;
   });
   window.addEventListener("pointerup", () => { showcaseDragging = false; });
 
@@ -1297,18 +1736,25 @@
   stickZone.addEventListener("pointerup", releaseStick);
   stickZone.addEventListener("pointercancel", releaseStick);
 
+  // Tap anywhere on 3D sky to aim & throw heavy chrome ball! Drag > 14px also smoothly steers.
   let canvasPointerId = null;
   let canvasOriginX = 0, canvasOriginY = 0;
   canvas.addEventListener("pointerdown", (e) => {
-    if (!isPlaying || gameMode === "BODY") return;
+    if (!isPlaying) return;
+    throwGyroBalls(e.clientX, e.clientY);
+    if (gameMode === "BODY") return;
     canvasPointerId = e.pointerId;
     canvasOriginX = e.clientX;
     canvasOriginY = e.clientY;
   });
   window.addEventListener("pointermove", (e) => {
     if (!isPlaying || e.pointerId !== canvasPointerId || gameMode === "BODY") return;
-    dragSteerX = Math.max(-1, Math.min(1, (e.clientX - canvasOriginX) / 90));
-    dragSteerY = Math.max(-1, Math.min(1, -(e.clientY - canvasOriginY) / 90));
+    const dx = e.clientX - canvasOriginX;
+    const dy = e.clientY - canvasOriginY;
+    if (Math.hypot(dx, dy) > 14) {
+      dragSteerX = Math.max(-1, Math.min(1, dx / 90));
+      dragSteerY = Math.max(-1, Math.min(1, -dy / 90));
+    }
   });
   window.addEventListener("pointerup", (e) => {
     if (e.pointerId === canvasPointerId) {
@@ -1379,7 +1825,11 @@
   window.addEventListener("keydown", (e) => {
     const k = e.key.toLowerCase();
     keys[k] = true;
-    if (k === " " || k === "shift") isBoosting = true;
+    if (k === "shift") isBoosting = true;
+    if ((k === " " || k === "f" || k === "j") && isPlaying) {
+      e.preventDefault();
+      throwGyroBalls();
+    }
     if ((k === "e" || k === "enter") && isPlaying) {
       const me = players.find((p) => p.id === "me");
       if (me) fireTacticalItem(me);
@@ -1389,7 +1839,7 @@
   window.addEventListener("keyup", (e) => {
     const k = e.key.toLowerCase();
     keys[k] = false;
-    if (k === " " || k === "shift") isBoosting = false;
+    if (k === "shift") isBoosting = false;
   });
 
   // Body Camera Motion
@@ -1460,8 +1910,27 @@
   }
 
   // =========================================================================
-  // 11. BILINGUAL UI SYNC, MODALS & MULTIPLAYER
+  // 11. BILINGUAL UI SYNC, UPGRADE WORKSHOP, MODALS & MULTIPLAYER
   // =========================================================================
+  let currentHangarTab = "upgrade";
+
+  function switchHangarTab(tabId) {
+    currentHangarTab = tabId;
+    document.querySelectorAll("#hangar-tabs [data-hg-tab]").forEach((b) => {
+      b.classList.toggle("active", b.dataset.hgTab === tabId);
+    });
+    document.getElementById("hg-panel-upgrade").classList.toggle("hidden", tabId !== "upgrade");
+    document.getElementById("hg-panel-balls").classList.toggle("hidden", tabId !== "balls");
+    document.getElementById("hg-panel-craft").classList.toggle("hidden", tabId !== "craft");
+  }
+
+  document.querySelectorAll("#hangar-tabs [data-hg-tab]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      AudioEngine.sfxClick();
+      switchHangarTab(btn.dataset.hgTab);
+    });
+  });
+
   function closeAllModals() {
     hangarOpen = false;
     ["modal-hangar", "modal-stages", "modal-multi", "modal-settings"].forEach((id) => {
@@ -1488,14 +1957,39 @@
     const craftMeta = CRAFT_CATALOG.find((c) => c.id === saveData.craftId) || CRAFT_CATALOG[0];
     const ch = CHAPTERS[saveData.chapterIdx] || CHAPTERS[0];
     const diff = DIFFICULTIES[saveData.diffIdx];
-    const lvl = Math.floor(saveData.xp / 500) + 1;
+    const rk = getRankInfo(saveData.xp);
 
+    document.getElementById("ui-rank-badge").textContent = `LV.${rk.lvl}`;
+    document.getElementById("ui-rank-title").textContent = rk.title;
+    document.getElementById("ui-coins-inline").textContent = saveData.credits.toLocaleString();
     document.getElementById("ui-best-inline").textContent =
       `BEST ${saveData.bestScore.toLocaleString()} RINGS`;
     document.getElementById("ui-hangar-credits").textContent =
-      `CREDITS: ${saveData.credits.toLocaleString()}  |  LV.${lvl}`;
+      `COINS: ${saveData.credits.toLocaleString()}  |  LV.${rk.lvl} ${rk.title}`;
 
-    document.getElementById("btn-lang-toggle").textContent = isEn ? "日本語" : "EN";
+    const upDot = document.getElementById("ui-upgrade-dot");
+    if (upDot) upDot.classList.toggle("hidden", !hasAffordableUpgrade());
+
+    // Sync Rolling Mission Banner
+    const m = getCurrentMission();
+    const prog = Math.min(m.goal, saveData.missionProg || 0);
+    const done = prog >= m.goal;
+    const mBanner = document.getElementById("btn-mission-banner");
+    const mTag = document.getElementById("ui-mission-tag");
+    const mText = document.getElementById("ui-mission-text");
+    const mFill = document.getElementById("ui-mission-fill");
+    const mRew = document.getElementById("ui-mission-reward");
+    if (mBanner) mBanner.classList.toggle("claimable", done);
+    if (mTag) mTag.textContent = done ? (isEn ? "CLAIM!" : "受取！") : "MISSION";
+    if (mText) {
+      mText.textContent = done
+        ? (isEn ? `${m.en} — Tap to claim!` : `${m.ja}（タップで報酬GET！）`)
+        : `${isEn ? m.en : m.ja} (${prog}/${m.goal})`;
+    }
+    if (mFill) mFill.style.width = `${Math.min(100, Math.round((prog / m.goal) * 100))}%`;
+    if (mRew) mRew.textContent = `+${m.reward}`;
+
+    document.getElementById("btn-lang-toggle").textContent = isEn ? "JA" : "EN";
     document.getElementById("audio-wave-path").style.display = saveData.soundOn ? "" : "none";
 
     document.getElementById("spec-code").textContent = craftMeta.code;
@@ -1532,6 +2026,105 @@
 
   function renderHangarModal() {
     const isEn = saveData.lang === "en";
+
+    // 1) Power Upgrades Panel
+    const upList = document.getElementById("upgrade-list");
+    if (upList) {
+      upList.innerHTML = UPGRADE_DEFS.map((u) => {
+        const lv = saveData[u.key] || 1;
+        const maxed = lv >= 10;
+        const cost = u.cost(lv);
+        const canBuy = !maxed && saveData.credits >= cost;
+        return `
+          <div class="upgrade-row">
+            <div class="upgrade-info">
+              <div class="upgrade-title-line">
+                <span class="upgrade-lv-badge">LV.${lv}${maxed ? " MAX" : ""}</span>
+                <span class="upgrade-name">${isEn ? u.enName : u.jaName}</span>
+              </div>
+              <div class="upgrade-desc">${isEn ? u.enDesc(lv) : u.jaDesc(lv)}</div>
+            </div>
+            <button type="button" data-upgrade-key="${u.key}" class="upgrade-buy-btn ${canBuy ? "" : "disabled"}">
+              ${maxed ? "MAX" : `● ${cost.toLocaleString()}`}
+            </button>
+          </div>
+        `;
+      }).join("");
+
+      upList.querySelectorAll("[data-upgrade-key]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const key = btn.dataset.upgradeKey;
+          const def = UPGRADE_DEFS.find((d) => d.key === key);
+          if (!def) return;
+          const lv = saveData[key] || 1;
+          if (lv >= 10) return;
+          const cost = def.cost(lv);
+          if (saveData.credits < cost) {
+            AudioEngine.sfxClick();
+            showCallout(isEn ? "Not enough coins!" : "コインが足りません！");
+            return;
+          }
+          saveData.credits -= cost;
+          saveData[key] = lv + 1;
+          AudioEngine.sfxRing(2);
+          persistSave();
+          rebuildShowcaseCraft();
+          renderHangarModal();
+          syncAllUI();
+        });
+      });
+    }
+
+    // 2) Realistic Metal Ball Skins Panel
+    const bGrid = document.getElementById("ball-skin-grid");
+    if (bGrid) {
+      bGrid.innerHTML = BALL_SKINS.map((b) => {
+        const unlocked = saveData.unlockedBalls.includes(b.id);
+        const equipped = saveData.ballSkinId === b.id;
+        const hex = "#" + new THREE.Color(b.color).getHexString();
+        const statusTxt = equipped
+          ? (isEn ? "EQUIPPED" : "装備中")
+          : unlocked
+            ? (isEn ? "TAP TO EQUIP" : "タップで装備")
+            : `● ${b.cost.toLocaleString()} COINS`;
+        return `
+          <button type="button" data-ball-skin="${b.id}" class="ball-skin-card ${equipped ? "active" : ""}">
+            <span class="ball-preview-orb" style="background:${hex};"></span>
+            <span class="ball-skin-meta">
+              <span class="ball-skin-name">${isEn ? b.enName : b.name}</span>
+              <span class="ball-skin-status">${statusTxt}</span>
+            </span>
+          </button>
+        `;
+      }).join("");
+
+      bGrid.querySelectorAll("[data-ball-skin]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.ballSkin;
+          const skin = BALL_SKINS.find((s) => s.id === id);
+          if (!skin) return;
+          if (!saveData.unlockedBalls.includes(id)) {
+            if (saveData.credits < skin.cost) {
+              AudioEngine.sfxClick();
+              showCallout(isEn ? "Not enough coins!" : "コインが足りません！");
+              return;
+            }
+            saveData.credits -= skin.cost;
+            saveData.unlockedBalls.push(id);
+            AudioEngine.sfxRing(3);
+          } else {
+            AudioEngine.sfxClick();
+          }
+          saveData.ballSkinId = id;
+          persistSave();
+          if (showcaseBall) showcaseBall.setSkin(id);
+          renderHangarModal();
+          syncAllUI();
+        });
+      });
+    }
+
+    // 3) Aircraft & Liveries Panel
     const cGrid = document.getElementById("hangar-craft-grid");
     cGrid.innerHTML = CRAFT_CATALOG.map((c) => `
       <button type="button" data-craft-id="${c.id}" class="craft-card ${c.id === saveData.craftId ? "active" : ""}">
@@ -1942,11 +2535,23 @@
   document.getElementById("btn-sortie").addEventListener("click", () => launchSoloOrBody(false));
   document.getElementById("btn-endless").addEventListener("click", () => launchSoloOrBody(false, true));
 
-  document.getElementById("btn-dock-hangar").addEventListener("click", () => {
+  function openHangarWorkshop(initialTab = "upgrade") {
     AudioEngine.sfxClick();
     hangarOpen = true;
+    switchHangarTab(initialTab);
     renderHangarModal();
     document.getElementById("modal-hangar").classList.remove("hidden");
+  }
+
+  document.getElementById("btn-dock-hangar").addEventListener("click", () => openHangarWorkshop("upgrade"));
+  document.getElementById("btn-top-coins").addEventListener("click", () => openHangarWorkshop("upgrade"));
+
+  document.getElementById("btn-mission-banner").addEventListener("click", () => {
+    if (!claimMissionReward()) {
+      AudioEngine.sfxClick();
+      const m = getCurrentMission();
+      showCallout(saveData.lang === "en" ? `${m.en} (${saveData.missionProg}/${m.goal})` : `${m.ja}（現在 ${saveData.missionProg}/${m.goal}）`);
+    }
   });
 
   const openStagesFn = () => {
@@ -1973,6 +2578,20 @@
   boostHoldBtn.addEventListener("pointercancel", () => { isBoosting = false; });
   boostHoldBtn.addEventListener("pointerleave", () => { isBoosting = false; });
 
+  // Dedicated Chrome Ball Throw Trigger (tap or hold for rapid fire!)
+  let holdingBallBtn = false;
+  let holdThrowAccum = 0;
+  const ballThrowBtn = document.getElementById("btn-throw-ball");
+  ballThrowBtn.addEventListener("pointerdown", (e) => {
+    e.stopPropagation();
+    holdingBallBtn = true;
+    holdThrowAccum = 0;
+    throwGyroBalls();
+  });
+  ballThrowBtn.addEventListener("pointerup", () => { holdingBallBtn = false; });
+  ballThrowBtn.addEventListener("pointercancel", () => { holdingBallBtn = false; });
+  ballThrowBtn.addEventListener("pointerleave", () => { holdingBallBtn = false; });
+
   document.getElementById("btn-tactical-item").addEventListener("click", (e) => {
     e.stopPropagation();
     if (clientConn && clientConn.open) {
@@ -1984,6 +2603,10 @@
   });
 
   document.getElementById("btn-res-home").addEventListener("click", returnToHangarHome);
+  document.getElementById("btn-res-upgrade").addEventListener("click", () => {
+    returnToHangarHome();
+    openHangarWorkshop("upgrade");
+  });
   document.getElementById("btn-res-retry").addEventListener("click", () => {
     AudioEngine.sfxClick();
     document.getElementById("modal-result").classList.add("modal-offscreen");
@@ -1995,10 +2618,11 @@
   document.getElementById("btn-share-x").addEventListener("click", () => {
     AudioEngine.sfxClick();
     const s = document.getElementById("res-score").textContent;
+    const sm = document.getElementById("res-smash").textContent;
     const d = document.getElementById("res-dist").textContent;
     const text = saveData.lang === "en"
-      ? `Passed ${s} rings (${d}) in GYRO DODGE 3D! #GYRODODGE`
-      : `GYRO DODGE 3D で リング${s}個通過（飛行距離 ${d}）を達成！ #GYRODODGE`;
+      ? `Passed ${s} rings & smashed ${sm} obstacles (${d}) in GYRO SMASH 3D! #GYROSMASH`
+      : `GYRO SMASH 3D で リング${s}個・障害物${sm}個粉砕（${d}）を達成！ #GYROSMASH`;
     const url = location.href.split("?")[0];
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, "_blank", "noopener");
   });
@@ -2008,8 +2632,8 @@
     const s = document.getElementById("res-score").textContent;
     const url = location.href.split("?")[0];
     const shareData = {
-      title: "GYRO DODGE 3D",
-      text: saveData.lang === "en" ? `Play GYRO DODGE 3D! My score: ${s} rings` : `GYRO DODGE 3D でリング${s}個通過！`,
+      title: "GYRO SMASH FLIGHT 3D",
+      text: saveData.lang === "en" ? `Play GYRO SMASH 3D! Score: ${s} rings` : `GYRO SMASH 3D でリング${s}個通過！`,
       url
     };
     if (navigator.share) {
@@ -2062,6 +2686,10 @@
     const baseSpeed = isPlaying
       ? ((diff.speed + diff.maxExtraSpeed * progressRatio) * ch.speedMult) * (activeBoost ? 1.42 : 1.0)
       : 16;
+
+    if (smashFlashLight.intensity > 0) {
+      smashFlashLight.intensity = Math.max(0, smashFlashLight.intensity - dt * 18);
+    }
 
     // Safe Modulo UV & Multi-Step While-Loop World Wrap (Stage NEVER Disappears!)
     if (saveData.environment === "indoor") {
@@ -2134,17 +2762,65 @@
       b.mat.opacity = 1.0 - b.age / b.maxAge;
     }
 
+    // 3D Solid Shatter Fragments (Tumbling chunks with realistic gravity!)
+    for (let i = shatterBursts.length - 1; i >= 0; i--) {
+      const sb = shatterBursts[i];
+      sb.age += dt;
+      if (sb.age >= sb.maxAge) {
+        sb.items.forEach((it) => scene.remove(it.mesh));
+        sb.materials.forEach((m) => m.dispose());
+        shatterBursts.splice(i, 1);
+        continue;
+      }
+      const shrink = sb.age > sb.maxAge * 0.7 ? Math.max(0.05, 1 - (sb.age - sb.maxAge * 0.7) / (sb.maxAge * 0.3)) : 1;
+      for (let k = 0; k < sb.items.length; k++) {
+        const it = sb.items[k];
+        it.vy -= 26.0 * dt;
+        it.mesh.position.x += it.vx * dt;
+        it.mesh.position.y += it.vy * dt;
+        it.mesh.position.z += (it.vz + baseSpeed * 0.75) * dt;
+        it.mesh.rotation.x += it.rx * dt;
+        it.mesh.rotation.y += it.ry * dt;
+        it.mesh.rotation.z += it.rz * dt;
+        if (shrink < 1) it.mesh.scale.multiplyScalar(0.94);
+      }
+    }
+
     if (!isPlaying) {
+      // Update any Home-screen Demo Thrown Balls!
+      for (let i = thrownBalls.length - 1; i >= 0; i--) {
+        const tb = thrownBalls[i];
+        tb.age += dt;
+        tb.vy -= 5.8 * dt;
+        tb.x += tb.vx * dt;
+        tb.y += tb.vy * dt;
+        tb.z += tb.vz * dt;
+        tb.mesh.position.set(tb.x, tb.y, tb.z);
+        tb.ballMesh.rotation.x -= dt * 16;
+        tb.ballMesh.rotation.y += dt * 11;
+        if (tb.z < -46 || tb.age > 0.85) {
+          spawnBurst3D(tb.x, tb.y, tb.z, 0x38bdf8, 18);
+          AudioEngine.sfxShatter(true);
+          scene.remove(tb.mesh);
+          thrownBalls.splice(i, 1);
+        }
+      }
+
       if (!showcaseDragging) orbitYaw += dt * 0.24;
       showcaseAnchor.position.set(
         Math.sin(t * 1.05) * 0.16,
-        (hangarOpen ? 1.65 : 1.18) + Math.sin(t * 1.9) * 0.09,
+        (hangarOpen ? 1.75 : 1.18) + Math.sin(t * 1.9) * 0.09,
         2.0
       );
       showcaseAnchor.rotation.z = Math.cos(t * 1.05) * 0.065;
       animateAircraftDetails(showcaseCraft, 1.05, t, dt);
+      if (showcaseBall) {
+        showcaseBall.mesh.position.y = 0.42 + Math.sin(t * 3.1) * 0.11;
+        showcaseBall.mesh.rotation.y += dt * 1.8;
+        showcaseBall.mesh.rotation.x = Math.sin(t * 1.6) * 0.32;
+      }
 
-      const radius = hangarOpen ? 5.9 : 7.3;
+      const radius = hangarOpen ? 5.9 : 7.2;
       const targetCamX = showcaseAnchor.position.x + Math.sin(orbitYaw) * Math.cos(orbitPitch) * radius;
       const targetCamY = showcaseAnchor.position.y + Math.sin(orbitPitch) * radius + (hangarOpen ? 0.65 : 0.95);
       const targetCamZ = showcaseAnchor.position.z + Math.cos(orbitYaw) * Math.cos(orbitPitch) * radius;
@@ -2154,7 +2830,7 @@
       camera.position.z += (targetCamZ - camera.position.z) * Math.min(1, dt * 6);
       camera.fov += (56 - camera.fov) * Math.min(1, dt * 6);
       camera.updateProjectionMatrix();
-      camera.lookAt(showcaseAnchor.position.x, showcaseAnchor.position.y - (hangarOpen ? 0.55 : 0.22), showcaseAnchor.position.z);
+      camera.lookAt(showcaseAnchor.position.x + 0.35, showcaseAnchor.position.y - (hangarOpen ? 0.55 : 0.18), showcaseAnchor.position.z);
 
       skyDome.mesh.position.copy(camera.position);
       burnerLight.position.set(showcaseAnchor.position.x, showcaseAnchor.position.y, showcaseAnchor.position.z + 2.2);
@@ -2163,9 +2839,42 @@
     }
 
     // =======================================================================
-    // ACTIVE FLIGHT TELEMETRY, PHYSICS & SWEPT COLLISIONS
+    // ACTIVE FLIGHT TELEMETRY, GYRO-BALL SMASH PHYSICS & SWEPT COLLISIONS
     // =======================================================================
     if (gameMode === "BODY") pollBodyCamera();
+
+    // Auto-reload Gyro-Balls & update Fever Mode timer
+    const baseCap = 15 + (saveData.upBallStock - 1) * 3;
+    const reloadSec = Math.max(0.72, 1.6 - (saveData.upBallStock - 1) * 0.09);
+    if (ballsLeft < baseCap) {
+      ballReloadTimer += dt;
+      if (ballReloadTimer >= reloadSec) {
+        ballReloadTimer = 0;
+        ballsLeft++;
+        updateBallHUD();
+      }
+    } else {
+      ballReloadTimer = 0;
+    }
+
+    if (feverTimer > 0) {
+      feverTimer = Math.max(0, feverTimer - dt);
+      feverGauge = (feverTimer / 7.5) * 100;
+      if (feverTimer <= 0) {
+        feverGauge = 0;
+        updateBallHUD();
+      }
+    }
+    const feverFillEl = document.getElementById("hud-fever-fill");
+    if (feverFillEl) feverFillEl.style.width = `${Math.min(100, Math.round(feverGauge))}%`;
+
+    if (holdingBallBtn) {
+      holdThrowAccum += dt;
+      if (holdThrowAccum >= (feverTimer > 0 ? 0.14 : 0.24)) {
+        holdThrowAccum = 0;
+        throwGyroBalls();
+      }
+    }
 
     let kx = 0, ky = 0;
     if (keys["arrowleft"] || keys["a"]) kx -= 1;
@@ -2196,7 +2905,9 @@
     } else {
       boostEnergy = Math.min(100, boostEnergy + 11 * dt);
     }
-    document.getElementById("screen-fx").classList.toggle("boost-active", activeBoost);
+    const fxEl = document.getElementById("screen-fx");
+    fxEl.classList.toggle("boost-active", activeBoost);
+    fxEl.classList.toggle("fever-active", feverTimer > 0);
     document.getElementById("btn-boost-hold").classList.toggle("active", activeBoost);
 
     const arcOffset = 239 * (1 - boostEnergy / 100);
@@ -2289,6 +3000,18 @@
       burnerLight.position.set(me.x, me.y, 4.0);
       burnerLight.intensity = activeBoost ? 2.5 : 1.2;
 
+      // Project Optical Gyro Sight Reticle onto screen!
+      const reticleEl = document.getElementById("aim-reticle");
+      if (reticleEl) {
+        const aimWx = Math.max(-BOUND_X, Math.min(BOUND_X, me.x + me.ix * 3.2 + gyroX * 1.4));
+        const aimWy = Math.max(BOUND_Y_MIN, Math.min(BOUND_Y_MAX + 1.2, me.y + me.iy * 2.5 + gyroY * 1.1 + 0.35));
+        unprojVec.set(aimWx, aimWy, -38).project(camera);
+        const sx = (unprojVec.x * 0.5 + 0.5) * window.innerWidth;
+        const sy = (-unprojVec.y * 0.5 + 0.5) * window.innerHeight;
+        reticleEl.style.left = `${sx}px`;
+        reticleEl.style.top = `${sy}px`;
+      }
+
       score = me.score;
       distance = me.distance;
     }
@@ -2333,6 +3056,103 @@
       obsSpawnTimer = Math.max(diff.minSpawn, curInterval);
     }
 
+    // Update Thrown Chrome Gyro-Balls & Swept-Z Obstacle Shatter Physics!
+    for (let bIdx = thrownBalls.length - 1; bIdx >= 0; bIdx--) {
+      const tb = thrownBalls[bIdx];
+      const prevX = tb.x;
+      const prevY = tb.y;
+      tb.prevZ = tb.z;
+      tb.age += dt;
+      tb.vy -= 6.2 * dt;
+      tb.x += tb.vx * dt;
+      tb.y += tb.vy * dt;
+      tb.z += tb.vz * dt;
+      tb.mesh.position.set(tb.x, tb.y, tb.z);
+      tb.ballMesh.rotation.x -= dt * 18;
+      tb.ballMesh.rotation.y += dt * 12;
+
+      const zMin = Math.min(tb.prevZ, tb.z) - 2.3;
+      const zMax = Math.max(tb.prevZ, tb.z) + 2.3;
+      let consumed = false;
+
+      for (let oIdx = obstacles.length - 1; oIdx >= 0; oIdx--) {
+        const o = obstacles[oIdx];
+        if (o.z < zMin || o.z > zMax) continue;
+
+        const zSpan = tb.z - tb.prevZ;
+        const frac = Math.abs(zSpan) > 0.001 ? Math.max(0, Math.min(1, (o.z - tb.prevZ) / zSpan)) : 1;
+        const testX = prevX + (tb.x - prevX) * frac;
+        const testY = prevY + (tb.y - prevY) * frac;
+
+        const clr = getSignedClearance(o, testX, testY, o.x, o.y, o.angleZ);
+        if (clr <= tb.hitRadius) {
+          // SHATTER OBSTACLE INTO 3D TUMBLING FRAGMENTS!
+          spawnObstacleShatter(o, o.x, o.y, o.z);
+          scene.remove(o.mesh);
+          obstacles.splice(oIdx, 1);
+
+          smashedCount++;
+          saveData.totalSmashed = (saveData.totalSmashed || 0) + 1;
+          const coinGain = 10 + (saveData.upBallPower - 1) * 3;
+          sessionSmashCoins += coinGain;
+          smashStreak++;
+          advanceMission("smash", 1);
+
+          cameraShake = Math.max(cameraShake, 0.3);
+          const smashEl = document.getElementById("hud-smash");
+          if (smashEl) smashEl.textContent = String(smashedCount);
+
+          if (feverTimer <= 0) {
+            feverGauge = Math.min(100, feverGauge + 11);
+            if (feverGauge >= 100) {
+              feverTimer = 7.5;
+              showHudEvent(tr("feverStartMsg"), "5x GOLD BALLS · ∞ AMMO!");
+              playVoice("speedup", true);
+            } else {
+              showHudEvent(tr("smashMsg"), `+${coinGain} COINS${smashStreak >= 3 ? ` · ${getMultiBallCount()}x STREAK` : ""}`);
+            }
+          } else {
+            showHudEvent("GOLD SMASH!", `+${coinGain} COINS`);
+          }
+          updateBallHUD();
+
+          // During Fever, heavy gold balls punch straight through multiple obstacles!
+          if (feverTimer <= 0) {
+            consumed = true;
+            break;
+          }
+        }
+      }
+
+      // Balls can also crack open Supply Pods from afar to grab Tactical Items!
+      if (!consumed) {
+        for (let pIdx = supplyPods.length - 1; pIdx >= 0; pIdx--) {
+          const pod = supplyPods[pIdx];
+          if (pod.taken || pod.z < zMin || pod.z > zMax) continue;
+          if (Math.hypot(tb.x - pod.x, tb.y - pod.y) < 1.9 + tb.hitRadius * 0.5) {
+            pod.taken = true;
+            pod.mesh.visible = false;
+            const meEnt = players.find((p) => p.id === "me" && p.alive);
+            if (meEnt) {
+              const picked = ATTACK_ITEMS[Math.floor(Math.random() * ATTACK_ITEMS.length)];
+              meEnt.heldItem = picked;
+              spawnBurst3D(pod.x, pod.y, pod.z, 0x38bdf8, 22);
+              AudioEngine.sfxRing(2);
+              updateTacticalButton(meEnt);
+              showCallout(`ITEM: ${getItemName(picked)}`);
+            }
+            consumed = true;
+            break;
+          }
+        }
+      }
+
+      if (consumed || tb.z < -150 || tb.age > 1.8) {
+        scene.remove(tb.mesh);
+        thrownBalls.splice(bIdx, 1);
+      }
+    }
+
     // Update Obstacles with Swept-Z Hit Detection (Zero Tunneling at High Speed!)
     for (let i = obstacles.length - 1; i >= 0; i--) {
       const o = obstacles[i];
@@ -2368,6 +3188,8 @@
 
               if (p.id === "me") {
                 ringCombo = 0;
+                smashStreak = 0;
+                updateBallHUD();
                 AudioEngine.sfxHit();
                 cameraShake = 1.0;
                 updateShieldHUD(p);
@@ -2406,18 +3228,30 @@
       }
     }
 
-    // Update Collectible Energy Rings (Swept-Z + Big Score Combo Multiplier!)
+    // Update Collectible Energy Rings (Swept-Z + Ring Magnet + +4 Balls Replenish!)
+    const magnetMult = 1.0 + (saveData.upShieldMag - 1) * 0.1;
+    const ringHitR = 2.35 * magnetMult;
     for (let i = energyRings.length - 1; i >= 0; i--) {
       const r = energyRings[i];
       r.prevZ = r.z;
       r.z += baseSpeed * dt;
+
+      // Subtle magnetic pull toward player when approaching!
+      if (!r.taken && me && r.z > -26 && r.z < PLAYER_Z + 1.5 && saveData.upShieldMag > 1) {
+        const pull = Math.min(1, dt * (1.2 + saveData.upShieldMag * 0.45));
+        r.x += (me.x - r.x) * pull;
+        r.y += (me.y - r.y) * pull;
+        r.mesh.position.x = r.x;
+        r.mesh.position.y = r.y;
+      }
       r.mesh.position.z = r.z;
       r.innerRing.rotation.z += dt * 3.0;
 
       if (!r.taken && r.prevZ <= PLAYER_Z + 1.4 && r.z >= PLAYER_Z - 1.4) {
         for (const p of players) {
           if (!p.alive) continue;
-          if (Math.hypot(p.x - r.x, p.y - r.y) < 2.35) {
+          const checkR = p.id === "me" ? ringHitR : 2.35;
+          if (Math.hypot(p.x - r.x, p.y - r.y) < checkR) {
             r.taken = true;
             r.mesh.visible = false;
 
@@ -2426,6 +3260,17 @@
               lastRingAt = now;
               p.score += 1;
               ringsCollected++;
+              ballsLeft += 4;
+              smashStreak++;
+              advanceMission("ring", 1);
+              if (feverTimer <= 0) {
+                feverGauge = Math.min(100, feverGauge + 16);
+                if (feverGauge >= 100) {
+                  feverTimer = 7.5;
+                }
+              }
+              updateBallHUD();
+
               boostEnergy = Math.min(100, boostEnergy + 24);
               pulseScoreReadout();
               AudioEngine.sfxRing(ringCombo);
@@ -2434,9 +3279,9 @@
               if (ringsCollected % 5 === 0 && p.shields < p.maxShields) {
                 p.shields++;
                 updateShieldHUD(p);
-                showHudEvent(tr("shieldRepairMsg"), `RING ${ringsCollected}${ringCombo > 1 ? ` (COMBO x${ringCombo})` : ""}`);
+                showHudEvent(tr("shieldRepairMsg"), `RING ${ringsCollected} · +4 BALLS`);
               } else {
-                showHudEvent(tr("ringBonusMsg"), `+1  RING ${ringsCollected}${ringCombo > 1 ? ` (COMBO x${ringCombo})` : ""}`);
+                showHudEvent(tr("ringBonusMsg"), `SCORE ${ringsCollected} · +4 BALLS`);
               }
               if (ringsCollected % 3 === 0) playVoice("good", false);
             } else {
