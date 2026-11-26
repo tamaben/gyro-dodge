@@ -89,12 +89,14 @@
       shareUrlBtn: "URL",
       stageClearTitle: "ステージクリア！",
       gameOverTitle: "フライト終了",
-      ringBonusMsg: "リング通過！",
+      ringBonusMsg: "RING PASS!",
       smashMsg: "SMASH!",
-      feverStartMsg: "FEVER RUSH!",
-      noBallsMsg: "ボール補充中… リング通過で+4！",
-      nearMissMsg: "ニアミス回避！",
-      shieldHitMsg: "シールド被弾！",
+      armorClangMsg: "重装甲！回避せよ！",
+      fatalCrashMsg: "機体大破！",
+      feverStartMsg: "FEVER 2x BALL!",
+      noBallsMsg: "弾切れ！リング通過で+1球",
+      nearMissMsg: "ニアミス！",
+      shieldHitMsg: "激突ダメージ！",
       shieldRepairMsg: "シールド修復！",
       gyroResetToast: "現在の傾きを中央にリセットしました",
       dailyToast: "デイリーボーナス +300 COINS 獲得！",
@@ -168,13 +170,15 @@
       shareXBtn: "POST X",
       shareUrlBtn: "LINK",
       stageClearTitle: "STAGE CLEAR!",
-      gameOverTitle: "RUN COMPLETE",
-      ringBonusMsg: "RING +4 BALLS!",
+      gameOverTitle: "CRASHED",
+      ringBonusMsg: "RING PASS!",
       smashMsg: "SMASH!",
-      feverStartMsg: "FEVER RUSH!",
-      noBallsMsg: "RELOADING... PASS RINGS FOR +4!",
-      nearMissMsg: "NEAR MISS!",
-      shieldHitMsg: "SHIELD HIT!",
+      armorClangMsg: "HEAVY ARMOR! DODGE!",
+      fatalCrashMsg: "AIRCRAFT DESTROYED!",
+      feverStartMsg: "FEVER 2x BALL!",
+      noBallsMsg: "OUT OF BALLS! RING +1",
+      nearMissMsg: "CLOSE CALL!",
+      shieldHitMsg: "HULL IMPACT!",
       shieldRepairMsg: "SHIELD REPAIRED!",
       gyroResetToast: "Current device position set as center",
       dailyToast: "Daily Bonus +300 COINS claimed!",
@@ -228,11 +232,11 @@
   saveData.missionIdx = Math.max(0, Number(saveData.missionIdx) || 0);
   saveData.missionProg = Math.max(0, Number(saveData.missionProg) || 0);
 
-  // v6+: score is the ring count — reset legacy point-based records once.
-  if (saveData.scoreSystem !== "rings") {
+  // v10: distance-matched ring score scale (1,500m ≈ 1,500 score)
+  if (saveData.scoreSystem !== "dist_matched_v10") {
     saveData.bestScore = 0;
     saveData.bestDist = Math.min(saveData.bestDist || 0, 10000);
-    saveData.scoreSystem = "rings";
+    saveData.scoreSystem = "dist_matched_v10";
   }
 
   function persistSave() {
@@ -269,27 +273,27 @@
   const UPGRADE_DEFS = [
     {
       key: "upBallPower",
-      jaName: "鋼球サイズ＆破壊範囲",
-      enName: "Ball Size & Smash Power",
-      jaDesc: (lv) => `破壊半径 +${(lv - 1) * 12}%・破壊コインUP`,
-      enDesc: (lv) => `Smash radius +${(lv - 1) * 12}% & bonus coins`,
-      cost: (lv) => 180 + (lv - 1) * 160
+      jaName: "鋼球サイズ＆破壊コイン",
+      enName: "Ball Size & Coin Bonus",
+      jaDesc: (lv) => `鋼球判定 +${(lv - 1) * 7}%・破壊コインUP`,
+      enDesc: (lv) => `Ball size +${(lv - 1) * 7}% & smash coin bonus`,
+      cost: (lv) => 220 + (lv - 1) * 180
     },
     {
       key: "upBallStock",
-      jaName: "初期ボール数＆高速補充",
-      enName: "Ball Capacity & Reload",
-      jaDesc: (lv) => `開始時 ${15 + (lv - 1) * 3}球・自動補充スピードUP`,
-      enDesc: (lv) => `Start with ${15 + (lv - 1) * 3} balls & faster reload`,
-      cost: (lv) => 200 + (lv - 1) * 170
+      jaName: "所持ボール上限アップ",
+      enName: "Ball Carry Limit",
+      jaDesc: (lv) => `開始 ${4 + Math.floor((lv - 1) * 0.5)}球 / 最大 ${6 + Math.floor(lv * 0.5)}球`,
+      enDesc: (lv) => `Start ${4 + Math.floor((lv - 1) * 0.5)} / Max ${6 + Math.floor(lv * 0.5)} balls`,
+      cost: (lv) => 240 + (lv - 1) * 190
     },
     {
       key: "upShieldMag",
-      jaName: "シールド装甲＆リング吸引",
-      enName: "Armor & Ring Magnet",
-      jaDesc: (lv) => `追加シールド +${Math.floor(lv / 3)}・吸引範囲 +${(lv - 1) * 10}%`,
-      enDesc: (lv) => `+${Math.floor(lv / 3)} Extra Shield & +${(lv - 1) * 10}% Magnet`,
-      cost: (lv) => 240 + (lv - 1) * 190
+      jaName: "機体フレーム強化",
+      enName: "Reinforced Airframe",
+      jaDesc: (lv) => `${lv >= 5 ? "シールド +1" : "Lv.5でシールド+1"}・リング判定 +${(lv - 1) * 4}%`,
+      enDesc: (lv) => `${lv >= 5 ? "+1 Shield" : "+1 Shield at Lv.5"} & +${(lv - 1) * 4}% Ring reach`,
+      cost: (lv) => 280 + (lv - 1) * 210
     }
   ];
 
@@ -309,7 +313,7 @@
     const cycle = Math.floor(idx / 3);
     const kind = idx % 3;
     if (kind === 0) {
-      const goal = 8 + cycle * 4;
+      const goal = 5 + cycle * 3;
       const reward = 250 + cycle * 60;
       return {
         type: "smash",
@@ -330,7 +334,7 @@
         en: `Pass through ${goal} rings`
       };
     }
-    const goal = 2500 + cycle * 1500;
+    const goal = 2000 + cycle * 1200;
     const reward = 300 + cycle * 70;
     return {
       type: "dist",
@@ -364,56 +368,56 @@
   }
 
   // =========================================================================
-  // 3. DIFFICULTY & DISTANCE CONFIGURATION (10,000m MAX / 7,000m / 4,500m / 3,000m) — distance never exceeds goal
+  // 3. HIGH-TENSION DIFFICULTY & DISTANCE CONFIG (10,000m / 7,000m / 4,500m / 3,000m)
   // =========================================================================
   const DIFFICULTIES = [
     {
       id: "EASY",
       goalDist: 10000,
-      speed: 35,
-      maxExtraSpeed: 16,
-      spawnBase: 0.96,
-      minSpawn: 0.56,
-      shields: 5,
-      minObs: 2,
-      maxObs: 3,
-      mult: 0.9
+      speed: 44,
+      maxExtraSpeed: 20,
+      spawnBase: 0.72,
+      minSpawn: 0.43,
+      shields: 2,
+      minObs: 3,
+      maxObs: 4,
+      mult: 0.95
     },
     {
       id: "NORMAL",
       goalDist: 7000,
-      speed: 42,
-      maxExtraSpeed: 21,
-      spawnBase: 0.78,
-      minSpawn: 0.44,
-      shields: 4,
-      minObs: 2,
-      maxObs: 4,
+      speed: 52,
+      maxExtraSpeed: 24,
+      spawnBase: 0.58,
+      minSpawn: 0.35,
+      shields: 2,
+      minObs: 3,
+      maxObs: 5,
       mult: 1.0
     },
     {
       id: "HARD",
       goalDist: 4500,
-      speed: 50,
-      maxExtraSpeed: 25,
-      spawnBase: 0.64,
-      minSpawn: 0.36,
-      shields: 3,
-      minObs: 3,
-      maxObs: 4,
-      mult: 1.5
+      speed: 60,
+      maxExtraSpeed: 28,
+      spawnBase: 0.48,
+      minSpawn: 0.29,
+      shields: 1,
+      minObs: 4,
+      maxObs: 5,
+      mult: 1.25
     },
     {
       id: "EXTREME",
       goalDist: 3000,
-      speed: 58,
-      maxExtraSpeed: 30,
-      spawnBase: 0.52,
-      minSpawn: 0.30,
-      shields: 2,
-      minObs: 3,
-      maxObs: 5,
-      mult: 2.2
+      speed: 68,
+      maxExtraSpeed: 32,
+      spawnBase: 0.40,
+      minSpawn: 0.25,
+      shields: 1,
+      minObs: 4,
+      maxObs: 6,
+      mult: 1.5
     }
   ];
 
@@ -500,6 +504,47 @@
       osc.stop(t + duration);
     },
 
+    noiseBuf: null,
+    getNoiseBuffer() {
+      if (this.noiseBuf) return this.noiseBuf;
+      if (!this.ctx) return null;
+      const len = Math.floor(this.ctx.sampleRate * 1.1);
+      const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      let b0 = 0;
+      for (let i = 0; i < len; i++) {
+        const w = Math.random() * 2 - 1;
+        b0 = 0.65 * b0 + 0.35 * w;
+        data[i] = Math.max(-1, Math.min(1, b0 * 1.45));
+      }
+      this.noiseBuf = buf;
+      return buf;
+    },
+
+    playNoise(duration, filterType, freqStart, freqEnd, q = 1.0, vol = 0.25) {
+      if (!saveData.soundOn) return;
+      this.ensure();
+      if (!this.ctx) return;
+      const buf = this.getNoiseBuffer();
+      if (!buf) return;
+      const t = this.ctx.currentTime;
+      const src = this.ctx.createBufferSource();
+      src.buffer = buf;
+      const flt = this.ctx.createBiquadFilter();
+      flt.type = filterType;
+      flt.Q.value = q;
+      flt.frequency.setValueAtTime(freqStart, t);
+      flt.frequency.exponentialRampToValueAtTime(Math.max(25, freqEnd), t + duration);
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(vol, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+      src.connect(flt);
+      flt.connect(gain);
+      gain.connect(this.ctx.destination);
+      src.start(t);
+      src.stop(t + duration);
+    },
+
     sfxRing(combo = 1) {
       const pitchBoost = Math.min(1.5, 1 + (combo - 1) * 0.1);
       this.playTone(587.3 * pitchBoost, 1174.6 * pitchBoost, 0.18, "triangle", 0.14);
@@ -508,10 +553,37 @@
 
     sfxNearMiss() {
       this.playTone(420, 145, 0.2, "sawtooth", 0.08);
+      this.playNoise(0.16, "bandpass", 900, 320, 1.8, 0.09);
     },
 
-    sfxHit() {
-      this.playTone(150, 38, 0.35, "sawtooth", 0.22);
+    // Realistic Multi-Layer Airframe Collision & Fatal Explosion Sound!
+    sfxHit(fatal = false) {
+      if (!saveData.soundOn) return;
+      this.ensure();
+      if (!this.ctx) return;
+      // 1) Heavy structural metal crumple + low concussive thud
+      this.playNoise(0.32, "lowpass", 520, 65, 0.9, fatal ? 0.42 : 0.32);
+      this.playNoise(0.22, "bandpass", 1450, 340, 2.2, 0.26);
+      // 2) Canopy glass / carbon panel fracture crackle
+      this.playNoise(0.16, "highpass", 2800, 1200, 1.4, 0.18);
+      this.playTone(155, 32, 0.34, "triangle", 0.28);
+      this.playTone(490, 118, 0.15, "sawtooth", 0.14);
+
+      if (fatal) {
+        // 3) Catastrophic turbine spin-down + secondary fireball detonation!
+        this.playTone(760, 72, 0.85, "sawtooth", 0.13);
+        setTimeout(() => {
+          this.playNoise(0.75, "lowpass", 440, 38, 0.8, 0.44);
+          this.playNoise(0.35, "bandpass", 1100, 220, 1.5, 0.24);
+          this.playTone(115, 24, 0.65, "sine", 0.32);
+        }, 420);
+      }
+    },
+
+    sfxArmorClang() {
+      this.playTone(1680, 1420, 0.14, "triangle", 0.14);
+      this.playTone(2540, 1980, 0.10, "sine", 0.09);
+      this.playNoise(0.08, "bandpass", 2400, 900, 3.0, 0.14);
     },
 
     sfxEmp() {
@@ -786,6 +858,12 @@
   let nextZoneDist = 0;
   const ENDLESS_ZONE_M = 1800;
 
+  // 1,500m Checkpoint Average-Ring Bonus State
+  const BONUS_INTERVAL_M = 1500;
+  let nextBonusDist = BONUS_INTERVAL_M;
+  let bonusCheckpoints = 0;
+  let totalMilestoneBonus = 0;
+
   let players = [];
   let obstacles = [];
   let energyRings = [];
@@ -883,11 +961,17 @@
   const unprojVec = new THREE.Vector3();
   const rayDirVec = new THREE.Vector3();
 
+  const ARMORED_OBSTACLES = new Set([
+    "BARRIER", "SHUTTER", "MONOLITH", "TORII_GATE", "STEAM_GEAR", "RING_TRAP"
+  ]);
+  let crashOutroTimer = 0;
+
+  function getMaxBallCap() {
+    return 6 + Math.floor((saveData.upBallStock || 1) * 0.5);
+  }
+
   function getMultiBallCount() {
-    if (feverTimer > 0) return 5;
-    if (smashStreak >= 6) return 3;
-    if (smashStreak >= 3) return 2;
-    return 1;
+    return feverTimer > 0 ? 2 : 1;
   }
 
   function updateBallHUD() {
@@ -895,20 +979,13 @@
     const badgeEl = document.getElementById("hud-multiball-badge");
     const throwBtn = document.getElementById("btn-throw-ball");
     if (cntEl) cntEl.textContent = feverTimer > 0 ? "∞" : `×${ballsLeft}`;
-    const multi = getMultiBallCount();
     if (badgeEl) {
       badgeEl.classList.remove("tier-2", "tier-3", "fever");
       if (feverTimer > 0) {
-        badgeEl.textContent = "FEVER 5x";
+        badgeEl.textContent = "FEVER 2x";
         badgeEl.classList.add("fever");
-      } else if (multi === 3) {
-        badgeEl.textContent = "3x BALL";
-        badgeEl.classList.add("tier-3");
-      } else if (multi === 2) {
-        badgeEl.textContent = "2x BALL";
-        badgeEl.classList.add("tier-2");
       } else {
-        badgeEl.textContent = "1x BALL";
+        badgeEl.textContent = `${ballsLeft}/${getMaxBallCap()}`;
       }
     }
     if (throwBtn) throwBtn.classList.toggle("fever-btn", feverTimer > 0);
@@ -916,7 +993,9 @@
 
   function throwGyroBalls(screenX = null, screenY = null) {
     const now = performance.now();
-    if (now - lastThrowTime < 95) return;
+    const minCd = isPlaying ? (feverTimer > 0 ? 220 : 380) : 120;
+    if (now - lastThrowTime < minCd) return;
+    if (crashOutroTimer > 0) return;
     lastThrowTime = now;
 
     // Home Screen Interactive Demo Throw!
@@ -960,7 +1039,7 @@
       return;
     }
 
-    const me = players.find((p) => p.id === "me" && p.alive);
+    const me = players.find((p) => p.id === "me" && p.alive && !p.crashing);
     if (!me) return;
 
     if (feverTimer <= 0 && ballsLeft <= 0) {
@@ -1000,8 +1079,8 @@
       }
     }
 
-    const scaleMult = (1.0 + (saveData.upBallPower - 1) * 0.065) * (feverTimer > 0 ? 1.16 : 1.0);
-    const hitRadius = (0.92 + (saveData.upBallPower - 1) * 0.11) * (feverTimer > 0 ? 1.25 : 1.0);
+    const scaleMult = 1.0 + (saveData.upBallPower - 1) * 0.05;
+    const hitRadius = 0.76 + (saveData.upBallPower - 1) * 0.055;
     const startX = me.x;
     const startY = me.y + 0.15;
     const startZ = PLAYER_Z - 1.1;
@@ -1048,7 +1127,7 @@
     scene.add(craft.root);
 
     const diff = DIFFICULTIES[saveData.diffIdx];
-    const bonusShields = slotIdx === 0 ? Math.floor((saveData.upShieldMag || 1) / 3) : 0;
+    const bonusShields = (slotIdx === 0 && (saveData.upShieldMag || 1) >= 5) ? 1 : 0;
     const totalShields = diff.shields + bonusShields;
     return {
       id, name, slotIdx, isBot, conn, craft,
@@ -1056,6 +1135,8 @@
       vx: 0, vy: 0,
       ix: 0, iy: 0,
       anchorX: sx, anchorY: sy, campTime: 0,
+      hitRoll: 0, hitRollVel: 0, hitPitch: 0,
+      crashing: false, crashAge: 0, crashFireTick: 0, crashExploded2: false,
       boost: false,
       alive: true,
       shields: totalShields,
@@ -1153,7 +1234,7 @@
       safeY = curY > 0.6 ? -1.4 : 2.6;
     }
 
-    const SAFE_MARGIN = 2.35; // Guarantees generous 4.7-unit wide passable opening!
+    const SAFE_MARGIN = 1.92; // Tight, thrilling passable corridor — demands sharp steering!
 
     function tryPlaceSingleObstacle(type, ox, oy, allowMotion = true) {
       const built = createObstacle(type, ch);
@@ -1192,6 +1273,7 @@
       obstacles.push({
         ...built,
         type,
+        armored: ARMORED_OBSTACLES.has(type),
         baseX: ox,
         x: ox,
         y: oy,
@@ -1264,20 +1346,23 @@
       }
     }
 
-    // Step 4: Spawn High-Value Score Ring inside the Guaranteed Safe Escape Gate!
-    if (waveCounter % 2 === 1 || Math.random() < 0.65) {
-      const ringObj = createEnergyRing(saveData.environment === "indoor" ? ch.railHex : 0xfbbf24);
-      ringObj.mesh.position.set(safeX, safeY, zSpawn);
-      scene.add(ringObj.mesh);
-      energyRings.push({
-        ...ringObj,
-        x: safeX,
-        y: safeY,
-        z: zSpawn,
-        prevZ: zSpawn,
-        taken: false
-      });
-    }
+    // Step 4: Spawn 1 Risk-Reward Score Ring nudged toward obstacle edge (close-call thrill!)
+    const nudgeX = (lockX - safeX) * 0.22;
+    const nudgeY = (lockY - safeY) * 0.22;
+    const ringX = Math.max(-BOUND_X + 0.8, Math.min(BOUND_X - 0.8, safeX + nudgeX));
+    const ringY = Math.max(BOUND_Y_MIN + 0.7, Math.min(BOUND_Y_MAX - 0.7, safeY + nudgeY));
+    const ringObj = createEnergyRing(saveData.environment === "indoor" ? ch.railHex : 0xfbbf24);
+    ringObj.mesh.scale.setScalar(1.05);
+    ringObj.mesh.position.set(ringX, ringY, zSpawn);
+    scene.add(ringObj.mesh);
+    energyRings.push({
+      ...ringObj,
+      x: ringX,
+      y: ringY,
+      z: zSpawn,
+      prevZ: zSpawn,
+      taken: false
+    });
   }
 
   function spawnWorldSupplyPod() {
@@ -1441,14 +1526,18 @@
     obsSpawnTimer = 0.55;
     podSpawnTimer = 3.2;
 
-    // Reset Gyro-Ball Ammo & Fever Rush state
-    ballsLeft = 15 + (saveData.upBallStock - 1) * 3;
+    // Reset Gyro-Ball Ammo, Crash Sequence, 1,500m Bonus & Fever Rush state
+    ballsLeft = 4 + Math.floor(((saveData.upBallStock || 1) - 1) * 0.5);
     ballReloadTimer = 0;
     smashedCount = 0;
     sessionSmashCoins = 0;
     smashStreak = 0;
     feverGauge = 0;
     feverTimer = 0;
+    crashOutroTimer = 0;
+    nextBonusDist = BONUS_INTERVAL_M;
+    bonusCheckpoints = 0;
+    totalMilestoneBonus = 0;
 
     if (rawBeta !== 0 || rawGamma !== 0) {
       zeroBeta = rawBeta;
@@ -1467,6 +1556,8 @@
     if (smashEl) smashEl.textContent = "0";
     const feverEl = document.getElementById("hud-fever-fill");
     if (feverEl) feverEl.style.width = "0%";
+    const retEl = document.getElementById("aim-reticle");
+    if (retEl) retEl.classList.remove("hidden");
 
     const ch = CHAPTERS[saveData.chapterIdx] || CHAPTERS[0];
     const diff = DIFFICULTIES[saveData.diffIdx];
@@ -1497,6 +1588,7 @@
     isPlaying = false;
     isBoosting = false;
     feverTimer = 0;
+    crashOutroTimer = 0;
     document.body.classList.remove("in-flight");
     syncExternalAdProtection();
     AudioEngine.updateEngine(false, false, 0);
@@ -1507,19 +1599,19 @@
     const me = players.find((p) => p.id === "me") || players[0];
     const finalScore = Math.floor(me ? me.score : score);
     const finalDist = Math.floor(me ? me.distance : distance);
-    const earnedCredits = Math.max(35, finalScore * 60 + sessionSmashCoins + (victory ? 500 : 0));
+    const earnedCredits = Math.max(35, Math.floor(finalScore * 0.08) + ringsCollected * 12 + sessionSmashCoins + (victory ? 450 : 0));
 
     advanceMission("dist", finalDist);
     saveData.credits += earnedCredits;
-    saveData.xp += Math.floor(finalDist * 0.08) + ringsCollected * 22 + smashedCount * 14;
+    saveData.xp += Math.floor(finalDist * 0.06) + Math.floor(finalScore * 0.07) + smashedCount * 15;
     if (finalScore > saveData.bestScore) saveData.bestScore = finalScore;
     if (finalDist > saveData.bestDist) saveData.bestDist = finalDist;
     persistSave();
     syncAllUI();
 
     const rk = getRankInfo(saveData.xp);
-    document.getElementById("res-kicker").textContent = victory ? "STAGE CLEAR" : "RUN COMPLETE";
-    document.getElementById("res-kicker").style.color = victory ? "#10b981" : "#f97316";
+    document.getElementById("res-kicker").textContent = victory ? "STAGE CLEAR" : "CRASHED";
+    document.getElementById("res-kicker").style.color = victory ? "#10b981" : "#ef4444";
     document.getElementById("res-title").textContent = victory ? tr("stageClearTitle") : tr("gameOverTitle");
     document.getElementById("res-score").textContent = finalScore.toLocaleString();
     const resSmashEl = document.getElementById("res-smash");
@@ -1539,8 +1631,8 @@
     document.getElementById("res-bonus").textContent = mReady
       ? (saveData.lang === "en" ? `🎯 Mission Complete! Tap Home banner for +${curM.reward} Coins!` : `🎯 ミッション達成！ホーム上部で +${curM.reward} COINS 受取可能！`)
       : (saveData.lang === "en"
-          ? `Smashed: ${smashedCount}  |  Rings: ${ringsCollected}  |  Near Miss: ${nearMisses}`
-          : `粉砕: ${smashedCount}個  /  リング: ${ringsCollected}個  /  ニアミス: ${nearMisses}回`);
+          ? `Rings: ${ringsCollected}  |  1,500m Bonus: +${totalMilestoneBonus}  |  Smashed: ${smashedCount}`
+          : `リング: ${ringsCollected}回  /  1500mボーナス: +${totalMilestoneBonus}  /  粉砕: ${smashedCount}個`);
 
     const rankBox = document.getElementById("res-ranking");
     if (players.length > 1) {
@@ -1549,7 +1641,7 @@
       rankBox.innerHTML = sorted.map((p, idx) => `
         <div class="setting-row" style="padding:7px 12px;">
           <span style="font-weight:900; font-size:13px;">#${idx + 1} ${p.name}</span>
-          <span style="font-weight:800; font-size:13px; color:#b45309;">${Math.floor(p.score).toLocaleString()} RINGS (${Math.floor(p.distance).toLocaleString()}m)</span>
+          <span style="font-weight:800; font-size:13px; color:#b45309;">${Math.floor(p.score).toLocaleString()} (${Math.floor(p.distance).toLocaleString()}m)</span>
         </div>
       `).join("");
     } else {
@@ -1568,6 +1660,7 @@
     isPlaying = false;
     isBoosting = false;
     feverTimer = 0;
+    crashOutroTimer = 0;
     document.body.classList.remove("in-flight");
     syncExternalAdProtection();
     AudioEngine.updateEngine(false, false, 0);
@@ -1588,7 +1681,7 @@
   // 9. DYNAMIC EXTERNAL AD OVERLAY GUARD (DETECTS NESTED FIXED OVERLAYS TOO!)
   // =========================================================================
   const OWN_FIXED_IDS = new Set([
-    "game-canvas", "screen-fx", "voice-banner-container", "blind-overlay",
+    "game-canvas", "screen-fx", "voice-banner-container", "blind-overlay", "aim-reticle",
     "body-preview-wrap", "home-shell", "flight-hud", "side-rail-left", "side-rail-right",
     "modal-hangar", "modal-stages", "modal-multi", "modal-settings", "modal-result"
   ]);
@@ -1963,7 +2056,7 @@
     document.getElementById("ui-rank-title").textContent = rk.title;
     document.getElementById("ui-coins-inline").textContent = saveData.credits.toLocaleString();
     document.getElementById("ui-best-inline").textContent =
-      `BEST ${saveData.bestScore.toLocaleString()} RINGS`;
+      `BEST SCORE ${saveData.bestScore.toLocaleString()}`;
     document.getElementById("ui-hangar-credits").textContent =
       `COINS: ${saveData.credits.toLocaleString()}  |  LV.${rk.lvl} ${rk.title}`;
 
@@ -2621,8 +2714,8 @@
     const sm = document.getElementById("res-smash").textContent;
     const d = document.getElementById("res-dist").textContent;
     const text = saveData.lang === "en"
-      ? `Passed ${s} rings & smashed ${sm} obstacles (${d}) in GYRO SMASH 3D! #GYROSMASH`
-      : `GYRO SMASH 3D で リング${s}個・障害物${sm}個粉砕（${d}）を達成！ #GYROSMASH`;
+      ? `Scored ${s} & smashed ${sm} obstacles (${d}) in GYRO SMASH 3D! #GYROSMASH`
+      : `GYRO SMASH 3D で スコア ${s}・障害物${sm}個粉砕（${d}）を達成！ #GYROSMASH`;
     const url = location.href.split("?")[0];
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, "_blank", "noopener");
   });
@@ -2633,7 +2726,7 @@
     const url = location.href.split("?")[0];
     const shareData = {
       title: "GYRO SMASH FLIGHT 3D",
-      text: saveData.lang === "en" ? `Play GYRO SMASH 3D! Score: ${s} rings` : `GYRO SMASH 3D でリング${s}個通過！`,
+      text: saveData.lang === "en" ? `Play GYRO SMASH 3D! Score: ${s}` : `GYRO SMASH 3D でスコア ${s} 達成！`,
       url
     };
     if (navigator.share) {
@@ -2843,12 +2936,10 @@
     // =======================================================================
     if (gameMode === "BODY") pollBodyCamera();
 
-    // Auto-reload Gyro-Balls & update Fever Mode timer
-    const baseCap = 15 + (saveData.upBallStock - 1) * 3;
-    const reloadSec = Math.max(0.72, 1.6 - (saveData.upBallStock - 1) * 0.09);
-    if (ballsLeft < baseCap) {
+    // Slow emergency ball reload only when below 3 balls (balls are precious!)
+    if (ballsLeft < 3 && crashOutroTimer <= 0) {
       ballReloadTimer += dt;
-      if (ballReloadTimer >= reloadSec) {
+      if (ballReloadTimer >= 3.2) {
         ballReloadTimer = 0;
         ballsLeft++;
         updateBallHUD();
@@ -2859,7 +2950,7 @@
 
     if (feverTimer > 0) {
       feverTimer = Math.max(0, feverTimer - dt);
-      feverGauge = (feverTimer / 7.5) * 100;
+      feverGauge = (feverTimer / 3.8) * 100;
       if (feverTimer <= 0) {
         feverGauge = 0;
         updateBallHUD();
@@ -2959,9 +3050,47 @@
         p.campTime += dt;
       }
 
+      if (p.crashing) {
+        // Fatal 3D Crash Animation: Spiraling out-of-control dive trailing fire & debris!
+        p.crashAge += dt;
+        p.crashFireTick += dt;
+        p.vy -= 14.5 * dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.craft.root.position.set(p.x, p.y, PLAYER_Z - p.crashAge * 3.5);
+        p.craft.root.rotation.z += p.hitRollVel * dt;
+        p.craft.root.rotation.x -= dt * 2.4;
+        p.craft.root.rotation.y += dt * 1.8;
+
+        if (p.crashFireTick >= 0.08 && p.crashAge < 0.72) {
+          p.crashFireTick = 0;
+          spawnBurst3D(
+            p.x + (Math.random() - 0.5) * 0.7,
+            p.y + (Math.random() - 0.5) * 0.5,
+            PLAYER_Z - p.crashAge * 3.5,
+            Math.random() < 0.5 ? 0xf97316 : 0xfef08a,
+            12
+          );
+        }
+        if (!p.crashExploded2 && p.crashAge >= 0.52) {
+          p.crashExploded2 = true;
+          p.craft.root.visible = false;
+          spawnObstacleShatter({ type: "DRONE" }, p.x, p.y, PLAYER_Z - p.crashAge * 3.5);
+          spawnBurst3D(p.x, p.y, PLAYER_Z - p.crashAge * 3.5, 0xef4444, 38);
+          cameraShake = 1.5;
+        }
+        return;
+      }
+
+      // Decay non-fatal collision shudder & roll impulse smoothly
+      p.hitRoll += p.hitRollVel * dt;
+      p.hitRollVel *= Math.pow(0.015, dt);
+      p.hitRoll *= Math.pow(0.04, dt);
+      p.hitPitch *= Math.pow(0.05, dt);
+
       p.craft.root.position.set(p.x, p.y, PLAYER_Z);
-      p.craft.root.rotation.z = -p.vx * 0.05;
-      p.craft.root.rotation.x = p.vy * 0.035;
+      p.craft.root.rotation.z = -p.vx * 0.05 + p.hitRoll;
+      p.craft.root.rotation.x = p.vy * 0.035 + p.hitPitch;
       p.craft.root.rotation.y = -p.vx * 0.018;
 
       p.craft.root.visible = now < p.invulnUntil ? (Math.floor(now / 65) % 2 === 0) : true;
@@ -3023,6 +3152,32 @@
       showHudEvent(`SPEED UP LV.${speedTierAnnounced}`, "");
       playVoice("speedup", true);
     }
+    // Every 1,500m Checkpoint: Award Bonus Score based on Average Rings per 1,500m!
+    while (isPlaying && distance >= nextBonusDist) {
+      bonusCheckpoints++;
+      const milestoneM = nextBonusDist;
+      nextBonusDist += BONUS_INTERVAL_M;
+
+      const avgRings = ringsCollected / bonusCheckpoints;
+      const avgDisp = Number.isInteger(avgRings) ? String(avgRings) : avgRings.toFixed(1);
+      // Distance-matched 1,500m bonus = Average Rings per 1,500m × 25 (e.g. avg 9 rings -> +225 SCORE)
+      const bonusScore = Math.max(75, Math.round(avgRings * 25));
+      totalMilestoneBonus += bonusScore;
+
+      if (me) {
+        me.score += bonusScore;
+        score = me.score;
+      }
+      pulseScoreReadout();
+      AudioEngine.sfxRing(5);
+      if (me) spawnBurst3D(me.x, me.y, PLAYER_Z - 1.5, 0xfde047, 28);
+      showHudEvent(
+        saveData.lang === "en" ? `${milestoneM.toLocaleString()}m BONUS!` : `${milestoneM.toLocaleString()}m ボーナス！`,
+        saveData.lang === "en" ? `AVG ${avgDisp} RINGS → +${bonusScore} SCORE` : `平均リング ${avgDisp}回 → SCORE +${bonusScore}`
+      );
+      playVoice("good", false);
+    }
+
     if (endless && isPlaying && distance >= nextZoneDist) {
       // Zone shift: new random world + difficulty, player is never told which
       nextZoneDist += ENDLESS_ZONE_M;
@@ -3084,9 +3239,22 @@
         const testX = prevX + (tb.x - prevX) * frac;
         const testY = prevY + (tb.y - prevY) * frac;
 
+        if (tb.ricocheted) continue;
         const clr = getSignedClearance(o, testX, testY, o.x, o.y, o.angleZ);
         if (clr <= tb.hitRadius) {
-          // SHATTER OBSTACLE INTO 3D TUMBLING FRAGMENTS!
+          // Heavy Armored Structural Obstacles deflect balls with sparks & clang!
+          if (o.armored && feverTimer <= 0) {
+            tb.ricocheted = true;
+            tb.vz = 42;
+            tb.vx = (testX >= o.x ? 1 : -1) * (14 + Math.random() * 10);
+            tb.vy = 10 + Math.random() * 8;
+            spawnBurst3D(testX, testY, o.z + 1.0, 0xfef08a, 16);
+            AudioEngine.sfxArmorClang();
+            showHudEvent(tr("armorClangMsg"), "");
+            break;
+          }
+
+          // SHATTER BREAKABLE OBSTACLE INTO 3D TUMBLING FRAGMENTS!
           spawnObstacleShatter(o, o.x, o.y, o.z);
           scene.remove(o.mesh);
           obstacles.splice(oIdx, 1);
@@ -3094,33 +3262,36 @@
           smashedCount++;
           saveData.totalSmashed = (saveData.totalSmashed || 0) + 1;
           const coinGain = 10 + (saveData.upBallPower - 1) * 3;
+          const smashScoreGain = Math.round((feverTimer > 0 ? 65 : 45) * diff.mult);
           sessionSmashCoins += coinGain;
           smashStreak++;
           advanceMission("smash", 1);
 
-          cameraShake = Math.max(cameraShake, 0.3);
+          if (me) {
+            me.score += smashScoreGain;
+            score = me.score;
+          }
+          pulseScoreReadout();
+
+          cameraShake = Math.max(cameraShake, 0.32);
           const smashEl = document.getElementById("hud-smash");
           if (smashEl) smashEl.textContent = String(smashedCount);
 
           if (feverTimer <= 0) {
-            feverGauge = Math.min(100, feverGauge + 11);
+            feverGauge = Math.min(100, feverGauge + 7);
             if (feverGauge >= 100) {
-              feverTimer = 7.5;
-              showHudEvent(tr("feverStartMsg"), "5x GOLD BALLS · ∞ AMMO!");
+              feverTimer = 3.8;
+              showHudEvent(tr("feverStartMsg"), "ARMOR PIERCE · 2x BALL!");
               playVoice("speedup", true);
             } else {
-              showHudEvent(tr("smashMsg"), `+${coinGain} COINS${smashStreak >= 3 ? ` · ${getMultiBallCount()}x STREAK` : ""}`);
+              showHudEvent(tr("smashMsg"), `+${smashScoreGain} SCORE`);
             }
           } else {
-            showHudEvent("GOLD SMASH!", `+${coinGain} COINS`);
+            showHudEvent("GOLD SMASH!", `+${smashScoreGain} SCORE`);
           }
           updateBallHUD();
-
-          // During Fever, heavy gold balls punch straight through multiple obstacles!
-          if (feverTimer <= 0) {
-            consumed = true;
-            break;
-          }
+          consumed = true;
+          break;
         }
       }
 
@@ -3177,35 +3348,58 @@
       // Swept Z-window across PLAYER_Z
       if (o.prevZ <= PLAYER_Z + 1.15 && o.z >= PLAYER_Z - 1.15) {
         players.forEach((p) => {
-          if (!p.alive) return;
+          if (!p.alive || p.crashing) return;
           const clearance = getSignedClearance(o, p.x, p.y, o.x, o.y, o.angleZ);
 
           if (clearance < 0) {
             if (now >= p.invulnUntil) {
               p.shields -= 1;
-              p.invulnUntil = now + 1300;
-              spawnBurst3D(p.x, p.y, PLAYER_Z, 0xef4444, 26);
+              p.invulnUntil = now + 780;
+              const isFatal = p.shields <= 0;
+
+              // Physical knockback & violent airframe roll/pitch jolt!
+              const pushX = (p.x - o.x) >= 0 ? 1 : -1;
+              p.vx = pushX * 13.5;
+              p.vy = 5.5;
+              p.hitRollVel = -pushX * (isFatal ? 16.5 : 12.5);
+              p.hitPitch = -0.38;
+
+              // Blast 3D sheared metal/obstacle fragments & sparks at the impact point!
+              spawnObstacleShatter(o, p.x, p.y, PLAYER_Z - 0.3);
+              spawnBurst3D(p.x, p.y, PLAYER_Z, 0xef4444, isFatal ? 44 : 28);
+              smashFlashLight.color.setHex(0xffedd5);
+              smashFlashLight.position.set(p.x, p.y, PLAYER_Z + 1.8);
+              smashFlashLight.intensity = isFatal ? 5.2 : 3.8;
 
               if (p.id === "me") {
                 ringCombo = 0;
                 smashStreak = 0;
                 updateBallHUD();
-                AudioEngine.sfxHit();
-                cameraShake = 1.0;
+                AudioEngine.sfxHit(isFatal);
+                cameraShake = isFatal ? 1.85 : 1.35;
                 updateShieldHUD(p);
                 const fx = document.getElementById("screen-fx");
                 fx.classList.add("damage-flash");
-                setTimeout(() => fx.classList.remove("damage-flash"), 250);
-                if (p.shields > 0) {
+                setTimeout(() => fx.classList.remove("damage-flash"), isFatal ? 650 : 280);
+                if (!isFatal) {
                   showHudEvent(tr("shieldHitMsg"), `SHIELD ${p.shields}/${p.maxShields}`);
                   playVoice("abuna", true);
+                } else {
+                  showHudEvent(tr("fatalCrashMsg"), "");
+                  const retEl = document.getElementById("aim-reticle");
+                  if (retEl) retEl.classList.add("hidden");
                 }
               }
 
-              if (p.shields <= 0) {
-                p.alive = false;
-                p.craft.root.visible = false;
-                spawnBurst3D(p.x, p.y, PLAYER_Z, 0xf97316, 42);
+              if (isFatal) {
+                if (p.id === "me" && (gameMode === "SOLO" || gameMode === "BODY")) {
+                  p.crashing = true;
+                  p.crashAge = 0;
+                  crashOutroTimer = 1.18;
+                } else {
+                  p.alive = false;
+                  p.craft.root.visible = false;
+                }
               }
             }
           } else if (clearance < 1.5 && !o.passed.has(p.id)) {
@@ -3228,64 +3422,51 @@
       }
     }
 
-    // Update Collectible Energy Rings (Swept-Z + Ring Magnet + +4 Balls Replenish!)
-    const magnetMult = 1.0 + (saveData.upShieldMag - 1) * 0.1;
-    const ringHitR = 2.35 * magnetMult;
+    // Update Collectible Energy Rings (Risk-Reward Placement + Distance-Matched Score + +1 Ball!)
+    const ringReachMult = 1.0 + (saveData.upShieldMag - 1) * 0.04;
+    const ringHitR = 2.28 * ringReachMult;
     for (let i = energyRings.length - 1; i >= 0; i--) {
       const r = energyRings[i];
       r.prevZ = r.z;
       r.z += baseSpeed * dt;
-
-      // Subtle magnetic pull toward player when approaching!
-      if (!r.taken && me && r.z > -26 && r.z < PLAYER_Z + 1.5 && saveData.upShieldMag > 1) {
-        const pull = Math.min(1, dt * (1.2 + saveData.upShieldMag * 0.45));
-        r.x += (me.x - r.x) * pull;
-        r.y += (me.y - r.y) * pull;
-        r.mesh.position.x = r.x;
-        r.mesh.position.y = r.y;
-      }
       r.mesh.position.z = r.z;
-      r.innerRing.rotation.z += dt * 3.0;
+      r.innerRing.rotation.z += dt * 3.2;
 
-      if (!r.taken && r.prevZ <= PLAYER_Z + 1.4 && r.z >= PLAYER_Z - 1.4) {
+      if (!r.taken && r.prevZ <= PLAYER_Z + 1.45 && r.z >= PLAYER_Z - 1.45) {
         for (const p of players) {
-          if (!p.alive) continue;
-          const checkR = p.id === "me" ? ringHitR : 2.35;
+          if (!p.alive || p.crashing) continue;
+          const checkR = p.id === "me" ? ringHitR : 2.3;
           if (Math.hypot(p.x - r.x, p.y - r.y) < checkR) {
             r.taken = true;
             r.mesh.visible = false;
 
             if (p.id === "me") {
-              ringCombo = (now - lastRingAt < 5500) ? Math.min(5, ringCombo + 1) : 1;
+              ringCombo = (now - lastRingAt < 5000) ? Math.min(4, ringCombo + 1) : 1;
               lastRingAt = now;
-              p.score += 1;
+              const baseRingPts = 105 + (ringCombo - 1) * 18;
+              const ringScoreGain = Math.round(baseRingPts * diff.mult);
+              p.score += ringScoreGain;
+              score = p.score;
               ringsCollected++;
-              ballsLeft += 4;
+              ballsLeft = Math.min(getMaxBallCap(), ballsLeft + 1);
               smashStreak++;
               advanceMission("ring", 1);
               if (feverTimer <= 0) {
-                feverGauge = Math.min(100, feverGauge + 16);
+                feverGauge = Math.min(100, feverGauge + 9);
                 if (feverGauge >= 100) {
-                  feverTimer = 7.5;
+                  feverTimer = 3.8;
                 }
               }
               updateBallHUD();
 
-              boostEnergy = Math.min(100, boostEnergy + 24);
+              boostEnergy = Math.min(100, boostEnergy + 20);
               pulseScoreReadout();
               AudioEngine.sfxRing(ringCombo);
               spawnBurst3D(r.x, r.y, PLAYER_Z, 0xfbbf24, 22);
-
-              if (ringsCollected % 5 === 0 && p.shields < p.maxShields) {
-                p.shields++;
-                updateShieldHUD(p);
-                showHudEvent(tr("shieldRepairMsg"), `RING ${ringsCollected} · +4 BALLS`);
-              } else {
-                showHudEvent(tr("ringBonusMsg"), `SCORE ${ringsCollected} · +4 BALLS`);
-              }
-              if (ringsCollected % 3 === 0) playVoice("good", false);
+              showHudEvent(tr("ringBonusMsg"), `+${ringScoreGain} SCORE · +1 BALL`);
+              if (ringsCollected % 4 === 0) playVoice("good", false);
             } else {
-              p.score += 1;
+              p.score += 110;
             }
             break;
           }
@@ -3355,13 +3536,20 @@
     const kmh = Math.round(baseSpeed * 28);
     document.getElementById("hud-speed-kmh").textContent = `${kmh.toLocaleString()} km/h`;
 
-    if (clearedStage) {
+    if (crashOutroTimer > 0) {
+      crashOutroTimer -= dt;
+      if (crashOutroTimer <= 0) {
+        const myEntity = players.find((p) => p.id === "me");
+        if (myEntity) myEntity.alive = false;
+        finishFlightSession(false);
+      }
+    } else if (clearedStage) {
       // Goal distance reached: flight ends here so distance never exceeds the goal.
       const myEntity = players.find((p) => p.id === "me");
-      finishFlightSession(!myEntity || myEntity.alive);
+      finishFlightSession(!myEntity || (myEntity.alive && !myEntity.crashing));
     } else if (gameMode === "SOLO" || gameMode === "BODY") {
       const myEntity = players.find((p) => p.id === "me");
-      if (myEntity && !myEntity.alive) finishFlightSession(clearedStage);
+      if (myEntity && !myEntity.alive && !myEntity.crashing) finishFlightSession(clearedStage);
     } else {
       if (players.length > 1 && aliveList.length <= 1) {
         const myEntity = players.find((p) => p.id === "me");

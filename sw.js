@@ -1,11 +1,11 @@
-const CACHE_NAME = "gyro-dodge-3d-aero-v8";
+const CACHE_NAME = "gyro-dodge-3d-aero-v10";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./style.css?v=8",
-  "./voices.js?v=8",
-  "./models3d.js?v=8",
-  "./game.js?v=8",
+  "./style.css?v=10",
+  "./voices.js?v=10",
+  "./models3d.js?v=10",
+  "./game.js?v=10",
   "./manifest.webmanifest",
   "./logo.svg",
   "./icons/icon-192.png",

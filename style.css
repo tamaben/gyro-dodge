@@ -2054,7 +2054,9 @@ input {
 }
 
 body.in-flight #home-ad-slot,
-body.in-flight .wide-side-rail {
+body.in-flight .wide-side-rail,
+body.in-flight ins.adsbygoogle,
+body.in-flight .google-auto-placed {
   display: none !important;
 }
 
